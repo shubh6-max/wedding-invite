@@ -1,34 +1,36 @@
 # Wedding Invite
 
-A custom wedding invitation web app built with React and Vite.
+This project is a custom digital wedding invitation built for Sakshi and Chinmay.
+It is designed to feel warm, interactive, and a little dramatic, more like opening a real invitation than visiting a plain landing page.
 
-## Highlights
+The experience includes:
 
-- Wax-seal opening animation for the invite entry
-- Couple introduction section with custom imagery and profile copy
-- Live countdown to the wedding date
-- Team Bride / Team Groom interaction with celebratory feedback
-- Wedding planner timeline cards with animated scroll reveals
-- Clickable Google Maps venue links for each ceremony event
+- a wax-seal entry animation
+- a countdown to the big day
+- team selection for `Team Bride` and `Team Groom`
+- a couple introduction section
+- a wedding planner timeline with animated event cards
+- venue links that open directly in Google Maps
 
-## Tech Stack
+## Built With
 
 - React 19
 - Vite 8
-- Plain CSS for custom styling and motion
+- CSS for all layout, styling, and animations
 
 ## Project Structure
 
 ```text
 src/
-  App.jsx        Main invite experience
-  App.css        Full visual styling and animations
-  main.jsx       React entry point
+  App.jsx     Main content, invite data, sections, and interactions
+  App.css     Styling, transitions, layouts, and card animations
+  main.jsx    React entry point
+
 public/
-  invite-media/  Invitation photos and fallback portraits
+  invite-media/  Photos and fallback portrait assets
 ```
 
-## Getting Started
+## Running It Locally
 
 Install dependencies:
 
@@ -36,7 +38,7 @@ Install dependencies:
 npm install
 ```
 
-Start the development server:
+Start the local development server:
 
 ```bash
 npm run dev
@@ -48,46 +50,56 @@ Create a production build:
 npm run build
 ```
 
-Preview the production build locally:
+Preview the production build:
 
 ```bash
 npm run preview
 ```
 
-## Customization Notes
+## Where To Edit Things
 
-- Main content lives in `src/App.jsx`
-- Styling and section animations live in `src/App.css`
-- Venue cards and planner timeline details can be updated in the event data inside `src/App.jsx`
-- Images are stored in `public/invite-media`
+If you want to customize the invite later, these are the most important places:
 
-## Push to GitHub
+- `src/App.jsx`
+  This is where the names, event details, countdown date, card content, and section copy live.
 
-This project is intended to be pushed to:
+- `src/App.css`
+  This controls the full look and feel, including the wax seal opening, planner card animations, layout spacing, and typography styling.
 
-`https://github.com/shubh6-max/wedding-invite.git`
+- `public/invite-media`
+  This folder contains the invite images and fallback portraits.
 
-If the local folder is not already a git repository, use:
+## Live Site
 
-```bash
-git init
-git branch -M main
-git remote add origin https://github.com/shubh6-max/wedding-invite.git
-git add .
-git commit -m "Initial wedding invite app"
-git push -u origin main
-```
-
-## Live Test Link
-
-This project is configured for GitHub Pages deployment from the `main` branch using GitHub Actions.
+This project is set up for GitHub Pages deployment through GitHub Actions.
 
 Expected live URL:
 
 `https://shubh6-max.github.io/wedding-invite/`
 
-If the site does not go live immediately, open the repository on GitHub and confirm:
+If GitHub Pages is enabled for the repository, every push to `main` can trigger a fresh deployment.
 
-1. `Settings` -> `Pages`
-2. Under `Build and deployment`, set `Source` to `GitHub Actions`
-3. Wait for the `Deploy static content to Pages` workflow in the `Actions` tab to finish
+## GitHub Pages Setup
+
+If the live link is not working yet, check this once on GitHub:
+
+1. Open the repository settings.
+2. Go to `Pages`.
+3. Under `Build and deployment`, set `Source` to `GitHub Actions`.
+4. Let the deployment workflow run from the `Actions` tab.
+
+## Pushing Future Changes
+
+From the project folder, the usual flow is:
+
+```bash
+git status
+git add .
+git commit -m "Describe your change"
+git push
+```
+
+## Final Note
+
+This invite was shaped to feel more personal than a standard template.
+If you want to keep evolving it, the easiest next upgrades would be RSVP handling, a photo gallery, background music, or a custom domain.
