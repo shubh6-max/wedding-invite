@@ -11,7 +11,7 @@ const AUTO_SCROLL_DELAY = 1600
 
 const invitation = {
   chapter: 'A New Chapter Begins',
-  saveDate: 'Save the Date: November 26, 2026',
+  saveDate: 'Save the Date: July 4, 2026',
   names: 'Sakshi & Chinmay',
   quoteLineOne: 'Sabne Poocha... "Kab?"',
   quoteLineTwo: 'Humne Bola... "Ab!"',
@@ -20,7 +20,7 @@ const invitation = {
   groomLabel: 'Team Groom',
   brideLabel: 'Team Bride',
   footerNote: "Think Fast... Baraat Won't Wait!",
-  targetDate: '2026-11-26T18:30:00+05:30',
+  targetDate: '2026-07-04T12:30:00+05:30',
 }
 
 const teamMessages = {
