@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
 
-const BACKGROUND_IMAGE = '/invite-media/couple-background.jpg'
-const BRIDE_IMAGE = '/invite-media/bride-komal.jpg'
-const GROOM_IMAGE = '/invite-media/groom-prem.jpg'
-const BRIDE_IMAGE_FALLBACK = '/invite-media/bride-komal.svg'
-const GROOM_IMAGE_FALLBACK = '/invite-media/groom-prem.svg'
+const INVITE_MEDIA_BASE = `${import.meta.env.BASE_URL}invite-media/`
+const BACKGROUND_IMAGE = `${INVITE_MEDIA_BASE}couple-background.jpg`
+const BRIDE_IMAGE = `${INVITE_MEDIA_BASE}bride-komal.jpg`
+const GROOM_IMAGE = `${INVITE_MEDIA_BASE}groom-prem.svg`
+const BRIDE_IMAGE_FALLBACK = `${INVITE_MEDIA_BASE}bride-komal.svg`
+const GROOM_IMAGE_FALLBACK = `${INVITE_MEDIA_BASE}groom-prem.svg`
 const AUTO_SCROLL_DELAY = 1600
 
 const invitation = {
