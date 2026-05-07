@@ -77,3 +77,17 @@ git add .
 git commit -m "Initial wedding invite app"
 git push -u origin main
 ```
+
+## Live Test Link
+
+This project is configured for GitHub Pages deployment from the `main` branch using GitHub Actions.
+
+Expected live URL:
+
+`https://shubh6-max.github.io/wedding-invite/`
+
+If the site does not go live immediately, open the repository on GitHub and confirm:
+
+1. `Settings` -> `Pages`
+2. Under `Build and deployment`, set `Source` to `GitHub Actions`
+3. Wait for the `Deploy static content to Pages` workflow in the `Actions` tab to finish
