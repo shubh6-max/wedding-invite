@@ -162,8 +162,8 @@ function PlannerCard({ event, index }) {
   return (
     <article className={`planner-card ${directionClass}`} data-planner-card>
       <div className="planner-card__header">
-        <span className="planner-card__index">Day {index + 1}</span>
-        <span className="planner-card__chip">Wedding Planner</span>
+        <span className="planner-card__index">Karyakram {index + 1}</span>
+        <span className="planner-card__chip">Shubh Sohala</span>
       </div>
 
       <h3 className="planner-card__title">{event.title}</h3>
@@ -488,14 +488,15 @@ export default function App() {
               <section
                 ref={plannerSectionRef}
                 className="planner-section"
-                aria-label="Wedding planner timeline"
+                aria-label="Lagna karyakram"
               >
                 <div className="planner-section__inner">
-                  <p className="planner-section__eyebrow">Wedding Planner</p>
-                  <h2 className="planner-section__title">Celebration Timeline</h2>
+                  <p className="planner-section__eyebrow">Lagnasohala</p>
+                  <h2 className="planner-section__title">Shubh Karyakram</h2>
                   <p className="planner-section__intro">
-                    Every ritual has its own glow. Here&apos;s the beautifully
-                    planned journey from the first blessing to the big day.
+                    From Grahayadnya and Mehendi to Simant Pujan and the big
+                    day, here is our family&apos;s celebration schedule for the
+                    special days ahead.
                   </p>
 
                   <div className="planner-timeline">
