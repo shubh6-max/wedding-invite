@@ -1,0 +1,157 @@
+/* Boho Sun gate. Everything scoped under .gate-boho; only transform/opacity animate. */
+.gate-boho {
+  --sand: #efd9c0;
+  --cream: #fbf1e3;
+  --ink: #5a2d1b;
+  --clay: #c8643a;
+  --clay-deep: #9c4220;
+  --ochre: #e3a74a;
+  --rose: #d89a98;
+  --sage: #a3b38c;
+  --sun: #f6cf7a;
+  color: var(--ink);
+  font: 400 1.0625rem/1.5 'Outfit', system-ui, sans-serif;
+}
+.gate-boho *, .gate-boho *::before, .gate-boho *::after { box-sizing: border-box; }
+.gate-boho p { margin: 0; }
+
+/* Full-bleed backdrop: sand, a warm glow and ghost arch rings. It fades first so the page shows through. */
+.gate-boho__bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 58%, rgb(246 207 122 / 0.45), transparent 46%), var(--sand);
+}
+.gate-boho__bg::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: min(80vw, 110svh);
+  aspect-ratio: 1 / 0.8;
+  margin-left: calc(min(80vw, 110svh) / -2);
+  border-radius: 999px 999px 0 0;
+  box-shadow:
+    0 0 0 1.4rem rgb(200 100 58 / 0.08),
+    0 0 0 2.8rem rgb(227 167 74 / 0.08),
+    0 0 0 4.2rem rgb(216 154 152 / 0.08),
+    0 0 0 5.6rem rgb(163 179 140 / 0.08);
+}
+
+.gate-boho__wrap {
+  --S: min(80vw, 26rem, 52svh); /* stage width: the one size everything below scales from */
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: clamp(0.75rem, 2.4svh, 1.5rem);
+  width: min(100%, 30rem);
+  padding: 0 1.25rem;
+  text-align: center;
+}
+
+.gate-boho__copy { display: grid; gap: 0.2rem; justify-items: center; }
+.gate-boho__guest { font: italic 1.125rem/1.3 'DM Serif Display', Georgia, serif; color: var(--clay-deep); overflow-wrap: anywhere; }
+.gate-boho__names {
+  font: 400 clamp(2rem, min(11vw, 7svh), 3.4rem)/1.05 'DM Serif Display', Georgia, serif;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.gate-boho__amp { display: inline-block; font-style: italic; font-size: 0.7em; color: var(--clay-deep); transform: rotate(-9deg); }
+.gate-boho__date { font: 400 1.25rem/1.3 'DM Serif Display', Georgia, serif; }
+
+/* The stack: arches stand on a floor line, the sun sits behind them with its top half showing. */
+.gate-boho__stage { position: relative; width: var(--S); height: calc(var(--S) * 0.92); }
+.gate-boho__stage::after {
+  content: '';
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  bottom: -3px;
+  height: 3px;
+  background: var(--ink);
+}
+.gate-boho__sun {
+  position: absolute;
+  left: calc(50% - var(--S) * 0.2);
+  bottom: calc(var(--S) * 0.5);
+  width: calc(var(--S) * 0.4);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--sun);
+  box-shadow: 0 0 0 0.6rem rgb(246 207 122 / 0.35), 0 0 0 1.4rem rgb(246 207 122 / 0.18);
+}
+.gate-boho__arch {
+  position: absolute;
+  bottom: 0;
+  left: calc(var(--i) * 7.5%);
+  width: calc(100% - var(--i) * 15%);
+  aspect-ratio: 1 / 0.7;
+  background: var(--c);
+  border-radius: 999px 999px 0 0;
+  box-shadow: 0 -0.2rem 0.7rem rgb(90 45 27 / 0.2); /* paper edge: each sheet sits above the next */
+  transform-origin: 50% 100%;
+}
+
+.gate-boho__btn {
+  min-height: 48px;
+  padding: 0.7rem 1.9rem;
+  border: 0;
+  background: var(--ink);
+  color: var(--cream);
+  font: 600 1rem 'Outfit', system-ui, sans-serif;
+  border-radius: 999px 999px 0.5rem 0.5rem;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+.gate-boho__btn:active { transform: scale(0.96); }
+.gate-boho__btn:focus-visible { outline: 3px solid var(--clay-deep); outline-offset: 3px; }
+.gate-boho__btn:disabled { cursor: default; }
+@media (hover: hover) and (pointer: fine) {
+  .gate-boho__btn:not(:disabled):hover { background: var(--clay-deep); transform: translateY(-2px); }
+}
+
+/* ---------- Opening (2000ms): arches lift front-first, sun climbs, backdrop fades from ~400ms ---------- */
+.gate-boho.is-opening .gate-boho__bg { opacity: 0; transition: opacity 0.8s linear 0.4s; will-change: opacity; }
+.gate-boho.is-opening .gate-boho__copy,
+.gate-boho.is-opening .gate-boho__btn { opacity: 0; transition: opacity 0.4s linear 0.15s; will-change: opacity; }
+.gate-boho.is-opening .gate-boho__stage::after { opacity: 0; transition: opacity 0.4s linear 0.2s; }
+
+.gate-boho.is-opening .gate-boho__arch {
+  --d: calc((5 - var(--i)) * 0.12s); /* innermost (front) sheet goes first */
+  opacity: 0;
+  transform: translateY(calc(var(--S) * -0.5)) rotate(var(--r));
+  transition: transform 0.95s cubic-bezier(0.45, 0, 0.2, 1) var(--d), opacity 0.45s linear calc(var(--d) + 0.5s);
+  will-change: transform, opacity;
+}
+.gate-boho.is-opening .gate-boho__sun {
+  opacity: 0;
+  transform: translateY(calc(var(--S) * -0.62));
+  transition: transform 1.6s cubic-bezier(0.3, 0.6, 0.25, 1) 0.15s, opacity 0.5s linear 1.4s;
+  will-change: transform, opacity;
+}
+
+/* ---------- Landscape phones: art left, words right, scaled by svh ---------- */
+@media (max-height: 480px) and (orientation: landscape) {
+  .gate-boho__wrap {
+    --S: min(36vw, 52svh);
+    grid-template-columns: auto 1fr;
+    grid-template-areas: 'art copy' 'art btn';
+    align-items: center;
+    column-gap: 1.5rem;
+    width: min(100%, 40rem);
+  }
+  .gate-boho__stage { grid-area: art; }
+  .gate-boho__copy { grid-area: copy; align-self: end; }
+  .gate-boho__btn { grid-area: btn; align-self: start; }
+}
+
+/* ---------- Reduced motion: no lift, a 250ms fade; the tap gate remains ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .gate-boho.is-opening .gate-boho__arch,
+  .gate-boho.is-opening .gate-boho__sun { transform: none; opacity: 1; transition: none; }
+  .gate-boho.is-opening .gate-boho__bg,
+  .gate-boho.is-opening .gate-boho__copy,
+  .gate-boho.is-opening .gate-boho__btn,
+  .gate-boho.is-opening .gate-boho__stage { opacity: 0; transition: opacity 0.25s linear; }
+}

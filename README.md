@@ -29,17 +29,38 @@ src/
   lib/                  useCountdown, useReveal, useRoute, .ics download
   components/RsvpForm   Shared RSVP form, styled per design
   templates/<id>/       One folder per design: Component.jsx + <id>.css (scoped to .tpl-<id>)
+                        and Gate.jsx + gate.css (its opening, scoped to .gate-<id>)
+  templates/_reference/ The gate pattern to copy for a new design
+  lib/gate.js, guest.js Gate state hook; ?to= guest name + invite context
+  scripts/              qa-gate.mjs / qa-all.mjs (npm run qa)
+docs/PLAN.md            Competitor research, positioning and the plan for the gates
   templates/seal/       The original invite, unchanged
 ```
+
+## Every design opens with a tap
+
+Each of the 25 designs starts closed, behind its own themed gate (palace doors, an envelope, a wax seal, a pull-cord curtain, a scroll, knots, shutters and more; see `docs/PLAN.md` for the full table). The guest taps once, the gate opens and the invitation animates in underneath. Hold and drag gates also have an "Open now" button, and every gate works with the keyboard and with reduced motion.
+
+Free features that competitors usually put behind a paid plan, none of which need a backend:
+
+- **Guest names**: add `?to=Sharma+Family` to a link and the gate greets them and the RSVP form pre-fills their name. Example: `#/t/rajmahal?to=Sharma+Family`
+- **Skip the animation**: add `?open=1` (combine with `&`), for example `#/t/rajmahal?open=1&to=Sharma+Family`
+- **Share and replay**: the floating bar shares the link (system share sheet, or WhatsApp) and replays the opening
+- **RSVP replies**: after the form, guests get WhatsApp and email links with the reply pre-written. To send replies to you directly, add `contact: { whatsapp: '919876543210', email: 'you@example.com' }` to the sample data file (country code, digits only)
+- **Add to calendar**: downloads an .ics file, or opens Google Calendar inside WhatsApp and Instagram in-app browsers where downloads fail
+- **Phone-first**: checked at 320 to 430px wide, in landscape and on desktop
+
+## Testing the gates and mobile layout
+
+`npm run build`, then `npm run preview` in one terminal, then `npm run qa` in another. It opens every design in Edge or Chrome (set `BROWSER_PATH` for another browser) at six phone sizes, landscape and desktop, and checks: the gate opens by tap and keyboard, nothing scrolls sideways, text is at least 12px and tap targets at least 44px, reduced motion, `?open=1`, hostile `?to=` input, and double taps. Screenshots go to `qa-out/`. `QA_PARALLEL=1` runs one design at a time, which is steadier on slower machines.
 
 ## Personalising a design
 
 Edit `src/data/sample.js` (names, date, venue, events, story). Every design reads from it.
 
-## Adding an eleventh design
+## Adding another design
 
-Create `src/templates/<id>/`, default-export a component taking `{ invite }`, scope CSS under `.tpl-<id>`
-with a root of `className="tpl tpl-<id>"`, and add a row to `src/data/templates.js`.
+Create `src/templates/<id>/` with the design (default-export a component taking `{ invite, viaGate }`, root `className="tpl tpl-<id>"`, CSS scoped under `.tpl-<id>`) and a `Gate.jsx` + `gate.css` following `src/templates/_reference/`. Add a row to `src/data/templates.js`; the gate is found automatically by folder. Run `npm run qa`.
 
 ## Running It Locally
 

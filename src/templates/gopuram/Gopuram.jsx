@@ -151,9 +151,10 @@ const Kolam = () => (
 
 /* ---------- page ---------- */
 
-export default function Gopuram({ invite }) {
+export default function Gopuram({ invite, viaGate }) {
   const ref = useRef(null)
-  const [lit, setLit] = useState(false)
+  // The gate already lit the lamp; the guest's own toggle keeps working.
+  const [lit, setLit] = useState(!!viaGate)
   const cd = useCountdown(invite.date)
   useReveal(ref)
 

@@ -186,7 +186,16 @@ const traditional = [
 ]
 
 // `tradition` drives the gallery tabs and which sample data a design receives.
-export const templates = [...contemporary.map((t) => ({ tradition: 'contemporary', ...t })), ...traditional]
+// Opening gates (src/templates/<id>/Gate.jsx) and page loaders are discovered by folder, so a design
+// without a Gate simply opens directly. `preload` warms the page chunk while the gate is on screen.
+const gateLoaders = import.meta.glob(['../templates/*/Gate.jsx', '!../templates/_reference/*'])
+const pageLoaders = import.meta.glob(['../templates/*/*.jsx', '!../templates/*/Gate.jsx', '!../templates/_reference/*'])
+const byId = (map, id) => map[Object.keys(map).find((k) => k.includes(`/templates/${id}/`))]
+
+export const templates = [...contemporary.map((t) => ({ tradition: 'contemporary', ...t })), ...traditional].map((t) => {
+  const gate = byId(gateLoaders, t.id)
+  return { ...t, Gate: gate ? lazy(gate) : null, preload: byId(pageLoaders, t.id) }
+})
 
 export const traditions = [
   { id: 'all', label: 'All' },

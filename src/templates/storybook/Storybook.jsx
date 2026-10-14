@@ -52,13 +52,15 @@ function Face({ side, board, children }) {
   )
 }
 
-export default function Storybook({ invite }) {
-  const [t, setT] = useState(0) // number of leaves turned
+export default function Storybook({ invite, viaGate }) {
+  const [t, setT] = useState(viaGate ? 1 : 0) // number of leaves turned; the gate already opened the cover
   const bookRef = useRef(null)
   const press = useRef(null)
   const cd = useCountdown(invite.date)
   const { couple, story = [], events = [] } = invite
   const full = invite.full || couple
+  // viaGate starts past the cover (hidden, unfocusable), so the page's h1 is a screen-reader heading outside the book.
+  const Names = viaGate ? 'div' : 'h1'
 
   const chunks = []
   for (let i = 0; i < events.length; i += 2) chunks.push(events.slice(i, i + 2))
@@ -76,11 +78,11 @@ export default function Storybook({ invite }) {
       front: (
         <div className="sb-cover">
           <p className="sb-hosts">{invite.hosts}</p>
-          <h1 className="sb-names">
+          <Names className="sb-names">
             <span>{couple.a}</span>
             <i>&amp;</i>
             <span>{couple.b}</span>
-          </h1>
+          </Names>
           <p className="sb-tag">{invite.tagline}</p>
           <Rosette n={8} />
           <p className="sb-date">{invite.dateLabel}</p>
@@ -212,6 +214,7 @@ export default function Storybook({ invite }) {
 
   return (
     <div className="tpl tpl-storybook">
+      {viaGate && <h1 className="sb-sr">{couple.a} &amp; {couple.b}</h1>}
       <div
         ref={bookRef}
         className="sb-book"

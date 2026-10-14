@@ -300,6 +300,10 @@
 
 .pill a:hover { background: rgba(255, 255, 255, 0.14); }
 .pill__count { opacity: 0.7; margin-left: 6px; }
+.pill button.pill__icon { appearance: none; border: 0; background: none; color: inherit; cursor: pointer; }
+.pill .pill__icon { display: inline-grid; place-items: center; width: 44px; min-width: 44px; padding: 0; }
+.pill button.pill__icon:hover { background: rgba(255, 255, 255, 0.14); }
+.pill button.pill__icon:focus-visible { outline: 3px solid var(--g-accent, #f2c66d); outline-offset: 3px; }
 .pill__label { padding: 0 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .loading {
@@ -329,6 +333,38 @@
 
 @media (max-width: 480px) {
   .pill__count { display: none; }
-  .pill__label { max-width: 34vw; padding: 0 6px; }
+  /* The design name stays available to screen readers; the pill needs the room for its controls. */
+  .pill__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; padding: 0; }
   .pill a { padding: 0 10px; }
 }
+
+/* ---------- opening gates ---------- */
+/* Each design's Gate (src/templates/<id>/Gate.jsx) renders `<div class="gate gate-<id>">`.
+   Base: full-viewport layer above the page and below the nav pill. Gates leave the bottom
+   ~88px (pill) free of interactive content. */
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) calc(88px + env(safe-area-inset-bottom)) env(safe-area-inset-left);
+  display: grid;
+  place-items: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* The invitation takes programmatic focus once the gate is gone; no ring on a heading. */
+.tpl h1:focus {
+  outline: none;
+}
+
+/* Gates are a one-off moment: reduced motion shortens them (see lib/gate.js) rather than removing them. */
+
+/* Shared RSVP confirmation: WhatsApp / email reply links (each design restyles .rsvp__done). */
+.tpl .rsvp__reply { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 12px 0 0; }
+.tpl .rsvp__reply a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }

@@ -194,6 +194,14 @@
   .tpl-havelifresco .hf-led-h { font-size: 1.2rem; }
 }
 
+/* Landscape phones: the panel is only ~180px tall, so the names text must tighten to stay inside the arch. */
+@media (max-height: 480px) {
+  .tpl-havelifresco .hf-names { inset: 19% 8% 5%; }
+  .tpl-havelifresco .hf-invo { font-size: 0.75rem; }
+  .tpl-havelifresco .hf-invo__s { font-size: 1rem; }
+  .tpl-havelifresco .hf-date { font-size: 0.75rem; text-wrap: balance; }
+}
+
 /* ---------- reduced motion: the drawn, painted end state, no transitions ---------- */
 @media (prefers-reduced-motion: reduce) {
   .tpl-havelifresco .ln { stroke-dashoffset: 0; transition: none; }

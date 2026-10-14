@@ -64,17 +64,19 @@ function Lotus() {
   )
 }
 
-export default function Rajmahal({ invite }) {
+export default function Rajmahal({ invite, viaGate }) {
   const rootRef = useRef(null)
-  const [open, setOpen] = useState(false)
+  // viaGate: the gate's doors already opened onto this page, so start open and skip our own doors/button.
+  const [open, setOpen] = useState(!!viaGate)
   const t = useCountdown(invite.date)
   useReveal(rootRef)
 
   // Doors open by themselves shortly after load; the button is the instant fallback.
   useEffect(() => {
+    if (viaGate) return undefined
     const id = setTimeout(() => setOpen(true), 1200)
     return () => clearTimeout(id)
-  }, [])
+  }, [viaGate])
 
   const cells = [
     ['Days', t.days],

@@ -56,16 +56,16 @@
 .tpl-boardingpass .bp-route { display: flex; align-items: flex-end; gap: 14px; margin: 26px 0; }
 .tpl-boardingpass .bp-route > div:not(.bp-route__path) { display: grid; line-height: 1; }
 .tpl-boardingpass .bp-route > div:last-child { text-align: right; }
-.tpl-boardingpass .bp-route small { font: 400 0.72rem var(--mono); text-transform: uppercase; color: var(--mute-ink); }
+.tpl-boardingpass .bp-route small { font: 400 0.8rem var(--mono); text-transform: uppercase; color: var(--mute-ink); }
 .tpl-boardingpass .bp-route b { font: 700 clamp(2rem, 8vw, 3.2rem)/1 var(--display); text-transform: uppercase; }
 .tpl-boardingpass .bp-route em { font: 500 0.95rem var(--mono); font-style: normal; color: var(--mute-ink); }
 .tpl-boardingpass .bp-route__path { position: relative; flex: 1; align-self: center; border-top: 2px dashed var(--mute-ink); min-width: 28px; }
 .tpl-boardingpass .bp-plane { position: absolute; left: 50%; top: -14px; width: 28px; height: 28px; margin-left: -14px; fill: var(--navy); rotate: 90deg; animation: bp-cruise 2.2s ease-out 0.4s both; }
 @keyframes bp-cruise { from { translate: -140% 0; } to { translate: 0 0; } }
 .tpl-boardingpass .bp-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px 18px; padding-top: 18px; border-top: 2px solid var(--navy); }
-.tpl-boardingpass .bp-fields dt { font: 400 0.72rem var(--mono); text-transform: uppercase; color: var(--mute-ink); }
+.tpl-boardingpass .bp-fields dt { font: 400 0.8rem var(--mono); text-transform: uppercase; color: var(--mute-ink); }
 .tpl-boardingpass .bp-fields dd { font: 700 1.35rem/1.15 var(--display); overflow-wrap: anywhere; }
-.tpl-boardingpass .bp-fields a { color: var(--navy); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tpl-boardingpass .bp-fields a { display: inline-block; padding: 12px 0 10px; color: var(--navy); text-decoration-thickness: 2px; text-underline-offset: 3px; }
 .tpl-boardingpass .bp-stub {
   position: relative;
   display: grid;
@@ -83,7 +83,7 @@
 .tpl-boardingpass .bp-stub::after { right: -13px; }
 .tpl-boardingpass .bp-code { width: 100%; height: 64px; fill: var(--navy); }
 .tpl-boardingpass .bp-stub__seat { display: flex; align-items: baseline; gap: 10px; }
-.tpl-boardingpass .bp-stub__seat small { font: 400 0.72rem var(--mono); text-transform: uppercase; color: var(--mute-ink); }
+.tpl-boardingpass .bp-stub__seat small { font: 400 0.8rem var(--mono); text-transform: uppercase; color: var(--mute-ink); }
 .tpl-boardingpass .bp-stub__seat b { font: 700 3.4rem/1 var(--display); }
 .tpl-boardingpass .bp-btn {
   min-height: 48px;
@@ -132,7 +132,7 @@
 .tpl-boardingpass .bp-timer { --fs: clamp(26px, 7.4vw, 56px); display: flex; flex-wrap: wrap; gap: 8px clamp(10px, 3vw, 28px); margin-top: 12px; }
 .tpl-boardingpass .bp-timer .bp-fl { color: var(--amber); }
 .tpl-boardingpass .bp-unit { display: grid; justify-items: start; gap: 4px; }
-.tpl-boardingpass .bp-unit small { font: 400 0.72rem var(--mono); text-transform: uppercase; color: var(--mute); }
+.tpl-boardingpass .bp-unit small { font: 400 0.8rem var(--mono); text-transform: uppercase; color: var(--mute); }
 .tpl-boardingpass .bp-cols { display: none; }
 .tpl-boardingpass .bp-rows { margin-top: 26px; }
 .tpl-boardingpass .bp-row { display: grid; gap: 8px; padding: 18px 0; border-top: 1px dashed #35577f; }
@@ -140,7 +140,7 @@
 .tpl-boardingpass .bp-row__name { --fs: clamp(24px, 7.6vw, 34px); font-weight: 700; }
 .tpl-boardingpass .bp-row__info { display: grid; gap: 2px; font-size: 1.1rem; line-height: 1.25; }
 .tpl-boardingpass .bp-row__info div { display: flex; gap: 10px; }
-.tpl-boardingpass .bp-row__info dt { flex: 0 0 3.4rem; font: 400 0.72rem/1.9 var(--mono); text-transform: uppercase; color: var(--mute); }
+.tpl-boardingpass .bp-row__info dt { flex: 0 0 3.4rem; font: 400 0.8rem/1.9 var(--mono); text-transform: uppercase; color: var(--mute); }
 .tpl-boardingpass .bp-row__status { display: flex; align-items: center; gap: 8px; font: 500 0.82rem var(--mono); text-transform: uppercase; color: var(--amber); }
 .tpl-boardingpass .bp-row__status::before { content: ''; width: 9px; height: 9px; border-radius: 50%; background: var(--amber); }
 @media (min-width: 860px) {
@@ -161,7 +161,7 @@
 .tpl-boardingpass .bp-leg__year { font: 700 clamp(2.4rem, 9vw, 3.4rem)/1 var(--display); color: var(--amber); }
 .tpl-boardingpass .bp-leg h3 { font: 700 1.7rem/1.1 var(--display); text-transform: uppercase; }
 .tpl-boardingpass .bp-leg p { max-width: 52ch; }
-.tpl-boardingpass .bp-leg small { display: block; margin-top: 6px; font: 400 0.72rem var(--mono); text-transform: uppercase; color: var(--mute); }
+.tpl-boardingpass .bp-leg small { display: block; margin-top: 6px; font: 400 0.8rem var(--mono); text-transform: uppercase; color: var(--mute); }
 .tpl-boardingpass .bp-leg[data-reveal] { clip-path: inset(0 100% 0 0); transition: clip-path 0.9s cubic-bezier(0.3, 0.7, 0.2, 1); }
 .tpl-boardingpass .bp-leg[data-reveal].in { clip-path: inset(-10px -10px -10px -30px); }
 .tpl-boardingpass .bp-total { margin: 30px 0 0 52px; font: 400 0.9rem/1.5 var(--mono); color: var(--mute); }
@@ -199,7 +199,7 @@
 .tpl-boardingpass .bp-half--r { flex: 1; margin-left: -9px; padding-left: 27px; transform-origin: 100% 100%; }
 .tpl-boardingpass .bp-half b { font: 700 clamp(2.4rem, 12vw, 4.2rem)/0.95 var(--display); text-transform: uppercase; }
 .tpl-boardingpass .bp-half--r b { font-size: clamp(1.3rem, 5vw, 1.8rem); line-height: 1; }
-.tpl-boardingpass .bp-half small { font: 400 0.72rem var(--mono); text-transform: uppercase; color: var(--mute-ink); }
+.tpl-boardingpass .bp-half small { font: 400 0.8rem var(--mono); text-transform: uppercase; color: var(--mute-ink); }
 .tpl-boardingpass .bp-half svg { width: 100%; height: 64px; fill: var(--navy); }
 .tpl-boardingpass .bp-tearbtn { position: absolute; z-index: 3; left: 50%; top: 50%; translate: -50% -50%; display: inline-flex; align-items: center; gap: 8px; max-width: 92%; min-height: 52px; padding: 0 20px; border: 2px solid var(--amber); border-radius: 999px; background: var(--navy); color: var(--amber); font: 700 1.1rem var(--display); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; box-shadow: 0 8px 22px rgb(0 0 0 / 0.35); }
 .tpl-boardingpass .bp-tearbtn svg { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }

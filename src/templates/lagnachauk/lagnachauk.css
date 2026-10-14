@@ -97,10 +97,10 @@
   padding: 0.35em 0.55em;
   background: var(--deep);
   border: 2px dotted var(--gold);
-  font: 400 clamp(11px, 2.9cqw, 16px) / 1.15 var(--disp);
+  font: 400 clamp(12px, 2.9cqw, 16px) / 1.15 var(--disp);
   text-align: center;
 }
-.tpl-lagnachauk .lbl small { display: block; margin-top: 0.15em; color: var(--gold); font: 600 0.8em/1.2 var(--body); }
+.tpl-lagnachauk .lbl small { display: block; margin-top: 0.15em; color: var(--gold); font: 600 max(12px, 0.8em)/1.2 var(--body); }
 
 /* The chauk: a square wall painting that holds the names. */
 .tpl-lagnachauk .chauk {

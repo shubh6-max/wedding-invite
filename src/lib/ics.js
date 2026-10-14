@@ -2,11 +2,24 @@
 const stamp = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
 const esc = (s) => String(s).replace(/([,;\\])/g, '\\$1').replace(/\n/g, '\\n')
 
+// In-app browsers (WhatsApp, Instagram, Facebook, Android WebView) often ignore blob downloads.
+const inAppBrowser = () => /FBAN|FBAV|Instagram|WhatsApp|Line\/|Snapchat|; wv\)/i.test(navigator.userAgent)
+
 export function downloadIcs(invite) {
   try {
     const start = new Date(invite.date)
     if (Number.isNaN(start.getTime())) throw new Error('Invalid wedding date')
     const end = new Date(start.getTime() + 4 * 36e5)
+    if (inAppBrowser()) {
+      const q = new URLSearchParams({
+        action: 'TEMPLATE',
+        text: `${invite.couple.a} & ${invite.couple.b}'s Wedding`,
+        dates: `${stamp(start)}/${stamp(end)}`,
+        location: `${invite.venue}, ${invite.city}`,
+      })
+      window.location.assign(`https://calendar.google.com/calendar/render?${q}`)
+      return
+    }
     const ics = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',

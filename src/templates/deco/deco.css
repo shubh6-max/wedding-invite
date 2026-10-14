@@ -163,7 +163,7 @@
 .tpl-deco .dc-clock { display: flex; justify-content: center; max-width: 640px; margin: 0 auto; }
 .tpl-deco .dc-cell { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 0; }
 .tpl-deco .dc-cell strong { font: 400 clamp(2rem, 9vw, 3.8rem)/1 'Limelight', serif; color: var(--g2); }
-.tpl-deco .dc-cell span { font-size: clamp(0.62rem, 2.4vw, 0.85rem); font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--g1); }
+.tpl-deco .dc-cell span { font-size: clamp(0.75rem, 2.4vw, 0.85rem); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--g1); }
 .tpl-deco .dc-cell .dc-dia { position: absolute; right: -4px; top: 34%; margin: 0; width: 6px; height: 6px; }
 
 /* ---------- events: chamfered double-line frames ---------- */

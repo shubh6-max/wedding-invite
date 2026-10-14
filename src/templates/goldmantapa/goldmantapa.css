@@ -92,7 +92,7 @@
 
 .tpl-goldmantapa .bead {
   position: relative; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 5px; width: 100%; min-height: 64px; padding: 0;
-  background: none; border: 0; color: var(--ink); cursor: pointer; font: 700 10.5px/1.15 'Cinzel', serif; -webkit-tap-highlight-color: transparent;
+  background: none; border: 0; color: var(--ink); cursor: pointer; font: 700 12px/1.15 'Cinzel', serif; -webkit-tap-highlight-color: transparent;
 }
 .tpl-goldmantapa .bead__gem {
   position: relative; width: 30px; height: 30px; border-radius: 50%; transition: transform 0.14s, box-shadow 0.4s;
@@ -132,7 +132,7 @@
   box-shadow: inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.8), inset -1.5px -1.5px 0 rgba(122, 30, 44, 0.4), 0 2px 0 var(--gold-dd);
 }
 .tpl-goldmantapa .plaque b { font: 800 1.6rem/1.2 'Cinzel', serif; font-variant-numeric: tabular-nums; }
-.tpl-goldmantapa .plaque span { font: 600 0.7rem 'Cinzel', serif; }
+.tpl-goldmantapa .plaque span { font: 600 0.75rem 'Cinzel', serif; }
 
 /* ---- drawer under the plinth ---- */
 .tpl-goldmantapa .drawer { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows 0.45s var(--ease), visibility 0s 0.45s; }

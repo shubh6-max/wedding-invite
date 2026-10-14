@@ -226,7 +226,7 @@
   box-shadow: 3px 4px 0 var(--plum);
 }
 .tpl-marigold .mg-tick strong { font: 400 clamp(1.6rem, 7.5vw, 3rem)/1 'Bagel Fat One', sans-serif; }
-.tpl-marigold .mg-tick span { font-size: clamp(0.7rem, 2.6vw, 0.9rem); font-weight: 800; }
+.tpl-marigold .mg-tick span { font-size: clamp(0.75rem, 2.6vw, 0.9rem); font-weight: 800; }
 .tpl-marigold .mg-t0 { background: var(--cream); border-radius: 60% 40% 55% 45% / 50% 55% 45% 50%; rotate: -3deg; }
 .tpl-marigold .mg-t1 { background: var(--pink); border-radius: 45% 55% 40% 60% / 55% 45% 55% 45%; rotate: 2deg; }
 .tpl-marigold .mg-t2 { background: var(--teal); color: #fff; border-radius: 55% 45% 60% 40% / 45% 50% 50% 55%; rotate: -2deg; }

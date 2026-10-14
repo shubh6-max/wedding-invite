@@ -51,3 +51,4 @@ graphify-out/
 playwright-report/
 test-results/
 .playwright/
+qa-out/

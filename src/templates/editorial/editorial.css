@@ -104,7 +104,7 @@
 /* ---------- end ---------- */
 .tpl-editorial .end { display: grid; justify-items: start; gap: 0.25rem; padding-block: clamp(3rem, 8vw, 6rem) calc(80px + 2rem); border-top: 1px solid var(--ink); }
 .tpl-editorial .end__label { color: var(--soft); }
-.tpl-editorial .end__venue { font: 400 clamp(2.4rem, 9vw, 7.5rem)/0.95 var(--serif); letter-spacing: -0.03em; color: var(--ink); text-decoration: underline 3px var(--red); text-underline-offset: 0.12em; overflow-wrap: anywhere; }
+.tpl-editorial .end__venue { display: inline-block; padding-block: 0.3rem; min-height: 44px; font: 400 clamp(2.4rem, 9vw, 7.5rem)/0.95 var(--serif); letter-spacing: -0.03em; color: var(--ink); text-decoration: underline 3px var(--red); text-underline-offset: 0.12em; overflow-wrap: anywhere; }
 .tpl-editorial .end__venue:hover { color: var(--red-t); }
 .tpl-editorial .end__city { font-size: 1.1rem; }
 .tpl-editorial .end__cal { margin-top: 1.75rem; min-height: 52px; padding: 0.5rem 1.75rem; font: 500 1.05rem 'Archivo', sans-serif; color: var(--ink); background: transparent; border: 1.5px solid var(--ink); cursor: pointer; transition: background 0.2s, color 0.2s; }
