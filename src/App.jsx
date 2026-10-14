@@ -1,10 +1,20 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
-import { groups, templates } from './data/templates.js'
+import { templates, traditions } from './data/templates.js'
 import { sample } from './data/sample.js'
+import { hinduSample } from './data/samples/hindu.js'
+import { marwadiSample } from './data/samples/marwadi.js'
+import { jainSample } from './data/samples/jain.js'
 import { useRoute } from './lib/hooks.js'
 import './gallery.css'
 
-const initials = `${sample.couple.a[0]}&${sample.couple.b[0]}`
+// Each tradition's designs render its own fictional sample (events, invocation, copy).
+const samples = { contemporary: sample, hindu: hinduSample, marwadi: marwadiSample, jain: jainSample }
+const initialsOf = (t) => {
+  const { a, b } = samples[t.tradition].couple
+  return `${a[0]}&${b[0]}`
+}
+// Nine designs, three per area, fanned in the hero.
+const FAN_IDS = ['rajmahal', 'kohbarghar', 'marigold', 'leheriyasafa', 'editorial', 'goldmantapa', 'celestial', 'panchrangdhvaj', 'boho']
 
 // Miniature of a design: palette, display font and a signature silhouette (see .thumb__shape--*).
 function Thumb({ t }) {
@@ -12,18 +22,20 @@ function Thumb({ t }) {
   return (
     <span className="thumb" style={{ '--bg': bg, '--ink': ink, '--accent': accent, fontFamily: t.font }} aria-hidden="true">
       <span className={`thumb__shape thumb__shape--${t.shape}`}>
-        <span className="thumb__mono">{initials}</span>
+        <span className="thumb__mono">{initialsOf(t)}</span>
       </span>
     </span>
   )
 }
 
 // Ten thumbs fanned out like a hand of cards; fans open once on load.
+const fanned = FAN_IDS.map((id) => templates.find((t) => t.id === id)).filter(Boolean)
+
 function Fan() {
   return (
     <div className="fan">
-      {templates.map((t, i) => {
-        const mid = (templates.length - 1) / 2
+      {fanned.map((t, i) => {
+        const mid = (fanned.length - 1) / 2
         return (
           <a
             key={t.id}
@@ -41,27 +53,27 @@ function Fan() {
 }
 
 function Gallery() {
-  const [group, setGroup] = useState('All')
-  const shown = templates.filter((t) => group === 'All' || t.group === group)
+  const [area, setArea] = useState('all')
+  const shown = templates.filter((t) => area === 'all' || t.tradition === area)
 
   return (
     <main className="gallery">
       <header className="hero">
-        <h1 className="hero__title">Ten invitations,<br />ten ways to say <em>yes, come.</em></h1>
+        <h1 className="hero__title">Twenty-five invitations,<br />each one a <em>yes, come.</em></h1>
         <p className="hero__lede">
           Open any design to see it as your guests will: countdown, schedule, story and RSVP, all moving.
-          Every one reads from the same details, so swapping couples takes a single edit.
+          Ten contemporary designs, plus five each for Hindu, Marwadi and Jain weddings, each drawn from that tradition's own art and ceremonies.
         </p>
         <Fan />
       </header>
 
       <section aria-labelledby="designs-h" className="designs">
         <div className="designs__bar">
-          <h2 id="designs-h">The collection</h2>
-          <div className="chips" role="group" aria-label="Filter by mood">
-            {groups.map((g) => (
-              <button key={g} type="button" className="chip" aria-pressed={g === group} onClick={() => setGroup(g)}>
-                {g}
+          <h2 id="designs-h">The collection <span className="count">{shown.length}</span></h2>
+          <div className="chips" role="group" aria-label="Filter by tradition">
+            {traditions.map((g) => (
+              <button key={g.id} type="button" className="chip" aria-pressed={g.id === area} onClick={() => setArea(g.id)}>
+                {g.label}
               </button>
             ))}
           </div>
@@ -144,7 +156,7 @@ export default function App() {
   return (
     <>
       <Suspense fallback={<div className="loading" role="status">Opening the invitation…</div>}>
-        <Page invite={sample} />
+        <Page invite={tpl ? samples[tpl.tradition] : sample} />
       </Suspense>
       <Pill id={id} />
     </>

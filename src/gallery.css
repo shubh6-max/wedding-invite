@@ -155,6 +155,8 @@
   font-size: clamp(1.8rem, 4vw, 2.8rem);
 }
 
+.designs h2 .count { color: var(--g-muted); font-size: 0.5em; margin-left: 6px; vertical-align: super; }
+
 .chips {
   display: flex;
   flex-wrap: wrap;

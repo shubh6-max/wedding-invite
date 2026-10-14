@@ -1,0 +1,207 @@
+/* Ratnatraya Prism: a three-faced pearl-glass prism that turns 120 degrees per section.
+   Everything is scoped under .tpl-ratnatrayaprism. */
+.tpl-ratnatrayaprism {
+  --ivory: #FAF7F2;
+  --ink: #1A1530;
+  --emerald: #1B6B4F;
+  --pearl: #C9D8D2;
+  --emerald-d: #0F4A35;
+  --ink-2: #4B4662;
+  --pearl-l: #E9F0EC;
+  --line: rgba(27, 107, 79, 0.38);
+  --serif: 'Bodoni Moda', 'Noto Serif Devanagari', serif;
+
+  /* prism geometry: face width --w, apothem --a = w / (2 * tan 60deg), scale --k for small screens */
+  --w: 220px;
+  --h: 280px;
+  --a: calc(var(--w) * 0.2887);
+  --k: 1;
+  --stage-h: calc(116px + var(--h) * var(--k));
+
+  min-height: 100svh;
+  overflow-x: clip;
+  color: var(--ink);
+  background: var(--ivory);
+  font: 500 1rem/1.65 var(--serif);
+}
+@media (max-width: 560px), (max-height: 780px) {
+  .tpl-ratnatrayaprism { --k: 0.8; }
+}
+.tpl-ratnatrayaprism *, .tpl-ratnatrayaprism *::before, .tpl-ratnatrayaprism *::after { box-sizing: border-box; }
+.tpl-ratnatrayaprism h1, .tpl-ratnatrayaprism h2, .tpl-ratnatrayaprism h3,
+.tpl-ratnatrayaprism p, .tpl-ratnatrayaprism ol { margin: 0; padding: 0; }
+.tpl-ratnatrayaprism ol { list-style: none; }
+.tpl-ratnatrayaprism i { font-style: italic; font-weight: 400; }
+.tpl-ratnatrayaprism .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.tpl-ratnatrayaprism [lang='hi'], .tpl-ratnatrayaprism [lang='sa'] { font-family: 'Noto Serif Devanagari', var(--serif); }
+.tpl-ratnatrayaprism :is(a, button, input, select, textarea):focus-visible { outline: 3px solid var(--emerald); outline-offset: 3px; }
+/* keep focused controls clear of the sticky stage */
+.tpl-ratnatrayaprism :is(a, button, input, select, textarea) { scroll-margin-top: calc(var(--stage-h) + 1rem); }
+
+/* ---------- hero ---------- */
+.tpl-ratnatrayaprism .hero {
+  position: relative; isolation: isolate; display: grid; justify-items: center; gap: 0.3rem;
+  padding: 3.5rem 1.25rem 1.25rem; text-align: center;
+}
+.tpl-ratnatrayaprism .hero::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    linear-gradient(158deg, rgba(201, 216, 210, 0.5) 0 20%, transparent 20%),
+    linear-gradient(204deg, rgba(201, 216, 210, 0.3) 0 13%, transparent 13%);
+}
+.tpl-ratnatrayaprism .invoc { max-width: 28rem; margin-bottom: 2rem; }
+.tpl-ratnatrayaprism .invoc__script { font-size: 1.375rem; line-height: 1.5; color: var(--emerald-d); }
+.tpl-ratnatrayaprism .invoc__text { font-style: italic; }
+.tpl-ratnatrayaprism .invoc__mean { font-size: 0.9375rem; color: var(--ink-2); }
+.tpl-ratnatrayaprism .hero__hosts { max-width: 32rem; text-wrap: balance; }
+.tpl-ratnatrayaprism .hero__tag { max-width: 28rem; font-style: italic; color: var(--ink-2); text-wrap: balance; }
+.tpl-ratnatrayaprism h1 {
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 0 0.55rem;
+  margin: 0.5rem 0 0.6rem; font-size: clamp(2.5rem, 11vw, 3.25rem); font-weight: 500; line-height: 1.08; letter-spacing: -0.01em;
+}
+.tpl-ratnatrayaprism .amp { font-size: 0.6em; font-style: italic; font-weight: 400; color: var(--emerald); }
+.tpl-ratnatrayaprism .hero__when { font-size: 1.125rem; font-weight: 600; }
+
+/* ---------- sticky stage + prism ---------- */
+.tpl-ratnatrayaprism .stage {
+  position: sticky; top: 0; z-index: 3; display: grid; justify-items: center; gap: 0.5rem;
+  padding: 0.75rem 1rem 28px;
+  background: linear-gradient(var(--ivory) calc(100% - 28px), rgba(250, 247, 242, 0));
+}
+.tpl-ratnatrayaprism .stage__label { font-size: 1rem; font-style: italic; color: var(--ink-2); line-height: 1.6; }
+.tpl-ratnatrayaprism .scene { position: relative; width: 100%; height: calc(var(--h) * var(--k) + 24px); perspective: 1100px; }
+.tpl-ratnatrayaprism .prism {
+  position: absolute; left: 50%; top: calc(50% - 8px); width: var(--w); height: var(--h);
+  margin: calc(var(--h) / -2) 0 0 calc(var(--w) / -2);
+  transform-style: preserve-3d;
+  transform: scale(var(--k)) rotateX(-12deg) rotateY(calc(var(--turn) * -120deg));
+  transition: transform 0.95s cubic-bezier(0.7, 0, 0.2, 1);
+}
+.tpl-ratnatrayaprism .face {
+  position: absolute; inset: 0; transform-style: preserve-3d;
+  transform: rotateY(calc(var(--i) * 120deg)) translateZ(var(--a));
+}
+/* glass is visible from behind too, so the two inactive faces read as a V through the front pane */
+.tpl-ratnatrayaprism .face__glass {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(112deg, transparent 0 46%, rgba(255, 255, 255, 0.75) 46% 47.4%, transparent 47.4%),
+    linear-gradient(64deg, rgba(27, 107, 79, 0.08) 0 28%, transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(201, 216, 210, 0.5) 58%, rgba(201, 216, 210, 0.78));
+  border-inline: 2px solid var(--emerald);
+  border-block: 1px solid rgba(27, 107, 79, 0.45);
+  box-shadow: inset 0 0 28px rgba(27, 107, 79, 0.16), 0 0 14px rgba(27, 107, 79, 0.2);
+}
+.tpl-ratnatrayaprism .face__txt {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.2rem; padding: 0 1rem; text-align: center; line-height: 1.35; backface-visibility: hidden;
+  transform: translateZ(1px); /* lift off the coplanar glass so it never z-fights */
+}
+/* inactive faces fall to 35 percent; the active one is full strength and a touch brighter */
+.tpl-ratnatrayaprism .face > * { opacity: 0.35; transition: opacity 0.9s ease, filter 0.9s ease; }
+.tpl-ratnatrayaprism .face[data-on='true'] > * { opacity: 1; }
+.tpl-ratnatrayaprism .face[data-on='true'] .face__glass { filter: brightness(1.07) saturate(1.1); }
+.tpl-ratnatrayaprism .face__title { font-size: 1.5rem; font-weight: 600; line-height: 1.2; }
+.tpl-ratnatrayaprism .face__sub { margin-bottom: 0.6rem; font-size: 0.8125rem; color: var(--emerald-d); }
+.tpl-ratnatrayaprism .face__soft { font-size: 0.875rem; color: var(--ink-2); }
+.tpl-ratnatrayaprism .face__names { font-size: 1.25rem; font-weight: 600; }
+.tpl-ratnatrayaprism .cap {
+  position: absolute; left: 0; width: var(--w); height: calc(var(--w) * 0.866);
+  top: calc((var(--h) - var(--w) * 0.866) / 2);
+  transform: rotateX(90deg) translate3d(0, calc(var(--w) * -0.1443), calc(var(--h) / 2));
+  opacity: 0.9;
+}
+.tpl-ratnatrayaprism .floor {
+  position: absolute; left: 50%; bottom: 0; width: calc(var(--w) * 1.1 * var(--k)); height: 18px; transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(26, 21, 48, 0.16), transparent);
+}
+.tpl-ratnatrayaprism .dots { display: flex; gap: 14px; }
+.tpl-ratnatrayaprism .dots span {
+  width: 10px; height: 10px; border: 1.5px solid var(--emerald); border-radius: 50%; opacity: 0.4;
+  transition: background-color 0.6s, opacity 0.6s;
+}
+.tpl-ratnatrayaprism .dots span[data-on='true'] { background: var(--emerald); opacity: 1; }
+/* short landscape screens: let the stage scroll away instead of eating the viewport */
+@media (max-height: 600px) {
+  .tpl-ratnatrayaprism .stage { position: static; }
+  .tpl-ratnatrayaprism .panel { min-height: 0; }
+}
+
+/* ---------- panels ---------- */
+.tpl-ratnatrayaprism .panel, .tpl-ratnatrayaprism .rsvp-sec { max-width: 36rem; margin-inline: auto; padding-inline: 1.25rem; text-align: center; }
+.tpl-ratnatrayaprism .panel { min-height: calc(100svh - var(--stage-h)); padding-top: 1.5rem; padding-bottom: 4.5rem; }
+.tpl-ratnatrayaprism h2 { font-size: 1.5rem; font-weight: 600; line-height: 1.2; text-wrap: balance; }
+.tpl-ratnatrayaprism .sub { margin-top: 0.15rem; font-size: 0.875rem; color: var(--emerald-d); }
+.tpl-ratnatrayaprism h3 { font-size: 1.25rem; font-weight: 600; line-height: 1.25; }
+
+.tpl-ratnatrayaprism .houses { display: grid; gap: 1.75rem; margin-top: 2rem; }
+.tpl-ratnatrayaprism .houses h3 { margin-bottom: 0.2rem; color: var(--emerald-d); }
+.tpl-ratnatrayaprism .houses p { max-width: 26rem; margin-inline: auto; text-wrap: balance; }
+.tpl-ratnatrayaprism .greet { margin-top: 2.75rem; font-size: 1.375rem; line-height: 1.5; color: var(--emerald-d); }
+.tpl-ratnatrayaprism .greet__text { font-style: italic; }
+.tpl-ratnatrayaprism .greet__mean { max-width: 24rem; margin-inline: auto; font-size: 0.9375rem; color: var(--ink-2); text-wrap: balance; }
+
+.tpl-ratnatrayaprism .fullnames { margin-top: 1.5rem; font-size: 1.125rem; }
+.tpl-ratnatrayaprism .story { display: grid; gap: 1.75rem; max-width: 30rem; margin: 2.25rem auto 0; text-align: left; }
+.tpl-ratnatrayaprism .story li { display: grid; grid-template-columns: 3.75rem 1fr; gap: 1rem; }
+.tpl-ratnatrayaprism .story__yr { font-size: 1.5rem; font-weight: 600; line-height: 1.2; color: var(--emerald); font-variant-numeric: lining-nums; }
+.tpl-ratnatrayaprism .story li > div { padding-left: 1rem; border-left: 1px solid var(--line); }
+.tpl-ratnatrayaprism .story h3 { font-size: 1.125rem; margin-bottom: 0.15rem; }
+
+/* countdown: four numerals threaded on one thin emerald line */
+.tpl-ratnatrayaprism .count { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); max-width: 24rem; margin: 1.75rem auto 0; }
+.tpl-ratnatrayaprism .count::before { content: ''; position: absolute; left: 0; right: 0; top: 1.05rem; height: 1px; background: var(--emerald); }
+.tpl-ratnatrayaprism .count div { position: relative; display: grid; justify-items: center; }
+.tpl-ratnatrayaprism .count b { padding: 0 0.5rem; font-size: 1.75rem; font-weight: 600; line-height: 1.2; background: var(--ivory); font-variant-numeric: lining-nums tabular-nums; }
+.tpl-ratnatrayaprism .count span { font-size: 0.8125rem; color: var(--ink-2); }
+.tpl-ratnatrayaprism .count__done { margin-top: 1.5rem; font-size: 1.25rem; font-style: italic; }
+
+.tpl-ratnatrayaprism .events { margin-top: 2.5rem; }
+.tpl-ratnatrayaprism .events li { padding: 1.4rem 0; border-top: 1px solid var(--line); }
+.tpl-ratnatrayaprism .events li:last-child { border-bottom: 1px solid var(--line); }
+.tpl-ratnatrayaprism .events li.is-main { border-top: 2px solid var(--emerald); }
+.tpl-ratnatrayaprism .events li.is-main h3 { font-size: 1.5rem; color: var(--emerald-d); }
+.tpl-ratnatrayaprism .ev__when { margin-top: 0.15rem; font-weight: 600; }
+.tpl-ratnatrayaprism .ev__dress span { color: var(--emerald-d); font-weight: 600; }
+.tpl-ratnatrayaprism .ev__note { max-width: 30rem; margin: 0.6rem auto 0; font-style: italic; color: var(--ink-2); text-wrap: pretty; }
+
+.tpl-ratnatrayaprism .venue { margin-top: 2.5rem; }
+.tpl-ratnatrayaprism .venue__name { font-size: 1.25rem; font-weight: 600; }
+.tpl-ratnatrayaprism .acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1.25rem; }
+
+.tpl-ratnatrayaprism .btn, .tpl-ratnatrayaprism .rsvp button {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0.6rem 1.4rem;
+  font: 600 1rem/1.2 var(--serif); color: var(--ivory); background: var(--emerald);
+  border: 1.5px solid var(--emerald); border-radius: 0; cursor: pointer; text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+.tpl-ratnatrayaprism .btn:hover, .tpl-ratnatrayaprism .rsvp button:hover { background: var(--emerald-d); border-color: var(--emerald-d); }
+.tpl-ratnatrayaprism .btn--line { color: var(--emerald-d); background: transparent; }
+.tpl-ratnatrayaprism .btn--line:hover { color: var(--emerald-d); background: var(--pearl-l); border-color: var(--emerald); }
+
+/* ---------- rsvp (sits under the prism) ---------- */
+.tpl-ratnatrayaprism .rsvp-sec { max-width: 30rem; padding-top: 1rem; padding-bottom: 5rem; }
+.tpl-ratnatrayaprism .rsvp-sec__by { margin-top: 0.3rem; color: var(--ink-2); }
+.tpl-ratnatrayaprism .rsvp { display: grid; gap: 1.1rem; margin-top: 1.5rem; text-align: left; }
+.tpl-ratnatrayaprism .rsvp label { display: grid; gap: 0.3rem; }
+.tpl-ratnatrayaprism .rsvp label span { font-weight: 600; color: var(--emerald-d); }
+.tpl-ratnatrayaprism .rsvp input, .tpl-ratnatrayaprism .rsvp select, .tpl-ratnatrayaprism .rsvp textarea {
+  width: 100%; min-height: 48px; padding: 0.6rem 0.75rem; font: inherit; color: var(--ink);
+  background: var(--pearl-l); border: 1px solid var(--line); border-bottom: 2px solid var(--emerald); border-radius: 0;
+}
+.tpl-ratnatrayaprism .rsvp textarea { resize: vertical; }
+.tpl-ratnatrayaprism .rsvp button { justify-self: start; }
+.tpl-ratnatrayaprism .rsvp__error { font-weight: 600; color: #9b2226; }
+.tpl-ratnatrayaprism .rsvp__done {
+  margin-top: 1.5rem; padding: 1.5rem; text-align: center; font-size: 1.125rem;
+  background: var(--pearl-l); border: 1px solid var(--line); border-top: 2px solid var(--emerald);
+}
+
+/* ---------- footer: Siddhashila crescent over the three dots ---------- */
+.tpl-ratnatrayaprism .close { display: grid; justify-items: center; gap: 0.2rem; padding: 4rem 1.25rem calc(80px + 2rem); text-align: center; color: var(--ink-2); }
+.tpl-ratnatrayaprism .siddha { width: 72px; height: 44px; margin-bottom: 1.25rem; fill: var(--emerald); }
+.tpl-ratnatrayaprism .close__names { font-size: 1.5rem; font-weight: 600; color: var(--ink); }
+
+@media (max-width: 380px) {
+  .tpl-ratnatrayaprism .story li { grid-template-columns: 1fr; gap: 0.25rem; }
+}
