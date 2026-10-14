@@ -41,3 +41,13 @@ coverage/
 Thumbs.db
 
 .vercel
+
+# Local AI / tooling state
+.claude/
+.codegraph/
+graphify-out/
+
+# Browser test output
+playwright-report/
+test-results/
+.playwright/

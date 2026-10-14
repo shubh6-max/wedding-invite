@@ -1,7 +1,5 @@
 :root {
   font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
-  color: #2d1b12;
-  background: #ab7e54;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -12,10 +10,6 @@
 *::before,
 *::after {
   box-sizing: border-box;
-}
-
-html {
-  background: #ab7e54;
 }
 
 body {

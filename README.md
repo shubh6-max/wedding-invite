@@ -1,34 +1,37 @@
-# Wedding Invite
+# Wedding Invite Designs
 
-This project is a custom digital wedding invitation built for Sakshi and Chinmay.
-It is designed to feel warm, interactive, and a little dramatic, more like opening a real invitation than visiting a plain landing page.
+A gallery of ten animated digital wedding invitations, plus the original Sakshi & Chinmay invite kept as-is.
+Built with React 19, Vite 8 and plain CSS (no router or animation library).
 
-The experience includes:
+## The ten designs
 
-- a wax-seal entry animation
-- a countdown to the big day
-- team selection for `Team Bride` and `Team Groom`
-- a couple introduction section
-- a wedding planner timeline with animated event cards
-- venue links that open directly in Google Maps
+Rajmahal, Gopuram, Marigold Mela, Editorial, Botanical, Gatsby Deco, Boho Sun, Celestial, Storybook, Boarding Pass.
+Each has its own layout, type, palette and one signature interaction (see `src/data/templates.js`).
+Every design includes a live countdown, event schedule, story, RSVP form (front-end only, no backend yet),
+add-to-calendar (.ics) and a map link. All sample names, venues and dates are fictional.
 
-## Built With
-
-- React 19
-- Vite 8
-- CSS for all layout, styling, and animations
-
-## Project Structure
+## Project structure
 
 ```text
 src/
-  App.jsx     Main content, invite data, sections, and interactions
-  App.css     Styling, transitions, layouts, and card animations
-  main.jsx    React entry point
-
-public/
-  invite-media/  Photos and fallback portrait assets
+  App.jsx               Gallery, hash router (#/t/<id>) and floating nav
+  gallery.css           Gallery styles + global reduced-motion rule
+  data/sample.js        Shared sample couple/events every design renders
+  data/templates.js     Registry of the ten designs (lazy-loaded)
+  lib/                  useCountdown, useReveal, useRoute, .ics download
+  components/RsvpForm   Shared RSVP form, styled per design
+  templates/<id>/       One folder per design: Component.jsx + <id>.css (scoped to .tpl-<id>)
+  templates/seal/       The original invite, unchanged
 ```
+
+## Personalising a design
+
+Edit `src/data/sample.js` (names, date, venue, events, story). Every design reads from it.
+
+## Adding an eleventh design
+
+Create `src/templates/<id>/`, default-export a component taking `{ invite }`, scope CSS under `.tpl-<id>`
+with a root of `className="tpl tpl-<id>"`, and add a row to `src/data/templates.js`.
 
 ## Running It Locally
 
@@ -55,19 +58,6 @@ Preview the production build:
 ```bash
 npm run preview
 ```
-
-## Where To Edit Things
-
-If you want to customize the invite later, these are the most important places:
-
-- `src/App.jsx`
-  This is where the names, event details, countdown date, card content, and section copy live.
-
-- `src/App.css`
-  This controls the full look and feel, including the wax seal opening, planner card animations, layout spacing, and typography styling.
-
-- `public/invite-media`
-  This folder contains the invite images and fallback portraits.
 
 ## Live Site
 
@@ -99,7 +89,3 @@ git commit -m "Describe your change"
 git push
 ```
 
-## Final Note
-
-This invite was shaped to feel more personal than a standard template.
-If you want to keep evolving it, the easiest next upgrades would be RSVP handling, a photo gallery, background music, or a custom domain.
