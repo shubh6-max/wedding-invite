@@ -56,6 +56,9 @@ const PROOF = {
 const sampleStrings = Object.values(presets).flatMap((p) => [p.couple.a, p.couple.b, p.full?.a, p.full?.b, p.hosts, p.venue, p.city].filter(Boolean))
 const squash = (t) => t.replace(/\s+/g, '').toLowerCase() // some designs set names letter by letter, and some uppercase them
 const has = (body, s) => squash(body).includes(squash(s))
+// squash() lowercases, so a pattern is always matched case-insensitively against squashed text (a
+// case-sensitive /Meera/ could never match "meera"). Patterns must not contain spaces: squashed text has none.
+const matchSquashed = (pattern, t) => new RegExp(pattern.source, pattern.flags.includes('i') ? pattern.flags : `${pattern.flags}i`).test(squash(t))
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 let browser
@@ -142,7 +145,7 @@ async function openGate(root, area, tag) {
 // Polls the preview's text until it matches, or returns false after `ms`.
 async function until(page, pattern, ms = 4000) {
   for (let t = 0; t < ms; t += 100) {
-    if (pattern.test(squash(await text(page)))) return true
+    if (matchSquashed(pattern, await text(page))) return true
     await sleep(100)
   }
   return false
@@ -173,7 +176,7 @@ async function editLive() {
       if (!(await until(page, /Zanele/i))) fail('edit-live', `${id}: gate does not show the edited name`)
       if (await openGate(frame, 'edit-live', id)) {
         const opened = await text(page)
-        if (!/Zanele/i.test(squash(opened)) || !/Quinn/i.test(squash(opened))) fail('edit-live', `${id}: opened page misses the edited names`)
+        if (!matchSquashed(/Zanele/, opened) || !matchSquashed(/Quinn/, opened)) fail('edit-live', `${id}: opened page misses the edited names`)
         // Editing again must change the page in place: no gate comes back and the page is not rebuilt.
         await frame.locator('.tpl').first().evaluate((el) => { el.dataset.mark = 'kept' })
         await type(page, 'ca', 'Mehr')
@@ -181,7 +184,7 @@ async function editLive() {
         let shown = false
         for (let i = 0; i < 12; i++) {
           if (await frame.locator('.gate').count()) replayed = true
-          if (/Mehr/i.test(squash(await text(page)))) shown = true
+          if (matchSquashed(/Mehr/, await text(page))) shown = true
           await sleep(100)
         }
         if (replayed) fail('edit-live', `${id}: the opening gate replayed while editing`)
@@ -705,7 +708,33 @@ async function proof() {
   await ctx.close()
 }
 
+// ---- self-test (no browser) ---------------------------------------------------------------------
+// node scripts/qa-studio.mjs --self-test  checks the text matching the browser areas rely on.
+function selfTest() {
+  const bad = []
+  const ok = (cond, what) => { if (!cond) bad.push(what) }
+  ok(matchSquashed(/Meera/, 'Me era\nMEERA'), 'mixed-case, letter-by-letter text must match a capitalised pattern')
+  ok(matchSquashed(/Zanele/i, 'Z A N E L E'), 'an /i pattern must match uppercase spaced text')
+  ok(!matchSquashed(/Quinn/, 'Mehr and Arjun'), 'a pattern must not match text without it')
+  ok(has('Tuesday,  1 JUNE 2027', 'tuesday, 1 june 2027'), 'has() must ignore case and whitespace')
+  ok(!has('Monday, 31 May 2027', 'Tuesday, 1 June 2027'), 'has() must not match a different day')
+  ok(/\b(undefined|NaN|null)\b|\[object/.test('Days: NaN') && !/\b(undefined|NaN|null)\b|\[object/.test('Nullarbor Banana'), 'junk regex on raw text')
+  for (const c of CASES) {
+    const { text: want, none } = expectations(c)
+    ok(want.length > 0, `fixture "${c.name}" asserts nothing that must appear`)
+    ok(Array.isArray(c.none), `fixture "${c.name}" has no none list`)
+    for (const w of want) ok(has(w.toUpperCase(), w), `"${w.slice(0, 20)}" does not match its own uppercase form`)
+    for (const w of none) ok(!want.some((t) => has(t, w)), `fixture "${c.name}": "${w}" is both required and forbidden`)
+  }
+  return bad
+}
+
 // ---- run ----------------------------------------------------------------------------------------
+if (process.argv.includes('--self-test')) {
+  const bad = selfTest()
+  console.log(JSON.stringify({ pass: bad.length === 0, failures: bad.map((b) => `[self-test] ${b}`), areas: {} }))
+  process.exit(bad.length ? 1 : 0)
+}
 const areas = { 'edit-live': editLive, share, hostile, storage, gallery, mobile, focus, proof }
 const results = {}
 // One overall timeout so a hung browser still ends in a JSON line.
