@@ -16,7 +16,7 @@ The shape that serves a non-technical couple on a phone fastest:
 4. **The link carries the data.** `#/t/<id>?d=<payload>`; short edits stay plain and short, heavy edits are deflate-compressed, and a longer "older phones" link is offered when compression was used.
 5. **Rajmahal first, then one design at a time.** A design shows Customize only after it passes an "editable-proof" checklist (section 12). A QA flag (`?qa=1`) opens the Studio for any design so all 25 can be tested from day one.
 
-Measured on a throwaway prototype of this plan, built in a scratch copy of the repo (not committed): `npm run lint` clean, 75 unit tests passing, production build passing, Studio browser suite passing for Rajmahal (edit-live, share, hostile, storage, gallery, mobile, focus, proof), and nine deliberate mutations each caught by it (section 13). The same checks also pass under the GitHub Pages base path (`/wedding-invite/`), the existing `scripts/qa-gate.mjs` suite still passes for Rajmahal with the new floating bar, and the basic edit-and-see check passes for all 25 designs. The numbers quoted below come from that prototype and are marked "measured".
+Measured on a throwaway prototype of this plan, built in a scratch copy of the repo (not committed): `npm run lint` clean, 75 unit tests passing, production build passing, Studio browser suite passing for Rajmahal (edit-live, share, hostile, storage, gallery, mobile, focus, proof), and ten deliberate mutations each caught by it (section 13). The same checks also pass under the GitHub Pages base path (`/wedding-invite/`), the existing `scripts/qa-gate.mjs` suite still passes for Rajmahal with the new floating bar, and the basic edit-and-see check passes for all 25 designs. The numbers quoted below come from that prototype and are marked "measured".
 
 ## 2. Goals and non-goals
 
@@ -339,7 +339,8 @@ Open design risk: the cutting-mat grid can read as a blueprint cliche; if so, dr
 | Share title and lede | Send your invitation. This link opens the invitation with your details. Free, no account, nothing stored on a server. |
 | Sample warning | Still the sample. Guests will see these as written in the sample: Names, Venue and city. Button: Go back and change them |
 | Link actions | Copy link, Send on WhatsApp, More options, Open as a guest. Result: Link copied. If clipboard is blocked: Press and hold the link, then choose Copy. |
-| Fine print | If you change something later, copy the link again. Links you already sent keep the old details. |
+| Fine print | If you change something later, copy the link again. Links you already sent keep the old details. Anyone with the link can see the details in it. |
+| Values that cannot be used | Check before sending. "These cannot be used as typed, so the sample or a shorter version will show: Map link (optional)." Button: Go back and fix them |
 | Older phones | Link for older phones. Phones from before 2023 may not open the short link. This one is longer but opens everywhere. Button: Copy long link |
 | Errors (on blur, text, tied to the field) | "Name shown first is needed." "Shorten this to 30 characters or fewer. Anything longer is cut off." "Enter a real date between 2000 and 2100." "Enter a time, for example 5:30 PM." "Use a Google Maps or Apple Maps link that starts with https://." "Enter 8 to 15 digits, starting with the country code." "Enter an email like name@example.com." "Enter a four-digit year, for example 2019." |
 | Guest link broken | "This invitation link did not open." "The link looks damaged or incomplete. Ask the sender to send it again." Variants: needs a newer phone (ask for the link for older phones); newer version of the studio. Button: See the designs |
@@ -447,7 +448,7 @@ The Studio turns text from three untrusted places (a person typing, a link, a sa
 6. **Missing optional fields.** Hosts, line before names, map link, reply-by, dress, note and contact can be empty: the element is not rendered, no empty margin box is left, no "undefined", "null" or "NaN" is printed.
 7. **Special characters.** Apostrophes, quotes, ampersand, emoji, Devanagari and Gujarati render (font stacks fall back to Noto), nothing is double-escaped (`&amp;` shows literally).
 8. **Dates.** Every date or time on the page and gate comes from `invite.dateLabel`, `timeLabel`, event `day` and `time`, and the countdown from `invite.date`. A past date shows zeros; a date in 2090 (five-digit day counts) fits its boxes.
-9. **Gate.** The gate shows the edited names and date, fits at 320px with maximum-length names, and the button label stays the design's own.
+9. **Gate.** The gate shows the edited names and date; at the field limits every line of its text stays on screen and clear of its button, from 320px up (the harness measures line boxes, not element boxes); the button label stays the design's own.
 10. **Counts and ids.** Anything that indexes `events[n]` or `story[n]` is correct for exactly 4 and 3; lookups use the event `id` (`wedding`).
 11. **Anchors.** `data-studio-section` on the hero, events, story, venue and replies containers (optional; missing ones are ignored).
 12. **No stale state.** Editing in the Studio changes the open page in place: no gate replay, no remount flash, reveal states preserved.
@@ -458,16 +459,17 @@ The Studio turns text from three untrusted places (a person typing, a link, a sa
 
 Before (original `Rajmahal.jsx`): story `key={s.year + s.title}` (line 180) and event `key={e.id || e.name}` (156); `hosts` (96), `tagline` (102), `city` (109 and 192), the "Wear" row (165) and the map button (195) rendered unconditionally; font stack `'Cormorant Garamond', Georgia` with no Devanagari or Gujarati fallback; long unbroken words not wrapped; hero text in a fixed-aspect arch with a `clip-path`, so overflow is silently cut.
 
-Changes (all in `src/templates/rajmahal/`: 6 conditionals, 2 key changes, 5 section anchors, 4 `data-fit` attributes and 15 added lines of CSS; the diff is +23 and -18 lines in `Rajmahal.jsx` and +15 and -2 in `rajmahal.css`):
+Changes (all in `src/templates/rajmahal/`: in `Rajmahal.jsx` 6 conditionals, 2 key changes, 5 section anchors and 4 `data-fit` attributes; in `rajmahal.css` 15 added lines; in `Gate.jsx` and `gate.css` one `data-fit` attribute and 2 CSS rules; the diff is +23 and -18 lines in `Rajmahal.jsx`, +15 and -2 in `rajmahal.css`, +3 in `Gate.jsx`, +2 in `gate.css`):
 
 - Index keys for events and story.
 - `invite.hosts &&`, `invite.tagline &&`, `invite.city &&` (both places), `e.dress &&`, `invite.mapUrl &&`.
 - `fitStep()` sets `data-fit` on the names (thresholds 10 and 16 graphemes), hosts (60 and 100), line before names (50 and 80) and venue line (40 and 70); CSS steps the type down to a floor of 12px.
 - Font stack adds `'Noto Serif Devanagari', 'Noto Serif Gujarati'`; the root gets `overflow-wrap: anywhere`; hosts, tagline and venue heading get `text-wrap: balance`; the venue's city line uses `max(12px, 0.9em)`.
 - `data-studio-section` on hero, events, story, venue and replies.
+- The gate's nameplate gets the same treatment: `data-fit` from the two names (10 and 16 graphemes), type capped at 36px and then 24px.
 - Shared: `useCountdown` fix (E3).
 
-Verified in the prototype with `scripts/qa-studio.mjs --only=proof --design=rajmahal`: nine fixtures (every field at maximum, Latin and Devanagari; shortest possible; optional fields emptied; special characters and emoji; one very long unbroken word; far-future date; past date; midnight in a far time zone) at four widths, plus a live edit run (date moved to 2090 and to 2020, a story title edited after its plaque had revealed). Failures found and fixed on the way: hero overflow of 16px at 320 with maximum Devanagari; a 10.8px text node from `0.9em` of a 12px line; a story plaque left invisible after its key changed (the check fails against the original key, see section 13).
+Verified in the prototype with `scripts/qa-studio.mjs --only=proof --design=rajmahal`: nine fixtures (every field at maximum, Latin and Devanagari; shortest possible; optional fields emptied; special characters and emoji; one very long unbroken word; far-future date; past date; midnight in a far time zone) at four widths, plus a live edit run (date moved to 2090 and to 2020, a story title edited after its plaque had revealed). Failures found and fixed on the way: hero overflow of 16px at 320 with maximum Devanagari; a 10.8px text node from `0.9em` of a 12px line; a story plaque left invisible after its key changed (the check fails against the original key, see section 13); and, after a screenshot showed it, the closed gate's nameplate running into its own button and off the screen with maximum-length names, which the first version of the harness (horizontal overflow only) had missed, so it now measures gate line boxes against the button and the viewport.
 
 ### 12.3 Order after Rajmahal
 
@@ -497,7 +499,7 @@ Browser (`node scripts/qa-studio.mjs`, Playwright core with Edge or Chrome, like
 | `gallery` | 25 cards, each with Customize (editable designs) or "Editing soon"; card actions 44px or more; no sideways scroll; the floating bar fits a 320px screen with every control 44px or more; a guest link gets the small bar (no gallery navigation) whose share link keeps `?d=`. |
 | `mobile` (390 by 844, touch) | Starts on Edit with the preview invisible; the tab bar steps aside while a field has focus and returns on blur; Preview shows the edit at full width; edits survive tab switches; no sideways scroll; fields 16px or more; controls 44px or more. |
 | `focus` | The preview never keeps keyboard focus after load or Replay; reduced motion removes the lay-down. |
-| `proof` (one design, nine fixtures, four widths, plus live edits) | Section 12.1 items 4 to 8, 12: no overflow, hero text inside its container, no text under 12px, no empty elements, no `undefined`, `NaN`, `null` or `[object` text, countdown zeros for a past date, digits fit, plaque stays visible after its text changes. |
+| `proof` (one design, nine fixtures, four widths, plus live edits) | Section 12.1 items 4 to 9, 12: no overflow, gate text clear of its button and on screen, hero text inside its container, no text under 12px, no empty elements, no `undefined`, `NaN`, `null` or `[object` text, countdown zeros for a past date, digits fit, plaque stays visible after its text changes. |
 
 Mutation checks (done on the prototype, each one breaks a single thing, rebuilds, and expects the named area to fail; repeat when the code changes):
 
@@ -512,6 +514,7 @@ Mutation checks (done on the prototype, each one breaks a single thing, rebuilds
 | The page remounted on every draft (`key` on the page) | `edit-live`: "the page was rebuilt instead of updated in place" | caught |
 | `normaliseUrl` accepts any URL | `hostile` ("a javascript: link reached the page") and three unit tests | caught |
 | The bar's share URL drops `d` | `gallery`: "the share link in the bar drops the personalised data" | caught |
+| The gate's `data-fit` removed | `proof`: "lines of gate text overlap the open button" | caught |
 
 Two harness defects were found this way and fixed: the cross-origin check first passed without proving anything (Chromium's local-network checks stopped the framed preview from loading), so it now fails when the frame did not load and runs in a browser started with those checks switched off; and the first "gate replayed" mutation (a key on the gate) was invisible because a gate that is already open is unmounted, so the check now also asserts that the page element itself survives an edit.
 
@@ -533,7 +536,7 @@ Ten tasks; file lists are disjoint, so tasks with no dependency between them can
 | 6 | Share sheet | `src/studio/ShareSheet.jsx` | 1, 2 |
 | 7 | Studio screen: tokens and styles, editor, field, screen | `src/studio/Studio.jsx`, `Editor.jsx`, `Field.jsx`, `studio.css` | 1, 3, 5, 6 |
 | 8 | App shell: router, viewer source, Customize in the gallery and bar | `src/App.jsx`, `src/gallery/Gallery.jsx`, `src/components/Pill.jsx`, `src/lib/hooks.js`, `src/lib/useInviteSource.js`, `src/gallery.css` | 2, 3, 5, 7 |
-| 9 | Rajmahal pilot: editable-proof changes and the first `editable: true` | `src/templates/rajmahal/Rajmahal.jsx`, `rajmahal.css`, `src/data/templates.js` | 8 |
+| 9 | Rajmahal pilot: editable-proof changes and the first `editable: true` | `src/templates/rajmahal/Rajmahal.jsx`, `rajmahal.css`, `Gate.jsx`, `gate.css`, `src/data/templates.js` | 8 |
 | 10 | Docs, description, unit tests in CI, rollout checklist, full run | `README.md`, `index.html`, `docs/PLAN.md`, `.github/workflows/deploy.yml` | 9 |
 
 Parallel lanes: after Task 1, Tasks 2, 3 and 4 run in parallel; after Task 3, Tasks 5 and 6 (needs 2) run in parallel; Task 7 joins them; Task 8 then 9 then 10 are sequential. Browser areas `edit-live`, `share`, `hostile`, `storage`, `gallery`, `mobile`, `focus` pass at the end of Task 8; `proof` passes at the end of Task 9. Before Task 8, Tasks 5 to 7 are checked by lint, build, unit tests and a manual smoke in `npm run dev`.

@@ -55,7 +55,7 @@ Also exercised: every optional field emptied and every field at its maximum in L
 | `src/studio/ShareSheet.jsx` | The share dialog | 6 |
 | `src/studio/Studio.jsx`, `Editor.jsx`, `Field.jsx`, `studio.css` | The Studio screen | 7 |
 | `src/App.jsx`, `src/gallery/Gallery.jsx`, `src/components/Pill.jsx`, `src/lib/hooks.js`, `src/lib/useInviteSource.js`, `src/gallery.css` | Router, viewer, Customize entry points | 8 |
-| `src/templates/rajmahal/*`, `src/data/templates.js` | First editable-proof design | 9 |
+| `src/templates/rajmahal/Rajmahal.jsx`, `rajmahal.css`, `Gate.jsx`, `gate.css`, `src/data/templates.js` | First editable-proof design | 9 |
 | `README.md`, `index.html`, `docs/PLAN.md`, `.github/workflows/deploy.yml` | Documentation and the CI test step | 10 |
 
 ---
@@ -2027,6 +2027,28 @@ async function proof() {
         if (gateOver > 0) fail('proof', `${tag}: gate scrolls sideways by ${gateOver}px`)
         const gateClip = await page.evaluate(() => [...document.querySelectorAll('.gate *')].filter((e) => { const r = e.getBoundingClientRect(); return r.width && (r.right > innerWidth + 1 || r.left < -1) }).length)
         if (gateClip) fail('proof', `${tag}: ${gateClip} gate elements leave the screen sideways`)
+        // Every line of text in the closed gate must stay on screen and clear of its button (line boxes, not element boxes).
+        const gate = await page.evaluate(() => {
+          const root = document.querySelector('.gate')
+          const button = root.querySelector('[data-gate-primary]')
+          const b = button.getBoundingClientRect()
+          const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+          let overlap = 0
+          let outside = 0
+          for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+            if (!n.textContent.trim() || button.contains(n)) continue
+            const range = document.createRange()
+            range.selectNodeContents(n)
+            for (const r of range.getClientRects()) {
+              if (!r.width || !r.height) continue
+              if (r.left < b.right - 2 && r.right > b.left + 2 && r.top < b.bottom - 2 && r.bottom > b.top + 2) overlap += 1
+              if (r.top < -1 || r.bottom > innerHeight + 1) outside += 1
+            }
+          }
+          return { overlap, outside }
+        })
+        if (gate.overlap) fail('proof', `${tag}: ${gate.overlap} lines of gate text overlap the open button`)
+        if (gate.outside) fail('proof', `${tag}: ${gate.outside} lines of gate text leave the screen vertically`)
         await openGate(page)
         await page.waitForSelector('.tpl h1', { timeout: 6000 })
         await sleep(2300) // the hero's own entrance
@@ -3732,6 +3754,8 @@ git commit -m "feat(studio): router, viewer content source, guest bar and Custom
 **Files:**
 - Modify: `src/templates/rajmahal/Rajmahal.jsx`
 - Modify: `src/templates/rajmahal/rajmahal.css`
+- Modify: `src/templates/rajmahal/Gate.jsx`
+- Modify: `src/templates/rajmahal/gate.css`
 - Modify: `src/data/templates.js` (the `editable` flag, and the comment above the registry)
 
 **Interfaces:**
@@ -3743,7 +3767,7 @@ git commit -m "feat(studio): router, viewer content source, guest bar and Custom
 Build and serve (`npm run build && npm run preview -- --port 4173`), then:
 
 Run: `node scripts/qa-studio.mjs --only=proof --design=rajmahal`
-Expected: FAIL. On the unchanged design the run reports 14 failures: the hero text overflows its arch by 105 to 140px with maximum-length Latin text and by 163 to 234px with maximum-length Devanagari (at 320, 360, 390 and 1366 wide); six empty elements remain when the optional fields are emptied (the hosts line, the tagline and four empty "Wear" values); the countdown digits overflow their boxes at 320 wide for a date in 2090; and the story plaque stays invisible after its title is edited. The exact numbers can differ by a few pixels between machines; the kinds of failure should match.
+Expected: FAIL. On the unchanged design the run reports 33 failures: the hero text overflows its arch (by 105 to 234px) for both maximum-length fixtures at every width; lines of the closed gate's text overlap its button, and some run off the bottom of the screen, for the maximum-length, one-long-word and special-character fixtures at several widths; six empty elements remain when the optional fields are emptied (the hosts line, the tagline and four empty "Wear" values); the countdown digits overflow their boxes at 320 wide for a date in 2090; and the story plaque stays invisible after its title is edited. Pixel counts can differ by a few between machines; the kinds of failure should match.
 
 - [ ] **Step 2: Edit `src/templates/rajmahal/Rajmahal.jsx`**
 
@@ -3923,7 +3947,53 @@ Apply by hand. Devanagari and Gujarati fallbacks, word wrapping, balanced lines,
    position: relative;
 ```
 
-- [ ] **Step 4: Mark the design editable**
+- [ ] **Step 4: Edit the gate: `src/templates/rajmahal/Gate.jsx` and `gate.css`**
+
+The closed gate shows the names on a plate above the button. With maximum-length names the plate runs into the button and off the screen (the harness measures every line box of gate text), so long names step down in size like the page's:
+
+```diff
+--- a/src/templates/rajmahal/Gate.jsx
++++ b/src/templates/rajmahal/Gate.jsx
+@@ -1,4 +1,5 @@
+ import { useGate } from '../../lib/gate.js'
++import { fitStep } from '../../lib/fit.js'
+ import { guestName } from '../../lib/guest.js'
+ import './gate.css'
+ 
+@@ -12,6 +13,7 @@
+   const { trigger, opening } = useGate({ onOpen, onDone, ms: 2000 })
+   const { a, b } = invite.couple
+   const guest = guestName()
++  const nameFit = Math.max(fitStep(a, [10, 16]), fitStep(b, [10, 16])) // long names step down so the plate never reaches the button
+ 
+   return (
+     <div role="region" aria-label={`Invitation for ${a} and ${b}`} className={`gate gate-rajmahal${opening ? ' is-opening' : ''}`}>
+@@ -35,7 +37,7 @@
+         </svg>
+         <div className="gate-rajmahal__plate">
+           {guest && <p className="gate-rajmahal__guest">For {guest}</p>}
+-          <p className="gate-rajmahal__names">
++          <p className="gate-rajmahal__names" data-fit={nameFit}>
+             <span>{a}</span>
+             <i aria-hidden="true">&amp;</i>
+             <span>{b}</span>
+```
+
+```diff
+--- a/src/templates/rajmahal/gate.css
++++ b/src/templates/rajmahal/gate.css
+@@ -132,6 +132,8 @@
+   line-height: 0.95;
+   color: var(--gold-light);
+ }
++.gate-rajmahal .gate-rajmahal__names[data-fit='1'] { font-size: clamp(26px, 8.5cqw, 36px); }
++.gate-rajmahal .gate-rajmahal__names[data-fit='2'] { font-size: clamp(18px, 6cqw, 24px); line-height: 1.15; }
+ .gate-rajmahal .gate-rajmahal__names i { font-weight: 400; font-size: 0.5em; line-height: 1; color: var(--gold); }
+ .gate-rajmahal .gate-rajmahal__date { margin-top: 8px; font-size: 15px; line-height: 1.2; color: var(--cream); }
+ 
+```
+
+- [ ] **Step 5: Mark the design editable**
 
 ```diff
 --- a/src/data/templates.js
@@ -3943,17 +4013,17 @@ Apply by hand. Devanagari and Gujarati fallbacks, word wrapping, balanced lines,
      palette: ['#4a0d1c', '#f5e6c4', '#d4a64a'], font: "'Cormorant Garamond', serif", shape: 'arch',
 ```
 
-- [ ] **Step 5: Rebuild and run the proof again**
+- [ ] **Step 6: Rebuild and run the proof again**
 
 Run: `npm run build` (restart `npm run preview` if it does not pick up the new `dist`), then `node scripts/qa-studio.mjs --only=proof --design=rajmahal`
 Expected: `proof      pass` and `"pass":true`. This runs nine fixtures at 320, 360, 390 and 1366 wide (about 4 minutes) plus the live-edit run.
 
-- [ ] **Step 6: Run every area and the older suites**
+- [ ] **Step 7: Run every area and the older suites**
 
 Run: `node scripts/qa-studio.mjs --design=rajmahal` then `node scripts/qa-gate.mjs rajmahal qa-out/rajmahal`
 Expected: all eight areas `pass`; the gate suite `"pass":true`.
 
-- [ ] **Step 7: Mutation checks (confirm the harness can fail)**
+- [ ] **Step 8: Mutation checks (confirm the harness can fail)**
 
 Make one temporary change at a time, rebuild, run the named area, expect the named failure, then restore the file with `git checkout -- <file>` (or undo the edit) and rebuild:
 
@@ -3968,13 +4038,14 @@ Make one temporary change at a time, rebuild, run the named area, expect the nam
 | `App.jsx`: `<Page key={invite.couple.a} ...>` | `--only=edit-live` | "the page was rebuilt instead of updated in place" |
 | `sanitise.js`: make `normaliseUrl` return `u.href` for any URL | `--only=hostile`, and `npm test` | "a javascript: link reached the page"; unit tests fail |
 | `Pill.jsx`: also delete `d` from the share query | `--only=gallery` | "the share link in the bar drops the personalised data" |
+| `Gate.jsx`: delete ` data-fit={nameFit}` | `--only=proof --cases=2` | "lines of gate text overlap the open button" |
 
 A mutation that is not caught means the check is too weak: strengthen the check before continuing.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 9: Commit**
 
 ```bash
-git add src/templates/rajmahal/Rajmahal.jsx src/templates/rajmahal/rajmahal.css src/data/templates.js
+git add src/templates/rajmahal/Rajmahal.jsx src/templates/rajmahal/rajmahal.css src/templates/rajmahal/Gate.jsx src/templates/rajmahal/gate.css src/data/templates.js
 git commit -m "feat(rajmahal): editable-proof layout and content handling; open Customize for Rajmahal"
 ```
 
