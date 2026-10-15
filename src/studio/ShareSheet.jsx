@@ -13,6 +13,8 @@ const nameOf = (f) => (f.sub === 'events' ? `${f.label} (ceremony ${f.index + 1}
 export default function ShareSheet({ id, tradition, names, overrides, onClose, onEdit }) {
   const dialog = useRef(null)
   const input = useRef(null)
+  const olderInput = useRef(null)
+  const olderBox = useRef(null)
   const [to, setTo] = useState('')
   const [links, setLinks] = useState({ for: null, main: '', plain: '', failed: false })
   const [note, setNote] = useState('')
@@ -42,13 +44,16 @@ export default function ShareSheet({ id, tradition, names, overrides, onClose, o
   const older = !loading && links.main.startsWith('z.') ? url(links.plain) : ''
   const message = `${names} are getting married. Open the invitation: ${main}`
 
-  const copy = async (text) => {
+  // `field` is the readonly input that holds `text`, so the manual fallback selects the link that was asked for.
+  const copy = async (text, field) => {
     try {
       await navigator.clipboard.writeText(text)
       setNote('Link copied.')
     } catch {
-      input.current?.focus()
-      input.current?.select()
+      // The long link lives in a collapsed <details>: open it first or the input cannot take focus.
+      if (field.current === olderInput.current && olderBox.current) olderBox.current.open = true
+      field.current?.focus()
+      field.current?.select()
       setNote('Press and hold the link, then choose Copy.')
     }
   }
@@ -56,7 +61,8 @@ export default function ShareSheet({ id, tradition, names, overrides, onClose, o
 
   return (
     <dialog ref={dialog} className="share" aria-labelledby="share-h" onClose={onClose} onClick={(e) => e.target === dialog.current && dialog.current.close()}>
-      <form method="dialog" className="share__body">
+      {/* No implicit submission: Enter in the guest name field must not close the sheet (Close is an explicit button). */}
+      <form className="share__body" onSubmit={(e) => e.preventDefault()}>
         <h2 id="share-h">Send your invitation</h2>
         <p className="share__lede">This link opens the invitation with your details. Free, no account, nothing stored on a server.</p>
 
@@ -90,7 +96,7 @@ export default function ShareSheet({ id, tradition, names, overrides, onClose, o
         {main.length > 2000 && <p className="share__warn">This link is long. Some apps may cut it off; try WhatsApp or email.</p>}
 
         <div className="share__actions">
-          <button type="button" className="btn" disabled={!main} onClick={() => copy(main)}>Copy link</button>
+          <button type="button" className="btn" disabled={!main} onClick={() => copy(main, input)}>Copy link</button>
           {main && <a className="btn btn--quiet" href={`https://wa.me/?text=${encodeURIComponent(message)}`} target="_blank" rel="noreferrer">Send on WhatsApp</a>}
           {canShare && <button type="button" className="btn btn--quiet" disabled={!main} onClick={() => navigator.share({ title: `${names}'s wedding invitation`, url: main }).catch(() => {})}>More options</button>}
           {main && <a className="btn btn--quiet" href={main} target="_blank" rel="noreferrer">Open as a guest</a>}
@@ -98,14 +104,18 @@ export default function ShareSheet({ id, tradition, names, overrides, onClose, o
         <p className="share__note" role="status">{note}</p>
 
         {older && (
-          <details className="share__older">
+          <details ref={olderBox} className="share__older">
             <summary>Link for older phones</summary>
             <p>Phones from before 2023 may not open the short link. This one is longer but opens everywhere.</p>
-            <button type="button" className="btn btn--quiet" onClick={() => copy(older)}>Copy long link</button>
+            <label className="share__long">
+              <span>Long invitation link</span>
+              <input ref={olderInput} readOnly value={older} onFocus={(e) => e.target.select()} />
+            </label>
+            <button type="button" className="btn btn--quiet" onClick={() => copy(older, olderInput)}>Copy long link</button>
           </details>
         )}
         <p className="share__fine">If you change something later, copy the link again. Links you already sent keep the old details. Anyone with the link can see the details in it.</p>
-        <button className="btn btn--quiet share__close">Close</button>
+        <button type="button" className="btn btn--quiet share__close" onClick={() => dialog.current.close()}>Close</button>
       </form>
     </dialog>
   )
