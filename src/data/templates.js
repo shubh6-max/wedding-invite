@@ -3,9 +3,11 @@ import { lazy } from 'react'
 // Registry of the ten designs. Each template lives in src/templates/<id>/ and default-exports
 // a component taking `{ invite }` (see data/sample.js). To add one: create the folder, add a row here.
 // `palette` = [background, ink, accent]; `font` / `shape` only drive the gallery thumbnail.
+// `editable: true` opens the design in the Studio ("Customize"). Set it in the commit that finishes the
+// design's editable-proof checklist (docs/superpowers/specs/2026-10-15-invitation-studio-design.md).
 const contemporary = [
   {
-    id: 'rajmahal', name: 'Rajmahal', group: 'Traditional',
+    id: 'rajmahal', name: 'Rajmahal', group: 'Traditional', editable: true,
     blurb: 'Mughal jharokha arch in maroon and gold.',
     signature: 'Palace doors swing open, then ornament draws itself in.',
     palette: ['#4a0d1c', '#f5e6c4', '#d4a64a'], font: "'Cormorant Garamond', serif", shape: 'arch',

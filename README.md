@@ -21,7 +21,7 @@ add-to-calendar (.ics) and a map link. All sample names, venues and dates are fi
 
 ```text
 src/
-  App.jsx               Gallery, hash router (#/t/<id>) and floating nav
+  App.jsx               Hash router (#/, #/t/<id>, #/studio/<id>) and the design view
   gallery.css           Gallery styles + global reduced-motion rule
   data/sample.js        Sample couple/events for the 10 contemporary designs
   data/samples/         Per-tradition samples: hindu.js, marwadi.js, jain.js
@@ -32,6 +32,9 @@ src/
                         and Gate.jsx + gate.css (its opening, scoped to .gate-<id>)
   templates/_reference/ The gate pattern to copy for a new design
   lib/gate.js, guest.js Gate state hook; ?to= guest name + invite context
+  studio/               The Studio: fields.js (schema), compose.js, sanitise.js, codec.js (links), store.js (drafts), Studio.jsx
+  gallery/Gallery.jsx   The gallery page; components/Pill.jsx is the floating bar
+  tests/studio/         node --test unit tests for the Studio's pure code (npm test)
   scripts/              qa-gate.mjs / qa-all.mjs (npm run qa)
 docs/PLAN.md            Competitor research, positioning and the plan for the gates
   templates/seal/       The original invite, unchanged
@@ -50,13 +53,23 @@ Free features that competitors usually put behind a paid plan, none of which nee
 - **Add to calendar**: downloads an .ics file, or opens Google Calendar inside WhatsApp and Instagram in-app browsers where downloads fail
 - **Phone-first**: checked at 320 to 430px wide, in landscape and on desktop
 
+## Customize in the Studio
+
+`#/studio/<id>` lets a couple change their names, date, venue, ceremonies, story and reply details, watch the real invitation update in a phone-sized preview, and send a link. No account, no server: the draft is saved on the device and the link carries the details (`#/t/<id>?d=<payload>`).
+
+- Only designs with `editable: true` in `src/data/templates.js` show **Customize**. Others say "Editing soon". Open any design for testing with `#/studio/<id>?qa=1`.
+- One field table, `src/studio/fields.js`, drives the form, validation, the link and the "still the sample" check. The four sample files in `src/data/` are the starting content; a draft is only what the person changed, and `compose()` turns it into the `invite` object every design already reads.
+- Short links are plain; long ones are compressed (`CompressionStream`, iOS 16.4 or newer) and the share sheet also offers a plain link for older phones.
+- To make the next design editable, work through the checklist in `docs/superpowers/specs/2026-10-15-invitation-studio-design.md` section 12, run `node scripts/qa-studio.mjs --only=edit-live,proof --design=<id>`, and set `editable: true` in the same commit.
+- Checks: `npm test` (pure functions, `node --test`), and with `npm run preview` running, `npm run qa:studio` (browser areas: edit-live, share, hostile, storage, gallery, mobile, focus, proof; use `--only=` and `--design=`).
+
 ## Testing the gates and mobile layout
 
 `npm run build`, then `npm run preview` in one terminal, then `npm run qa` in another. It opens every design in Edge or Chrome (set `BROWSER_PATH` for another browser) at six phone sizes, landscape and desktop, and checks: the gate opens by tap and keyboard, nothing scrolls sideways, text is at least 12px and tap targets at least 44px, reduced motion, `?open=1`, hostile `?to=` input, and double taps. Screenshots go to `qa-out/`. `QA_PARALLEL=1` runs one design at a time, which is steadier on slower machines.
 
 ## Personalising a design
 
-Edit `src/data/sample.js` (names, date, venue, events, story). Every design reads from it.
+Starting content lives in `src/data/sample.js` and `src/data/samples/`; a couple's own details are edits on top of it (see Customize in the Studio). Every design reads from it.
 
 ## Adding another design
 

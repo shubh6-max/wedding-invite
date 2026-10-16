@@ -1,4 +1,5 @@
 import { useGate } from '../../lib/gate.js'
+import { fitStep } from '../../lib/fit.js'
 import { guestName } from '../../lib/guest.js'
 import './gate.css'
 
@@ -12,6 +13,7 @@ export default function Gate({ invite, onOpen, onDone }) {
   const { trigger, opening } = useGate({ onOpen, onDone, ms: 2000 })
   const { a, b } = invite.couple
   const guest = guestName()
+  const nameFit = Math.max(fitStep(a, [10, 16]), fitStep(b, [10, 16])) // long names step down so the plate never reaches the button
 
   return (
     <div role="region" aria-label={`Invitation for ${a} and ${b}`} className={`gate gate-rajmahal${opening ? ' is-opening' : ''}`}>
@@ -35,7 +37,7 @@ export default function Gate({ invite, onOpen, onDone }) {
         </svg>
         <div className="gate-rajmahal__plate">
           {guest && <p className="gate-rajmahal__guest">For {guest}</p>}
-          <p className="gate-rajmahal__names">
+          <p className="gate-rajmahal__names" data-fit={nameFit}>
             <span>{a}</span>
             <i aria-hidden="true">&amp;</i>
             <span>{b}</span>

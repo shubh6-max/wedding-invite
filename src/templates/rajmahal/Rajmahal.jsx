@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import RsvpForm from '../../components/RsvpForm.jsx'
 import { useCountdown, useReveal } from '../../lib/hooks.js'
+import { fitStep } from '../../lib/fit.js'
 import { downloadIcs } from '../../lib/ics.js'
 import './rajmahal.css'
 
@@ -84,29 +85,31 @@ export default function Rajmahal({ invite, viaGate }) {
     ['Minutes', t.minutes],
     ['Seconds', t.seconds],
   ]
+  // Longer names and host lines step down in size (see data-fit in rajmahal.css) so the arch never overflows.
+  const nameFit = Math.max(fitStep(invite.couple.a, [10, 16]), fitStep(invite.couple.b, [10, 16]))
 
   return (
     <div className="tpl tpl-rajmahal" ref={rootRef}>
-      <header className={`rj-hero${open ? ' is-open' : ''}`}>
+      <header className={`rj-hero${open ? ' is-open' : ''}`} data-studio-section="hero">
         <Feather side="l" />
         <Feather side="r" />
         <div className="rj-arch">
           <div className="rj-inner">
           <div className="rj-room">
-            <p className="rj-hosts">{invite.hosts}</p>
-            <h1 className="rj-names">
+            {invite.hosts && <p className="rj-hosts" data-fit={fitStep(invite.hosts, [60, 100])}>{invite.hosts}</p>}
+            <h1 className="rj-names" data-fit={nameFit}>
               <span>{invite.couple.a}</span>
               <i>&amp;</i>
               <span>{invite.couple.b}</span>
             </h1>
-            <p className="rj-tagline">{invite.tagline}</p>
+            {invite.tagline && <p className="rj-tagline" data-fit={fitStep(invite.tagline, [50, 80])}>{invite.tagline}</p>}
             <p className="rj-when">
               <time dateTime={invite.date}>{invite.dateLabel}</time>
               <span>{invite.timeLabel}</span>
             </p>
-            <p className="rj-where">
+            <p className="rj-where" data-fit={fitStep(`${invite.venue}${invite.city}`, [40, 70])}>
               {invite.venue}
-              <span>{invite.city}</span>
+              {invite.city && <span>{invite.city}</span>}
             </p>
           </div>
           <div className="rj-doors" aria-hidden="true">
@@ -146,14 +149,14 @@ export default function Rajmahal({ invite, viaGate }) {
         </div>
       </section>
 
-      <section className="rj-events" aria-labelledby="rj-ev-h">
+      <section className="rj-events" aria-labelledby="rj-ev-h" data-studio-section="events">
         <div data-reveal>
           <h2 id="rj-ev-h">Celebrations</h2>
           <Lotus />
         </div>
         <ol className="rj-niches">
           {invite.events.map((e, i) => (
-            <li key={e.id || e.name}>
+            <li key={e.id || i}>
               <article className="rj-niche" data-reveal>
                 <span className="rj-niche__no" aria-hidden="true">{ROMAN[i] || i + 1}</span>
                 <h3>{e.name}</h3>
@@ -162,7 +165,7 @@ export default function Rajmahal({ invite, viaGate }) {
                 </p>
                 <dl>
                   <div><dt>At</dt><dd>{e.place}</dd></div>
-                  <div><dt>Wear</dt><dd>{e.dress}</dd></div>
+                  {e.dress && <div><dt>Wear</dt><dd>{e.dress}</dd></div>}
                 </dl>
               </article>
             </li>
@@ -170,14 +173,14 @@ export default function Rajmahal({ invite, viaGate }) {
         </ol>
       </section>
 
-      <section className="rj-story" aria-labelledby="rj-st-h">
+      <section className="rj-story" aria-labelledby="rj-st-h" data-studio-section="story">
         <div data-reveal>
           <h2 id="rj-st-h">Our story, in stone</h2>
           <Lotus />
         </div>
         <ol className="rj-plaques">
-          {invite.story.map((s) => (
-            <li className="rj-plaque" key={s.year + s.title} data-reveal>
+          {invite.story.map((s, i) => (
+            <li className="rj-plaque" key={i} data-reveal>
               <span className="rj-plaque__year">{s.year}</span>
               <h3>{s.title}</h3>
               <p>{s.text}</p>
@@ -186,15 +189,17 @@ export default function Rajmahal({ invite, viaGate }) {
         </ol>
       </section>
 
-      <section className="rj-venue" aria-labelledby="rj-ve-h">
+      <section className="rj-venue" aria-labelledby="rj-ve-h" data-studio-section="venue">
         <div className="rj-venue__arch" data-reveal>
           <h2 id="rj-ve-h">{invite.venue}</h2>
-          <p>{invite.city}</p>
+          {invite.city && <p>{invite.city}</p>}
           <Lotus />
           <div className="rj-actions">
-            <a className="rj-btn" href={invite.mapUrl} target="_blank" rel="noreferrer">
-              Find the venue
-            </a>
+            {invite.mapUrl && (
+              <a className="rj-btn" href={invite.mapUrl} target="_blank" rel="noreferrer">
+                Find the venue
+              </a>
+            )}
             <button type="button" className="rj-btn rj-btn--ghost" onClick={() => downloadIcs(invite)}>
               Add to calendar
             </button>
@@ -202,7 +207,7 @@ export default function Rajmahal({ invite, viaGate }) {
         </div>
       </section>
 
-      <section className="rj-rsvp" aria-labelledby="rj-rs-h">
+      <section className="rj-rsvp" aria-labelledby="rj-rs-h" data-studio-section="replies">
         <div data-reveal>
           <h2 id="rj-rs-h">Kindly reply</h2>
           <Lotus />
