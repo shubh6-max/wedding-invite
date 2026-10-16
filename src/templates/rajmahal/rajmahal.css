@@ -15,7 +15,8 @@
   overflow-x: clip;
   background: var(--maroon);
   color: var(--cream);
-  font: 500 1.2rem/1.5 'Cormorant Garamond', Georgia, serif;
+  font: 500 1.2rem/1.5 'Cormorant Garamond', 'Noto Serif Devanagari', 'Noto Serif Gujarati', Georgia, serif;
+  overflow-wrap: anywhere; /* a very long word wraps instead of pushing the page sideways */
 }
 .tpl-rajmahal *,
 .tpl-rajmahal *::before,
@@ -100,6 +101,20 @@
   overflow-wrap: anywhere;
 }
 .tpl-rajmahal .rj-names i { font-weight: 400; font-size: 0.5em; line-height: 1; color: var(--gold); }
+/* Longer text steps down so the arch never overflows (data-fit is set from the grapheme count). */
+.tpl-rajmahal .rj-names[data-fit='1'] { font-size: clamp(32px, 12cqw, 58px); }
+.tpl-rajmahal .rj-names[data-fit='2'] { font-size: clamp(20px, 7cqw, 38px); line-height: 1.05; }
+.tpl-rajmahal .rj-hosts[data-fit='1'] { font-size: clamp(13px, 3.6cqw, 16px); }
+.tpl-rajmahal .rj-hosts[data-fit='2'] { font-size: 12px; line-height: 1.2; }
+.tpl-rajmahal .rj-tagline[data-fit='1'] { font-size: clamp(13px, 3.8cqw, 17px); }
+.tpl-rajmahal .rj-tagline[data-fit='2'] { font-size: 12px; line-height: 1.2; }
+.tpl-rajmahal .rj-where[data-fit='1'] { font-size: clamp(13px, 3.8cqw, 17px); }
+.tpl-rajmahal .rj-where[data-fit='2'] { font-size: 12px; line-height: 1.2; }
+/* With a long line in the hero, give the text the arch's spare margin (an older browser without :has() just keeps the roomier padding). */
+.tpl-rajmahal .rj-room:has([data-fit='2']) { padding-inline: 8%; padding-bottom: 4%; }
+.tpl-rajmahal .rj-hosts,
+.tpl-rajmahal .rj-tagline,
+.tpl-rajmahal .rj-venue__arch h2 { text-wrap: balance; }
 .tpl-rajmahal .rj-tagline { font-size: clamp(14px, 4.6cqw, 21px); font-style: italic; }
 .tpl-rajmahal .rj-when,
 .tpl-rajmahal .rj-where {
@@ -111,7 +126,7 @@
   color: var(--cream);
 }
 .tpl-rajmahal .rj-when time { color: var(--gold-light); font-weight: 600; }
-.tpl-rajmahal .rj-where span { font-size: 0.9em; font-style: italic; color: var(--cream-dim); }
+.tpl-rajmahal .rj-where span { font-size: max(12px, 0.9em); font-style: italic; color: var(--cream-dim); }
 .tpl-rajmahal .rj-doors { position: absolute; inset: 0; display: flex; z-index: 1; pointer-events: none; perspective: 1500px; }
 .tpl-rajmahal .rj-door {
   position: relative;
