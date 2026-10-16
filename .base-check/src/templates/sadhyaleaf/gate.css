@@ -1,0 +1,118 @@
+/* Sadhya Leaf gate: pale lime page, banana leaf, a brass lid over the first serving.
+   Opening: the lid rises straight up and away, the leaf brightens, servings land one by one.
+   Only transform/opacity animate; will-change only while .is-opening. */
+.gate-sadhyaleaf {
+  --gsl-lime: #eef2d6;
+  --gsl-paper: #f8fae8;
+  --gsl-leaf-d: #3e6420;
+  --gsl-ink: #12301b;
+  background-color: var(--gsl-lime);
+  background-image: repeating-linear-gradient(78deg, transparent 0 34px, rgba(91, 138, 43, 0.09) 34px 35px);
+  color: var(--gsl-ink);
+  font-family: 'Hind', 'Mukta', system-ui, sans-serif;
+  /* The cover fades once the lid is off; the invitation is already mounted beneath. */
+  transition: opacity 0.8s ease 0.6s;
+}
+.gate-sadhyaleaf *, .gate-sadhyaleaf *::before, .gate-sadhyaleaf *::after { box-sizing: border-box; }
+.gate-sadhyaleaf.is-opening { opacity: 0; pointer-events: none; will-change: opacity; }
+
+/* Banana-leaf green band along the top, a thin brass line beneath it */
+.gate-sadhyaleaf__band { position: absolute; top: 0; left: 0; right: 0; height: 14px; background: #5b8a2b; border-bottom: 3px solid #c8962e; }
+
+.gate-sadhyaleaf__stage {
+  display: grid;
+  justify-items: center;
+  gap: clamp(0.4rem, 1.8svh, 1rem);
+  width: min(100%, 30rem);
+  padding: 22px 1rem 8px;
+  text-align: center;
+}
+
+/* ---------- art ---------- */
+.gate-sadhyaleaf__art { position: relative; width: min(100%, 26rem, 40svh * 1.333); aspect-ratio: 4 / 3; }
+.gate-sadhyaleaf__art > * { position: absolute; display: block; }
+.gate-sadhyaleaf__leaf, .gate-sadhyaleaf__food { inset: 0; width: 100%; height: 100%; overflow: visible; }
+.gate-sadhyaleaf__leaf { opacity: 0.55; transform: scale(0.94); }
+
+.gsl-s { transform-box: fill-box; transform-origin: 50% 50%; opacity: 0; transform: translateY(-14px) scale(0.85); }
+.gsl-s--rice circle:first-child { fill: var(--gsl-paper); stroke: #d9e2a8; stroke-width: 1.5; }
+.gsl-s--payasam circle { fill: #ead9a2; }
+.gsl-s--jaggery circle { fill: #8a5a1e; }
+.gsl-s--pickle circle { fill: #4a2a14; }
+.gsl-s--chips circle { fill: #e6c46a; }
+.gsl-s--salt circle { fill: var(--gsl-paper); }
+
+.gate-sadhyaleaf__shadow {
+  left: 26%; top: 56%; width: 48%; height: 12%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(18, 48, 27, 0.42), transparent);
+}
+.gate-sadhyaleaf__lid { left: 26%; top: 17%; width: 48%; height: auto; overflow: visible; transform-origin: 50% 100%; }
+
+/* ---------- copy ---------- */
+.gate-sadhyaleaf__copy { display: grid; justify-items: center; gap: clamp(0.25rem, 1.2svh, 0.6rem); width: 100%; }
+.gate-sadhyaleaf__script { margin: 0; font: 400 clamp(1.1875rem, 3.8svh, 1.75rem) / 1.35 'Tiro Devanagari Hindi', 'Noto Serif Devanagari', serif; }
+.gate-sadhyaleaf__tr { margin: 0; font: 400 0.9375rem / 1.3 'DM Serif Display', serif; color: var(--gsl-leaf-d); }
+.gate-sadhyaleaf__meaning { margin: 0; max-width: 34ch; font-size: 0.875rem; line-height: 1.35; text-wrap: balance; }
+.gate-sadhyaleaf__names { margin: 0.1rem 0 0; font: 400 clamp(1.875rem, min(9.5vw, 6.5svh), 3rem) / 1.1 'DM Serif Display', 'Tiro Devanagari Hindi', serif; text-wrap: balance; }
+.gate-sadhyaleaf__names i { font-style: italic; color: var(--gsl-leaf-d); }
+.gate-sadhyaleaf__date, .gate-sadhyaleaf__guest { margin: 0; font-size: 1rem; font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+.gate-sadhyaleaf__guest { font-weight: 400; }
+
+.gate-sadhyaleaf__btn {
+  min-height: 48px;
+  margin-top: 0.4rem;
+  padding: 0 2rem;
+  border: 2px solid var(--gsl-ink);
+  border-radius: 999px;
+  background: var(--gsl-ink);
+  color: var(--gsl-lime);
+  font: 600 1rem 'Hind', 'Mukta', system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+.gate-sadhyaleaf__btn:active { transform: scale(0.97); }
+.gate-sadhyaleaf__btn:focus-visible { outline: 3px solid var(--gsl-ink); outline-offset: 3px; }
+@media (hover: hover) and (pointer: fine) {
+  .gate-sadhyaleaf__btn:hover { background: var(--gsl-leaf-d); border-color: var(--gsl-leaf-d); }
+}
+
+/* ---------- short landscape: art left, copy right, scaled by height ---------- */
+@media (orientation: landscape) and (max-height: 480px) {
+  .gate-sadhyaleaf__stage { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; gap: 1.25rem; width: min(100%, 40rem); padding-top: 18px; }
+  .gate-sadhyaleaf__art { width: min(100%, 64svh); }
+  .gate-sadhyaleaf__meaning { display: none; }
+  .gate-sadhyaleaf__script { font-size: 1.1875rem; }
+  .gate-sadhyaleaf__names { font-size: clamp(1.75rem, 9svh, 2.4rem); }
+}
+
+/* ---------- opening ---------- */
+.gate-sadhyaleaf.is-opening .gate-sadhyaleaf__leaf { opacity: 1; transform: none; will-change: transform, opacity; transition: opacity 0.5s ease 0.1s, transform 0.6s ease-out; }
+.gate-sadhyaleaf.is-opening .gate-sadhyaleaf__shadow { opacity: 0; will-change: opacity; transition: opacity 0.35s ease; }
+.gate-sadhyaleaf.is-opening .gate-sadhyaleaf__lid { will-change: transform, opacity; animation: gsl-lift 0.85s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.gate-sadhyaleaf.is-opening .gsl-s {
+  opacity: 1;
+  transform: none;
+  will-change: transform, opacity;
+  transition: opacity 0.35s ease calc(0.3s + var(--i) * 0.13s), transform 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) calc(0.3s + var(--i) * 0.13s);
+}
+/* Copy clears first so gate text never ghosts over the invitation's text during the cover fade */
+.gate-sadhyaleaf.is-opening .gate-sadhyaleaf__copy { opacity: 0; will-change: opacity; transition: opacity 0.3s ease; }
+/* A small settle down, then straight up; fades only once clear of the leaf */
+@keyframes gsl-lift {
+  0% { transform: translateY(0); opacity: 1; }
+  14% { transform: translateY(3%); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translateY(-180%); opacity: 0; }
+}
+
+/* ---------- reduced motion: a 250ms fade, no travel ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .gate-sadhyaleaf { transition: opacity 0.25s; }
+  .gate-sadhyaleaf.is-opening { transition: opacity 0.25s; }
+  .gate-sadhyaleaf.is-opening .gate-sadhyaleaf__leaf,
+  .gate-sadhyaleaf.is-opening .gate-sadhyaleaf__shadow,
+  .gate-sadhyaleaf.is-opening .gsl-s { transition: none; }
+  .gate-sadhyaleaf.is-opening .gate-sadhyaleaf__copy { opacity: 1; transition: none; }
+  .gate-sadhyaleaf.is-opening .gate-sadhyaleaf__lid { animation: none; }
+}

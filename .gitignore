@@ -52,3 +52,10 @@ playwright-report/
 test-results/
 .playwright/
 qa-out/
+
+# Local AI / design tool state
+.impeccable/
+.superpowers/
+
+# Scratch / throwaway scripts
+scratch-*

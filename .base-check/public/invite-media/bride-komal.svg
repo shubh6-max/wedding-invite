@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" role="img" aria-label="Sakshi placeholder portrait">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe0ea"/>
+      <stop offset="55%" stop-color="#f2d9ff"/>
+      <stop offset="100%" stop-color="#d8e6ff"/>
+    </linearGradient>
+    <linearGradient id="dress" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8a66b5"/>
+      <stop offset="100%" stop-color="#6e4a9e"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="480" rx="48" fill="url(#bg)"/>
+  <circle cx="240" cy="178" r="92" fill="#f6ceb4"/>
+  <path d="M154 180c8-76 164-75 171 4-20-24-49-40-86-40-31 0-61 11-85 36z" fill="#4b2f2c"/>
+  <path d="M144 398c18-84 76-128 96-128 23 0 78 47 95 128z" fill="url(#dress)"/>
+  <circle cx="204" cy="180" r="8" fill="#4b2f2c"/>
+  <circle cx="276" cy="180" r="8" fill="#4b2f2c"/>
+  <path d="M206 226c20 17 49 17 69 0" fill="none" stroke="#c07d74" stroke-linecap="round" stroke-width="8"/>
+  <text x="240" y="448" text-anchor="middle" fill="#825d8a" font-family="Georgia, serif" font-size="38">Sakshi</text>
+</svg>

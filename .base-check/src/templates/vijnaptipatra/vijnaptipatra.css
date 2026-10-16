@@ -1,0 +1,155 @@
+/* Vijnapti Patra: a painted Jain invitation scroll on walnut. Everything scoped to .tpl-vijnaptipatra. */
+.tpl-vijnaptipatra {
+  --walnut: #2b1b0e;
+  --walnut-l: #3a2513;
+  --parch: #ebd8ae;
+  --parch-d: #dcc590;
+  --parch-l: #f4e9cc;
+  --sepia: #5a3a1e;
+  --sepia-s: #6e4a28; /* secondary text, 5.5:1 on parchment */
+  --lac: #8b2a1a;
+  --wood-1: #b27c41;
+  --wood-2: #7a4c22;
+  --wood-3: #3a220f;
+  --display: 'Amita', 'Noto Serif Gujarati', serif;
+  --body: 'Spectral', Georgia, serif;
+  /* Painted strip tiles: lotus, leaf, kalasha (upright, static). */
+  --t-lotus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='28' viewBox='0 0 48 28'%3E%3Cg fill='%23B8604A' stroke='%235A3A1E' stroke-width='.8'%3E%3Cpath d='M24 24C14 26 8 22 5 17C12 16 20 18 24 24z'/%3E%3Cpath d='M24 24C34 26 40 22 43 17C36 16 28 18 24 24z'/%3E%3Cpath d='M24 24C16 22 12 15 13 9C19 12 23 17 24 24z'/%3E%3Cpath d='M24 24C32 22 36 15 35 9C29 12 25 17 24 24z'/%3E%3C/g%3E%3Cpath d='M24 24C19 18 19 10 24 4C29 10 29 18 24 24z' fill='%238B2A1A' stroke='%235A3A1E' stroke-width='.8'/%3E%3C/svg%3E");
+  --t-leaf: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='28' viewBox='0 0 36 28'%3E%3Cpath d='M0 14H36' stroke='%235A3A1E' stroke-width='.9'/%3E%3Cg fill='%237A5A3A' stroke='%235A3A1E' stroke-width='.8'%3E%3Cpath d='M6 14C8 6 16 3 24 5C22 12 15 16 6 14z'/%3E%3Cpath d='M18 14C19 22 26 25 33 24C32 17 26 12 18 14z'/%3E%3C/g%3E%3Ccircle cx='18' cy='14' r='2' fill='%238B2A1A'/%3E%3C/svg%3E");
+  --t-kal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='28' viewBox='0 0 44 28'%3E%3Cg fill='%237A5A3A' stroke='%235A3A1E' stroke-width='.8'%3E%3Cpath d='M22 8C17 3 11 4 9 9C14 11 19 10 22 8z'/%3E%3Cpath d='M22 8C27 3 33 4 35 9C30 11 25 10 22 8z'/%3E%3Ccircle cx='22' cy='9' r='3.6'/%3E%3C/g%3E%3Cpath d='M22 25C14 25 12 18 15 15H29C32 18 30 25 22 25z' fill='%238B2A1A' stroke='%235A3A1E' stroke-width='.8'/%3E%3Cpath d='M17 15v-2h10v2z' fill='%235A3A1E'/%3E%3Cpath d='M15.5 19h13' stroke='%23EBD8AE' stroke-width='1.2'/%3E%3C/svg%3E");
+
+  box-sizing: border-box;
+  min-height: 100svh;
+  overflow-x: clip;
+  padding: 1.5rem 0 80px; /* 80px: room for the fixed gallery pill */
+  color: var(--sepia);
+  font: 1.0625rem/1.65 var(--body);
+  background-color: var(--walnut);
+  background-image:
+    radial-gradient(120% 60% at 50% 0%, var(--walnut-l), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(235, 216, 174, 0.025) 0 1px, transparent 1px 9px, rgba(0, 0, 0, 0.12) 9px 10px, transparent 10px 23px);
+}
+.tpl-vijnaptipatra *, .tpl-vijnaptipatra *::before, .tpl-vijnaptipatra *::after { box-sizing: border-box; }
+.tpl-vijnaptipatra h1, .tpl-vijnaptipatra h2, .tpl-vijnaptipatra h3, .tpl-vijnaptipatra p,
+.tpl-vijnaptipatra dl, .tpl-vijnaptipatra dd, .tpl-vijnaptipatra ol { margin: 0; padding: 0; }
+.tpl-vijnaptipatra ol { list-style: none; }
+.tpl-vijnaptipatra h1, .tpl-vijnaptipatra h2, .tpl-vijnaptipatra h3 { font-family: var(--display); font-weight: 400; line-height: 1.3; }
+.tpl-vijnaptipatra h2 { font-size: 1.625rem; text-wrap: balance; }
+.tpl-vijnaptipatra .vp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.tpl-vijnaptipatra a:focus-visible, .tpl-vijnaptipatra button:focus-visible, .tpl-vijnaptipatra input:focus-visible,
+.tpl-vijnaptipatra select:focus-visible, .tpl-vijnaptipatra textarea:focus-visible { outline: 3px solid var(--lac); outline-offset: 3px; }
+/* Keeps a focused control inside the unrolled part when the browser scrolls it into view. */
+.tpl-vijnaptipatra :is(a, button, input, select, textarea) { scroll-margin-bottom: max(8rem, 16svh); }
+
+/* ---------- reel: two rollers around one narrow sheet ---------- */
+.tpl-vijnaptipatra .vp-reel { width: min(420px, 100% - 56px); margin-inline: auto; }
+.tpl-vijnaptipatra .vp-unroll { position: relative; margin-bottom: 1.75rem; }
+
+.tpl-vijnaptipatra .vp-roller { position: relative; z-index: 2; height: 26px; margin: 0 -18px -13px; border-radius: 13px;
+  background: linear-gradient(var(--wood-1), var(--wood-2) 42%, #4a2c13 78%, var(--wood-3));
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(0, 0, 0, 0.35); }
+/* Turned caps at both ends. */
+.tpl-vijnaptipatra .vp-roller::before, .tpl-vijnaptipatra .vp-roller::after { content: ''; position: absolute; top: -7px; width: 20px; height: 40px; border-radius: 10px;
+  background: linear-gradient(90deg, var(--wood-3), var(--wood-1) 40%, var(--wood-2) 70%, var(--wood-3));
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), inset 0 6px 0 -3px rgba(139, 42, 26, 0.9), inset 0 -6px 0 -3px rgba(139, 42, 26, 0.9); }
+.tpl-vijnaptipatra .vp-roller::before { left: -8px; }
+.tpl-vijnaptipatra .vp-roller::after { right: -8px; }
+
+/* Lower roller: hangs on the sheet's end by default; the scroll moves it down when live. */
+.tpl-vijnaptipatra .vp-roller--low { position: absolute; left: 0; right: 0; top: 100%; margin: 0 -18px; transform: translateY(-50%);
+  box-shadow: 0 -10px 14px -6px rgba(0, 0, 0, 0.35), 0 6px 10px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(0, 0, 0, 0.35); }
+.tpl-vijnaptipatra[data-live] .vp-roller--low { top: 0; transform: translateY(calc(var(--h) * 1px - 50%)); will-change: transform; }
+
+.tpl-vijnaptipatra .vp-sheet { position: relative; text-align: center;
+  background:
+    radial-gradient(90% 3% at 50% 0%, rgba(255, 240, 200, 0.4), transparent),
+    radial-gradient(45% 6% at 88% 24%, rgba(139, 42, 26, 0.06), transparent),
+    radial-gradient(40% 7% at 8% 52%, rgba(90, 58, 30, 0.08), transparent),
+    radial-gradient(45% 6% at 85% 80%, rgba(90, 58, 30, 0.08), transparent),
+    var(--parch);
+  box-shadow: inset 16px 0 18px -14px rgba(90, 58, 30, 0.4), inset -16px 0 18px -14px rgba(90, 58, 30, 0.4); }
+/* The signature: sheet height follows scroll through --h (set from the component). */
+.tpl-vijnaptipatra[data-live] .vp-sheet { clip-path: inset(0 0 calc(100% - var(--h) * 1px) 0); }
+
+/* ---------- painted border strips ---------- */
+.tpl-vijnaptipatra .vp-strip { height: 36px; border-block: 3px double var(--sepia); background: rgba(90, 58, 30, 0.07) var(--t-lotus) center / auto 28px repeat-x; }
+.tpl-vijnaptipatra .vp-strip--leaf { background-image: var(--t-leaf); }
+.tpl-vijnaptipatra .vp-strip--kalasha { background-image: var(--t-kal); }
+
+/* ---------- panels ---------- */
+.tpl-vijnaptipatra .vp-panel { padding: 1.9rem 1.25rem 2rem; }
+.tpl-vijnaptipatra .vp-panel > * + * { margin-top: 0.75rem; }
+.tpl-vijnaptipatra .vp-hero { padding-top: 2.75rem; }
+.tpl-vijnaptipatra .vp-greet { font: 1.625rem/1.6 var(--display); color: var(--lac); }
+.tpl-vijnaptipatra .vp-inv { font: 1.75rem/1.6 var(--display); margin-top: 0.25rem; }
+.tpl-vijnaptipatra .vp-inv__t { font-size: 0.97rem; line-height: 1.5; color: var(--sepia-s); margin-top: 0; text-wrap: balance; }
+.tpl-vijnaptipatra .vp-hosts { margin-top: 1.75rem; text-wrap: balance; }
+.tpl-vijnaptipatra .vp-tag { font-style: italic; color: var(--sepia-s); text-wrap: balance; }
+.tpl-vijnaptipatra .vp-hero h1 { display: flex; flex-direction: column; align-items: center; margin-top: 0.5rem; font-size: clamp(2.25rem, 13vw, 3.125rem); line-height: 1.25; overflow-wrap: anywhere; }
+.tpl-vijnaptipatra .vp-lotus { width: 40px; height: auto; fill: var(--lac); stroke: var(--sepia); stroke-width: 0.8; }
+.tpl-vijnaptipatra .vp-when { margin-top: 1.5rem; font: 1.25rem/1.5 var(--display); color: var(--lac); }
+.tpl-vijnaptipatra .vp-when + p { margin-top: 0.1rem; }
+
+/* countdown: four leaf-cornered cartouches */
+.tpl-vijnaptipatra .vp-count h2 { margin-bottom: 0.25rem; }
+.tpl-vijnaptipatra .vp-cart { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; margin-top: 1rem; }
+.tpl-vijnaptipatra .vp-cart div { display: grid; padding: 0.5rem 0 0.4rem; border: 3px double var(--sepia); border-radius: 4px 16px; background: var(--parch-d); }
+.tpl-vijnaptipatra .vp-cart b { font: 1.5rem/1.35 var(--display); color: var(--lac); font-variant-numeric: tabular-nums; }
+.tpl-vijnaptipatra .vp-cart span { font-size: 0.75rem; line-height: 1.2; font-style: italic; }
+
+/* ceremonies */
+.tpl-vijnaptipatra .vp-event__when { font: 1.125rem/1.5 var(--display); color: var(--lac); }
+.tpl-vijnaptipatra .vp-event__note { max-width: 34ch; margin-inline: auto; text-wrap: pretty; }
+.tpl-vijnaptipatra .vp-event dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 0.75rem 1rem; margin-top: 1rem; }
+.tpl-vijnaptipatra .vp-event dt { font-size: 0.9rem; font-style: italic; color: var(--sepia-s); }
+.tpl-vijnaptipatra .vp-event dd { line-height: 1.45; }
+/* The wedding itself gets a ruled frame and lac title; the rest stay plain. */
+.tpl-vijnaptipatra .vp-event--main { outline: 1px solid rgba(90, 58, 30, 0.5); outline-offset: -10px; background: radial-gradient(70% 55% at 50% 0%, rgba(139, 42, 26, 0.09), transparent); }
+.tpl-vijnaptipatra .vp-event--main h2 { color: var(--lac); }
+
+/* story: a short letter, years in the margin */
+.tpl-vijnaptipatra .vp-story ol { margin-top: 1.25rem; text-align: left; }
+.tpl-vijnaptipatra .vp-story li { display: grid; grid-template-columns: 3.4rem 1fr; gap: 0.75rem; padding-block: 1rem; }
+.tpl-vijnaptipatra .vp-story li + li { border-top: 1px dotted rgba(90, 58, 30, 0.55); }
+.tpl-vijnaptipatra .vp-story__year { font: 1.25rem/1.4 var(--display); color: var(--lac); }
+.tpl-vijnaptipatra .vp-story h3 { font-size: 1.125rem; }
+.tpl-vijnaptipatra .vp-story li p { margin-top: 0.25rem; }
+
+/* venue, buttons */
+.tpl-vijnaptipatra .vp-actions { display: grid; gap: 0.6rem; max-width: 20rem; margin: 1.25rem auto 0; }
+.tpl-vijnaptipatra .vp-btn, .tpl-vijnaptipatra .rsvp button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0.5rem 1.25rem;
+  border: 2px solid var(--sepia); border-radius: 4px 14px; background: var(--sepia); color: var(--parch);
+  font: 600 1.0625rem/1.3 var(--body); text-decoration: none; cursor: pointer; transition: background-color 0.2s; }
+.tpl-vijnaptipatra .vp-btn--ghost { background: transparent; color: var(--sepia); }
+@media (hover: hover) and (pointer: fine) {
+  .tpl-vijnaptipatra .vp-btn:hover, .tpl-vijnaptipatra .rsvp button:hover { background: var(--lac); border-color: var(--lac); }
+  .tpl-vijnaptipatra .vp-btn--ghost:hover { background: var(--lac); color: var(--parch); }
+}
+
+/* RSVP */
+.tpl-vijnaptipatra .vp-rsvp__by { font-style: italic; color: var(--sepia-s); }
+.tpl-vijnaptipatra .rsvp { display: grid; gap: 0.9rem; margin-top: 1.25rem; text-align: left; }
+.tpl-vijnaptipatra .rsvp label { display: grid; gap: 0.25rem; }
+.tpl-vijnaptipatra .rsvp label span { font-size: 0.95rem; font-style: italic; }
+.tpl-vijnaptipatra .rsvp input, .tpl-vijnaptipatra .rsvp select, .tpl-vijnaptipatra .rsvp textarea { width: 100%; min-height: 48px; padding: 0.55rem 0.75rem;
+  border: 2px solid var(--sepia-s); border-radius: 3px; background: var(--parch-l); color: var(--sepia); font: inherit; }
+.tpl-vijnaptipatra .rsvp textarea { min-height: 5.5rem; resize: vertical; }
+.tpl-vijnaptipatra .rsvp button { justify-self: stretch; margin-top: 0.25rem; }
+.tpl-vijnaptipatra .rsvp__error { padding-bottom: 0.3rem; border-bottom: 1px dotted var(--lac); color: var(--lac); font-weight: 600; }
+.tpl-vijnaptipatra .rsvp__done { margin-top: 1.25rem; padding: 0.9rem 0.5rem; border-block: 3px double var(--sepia); font-style: italic; }
+
+/* closing seal: visible by default; when live it waits for the scroll to finish, then stamps once */
+.tpl-vijnaptipatra .vp-close { padding: 0.5rem 1.25rem 2.75rem; font: 1.125rem/1.5 var(--display); color: var(--lac); }
+.tpl-vijnaptipatra .vp-seal { width: 112px; margin: 0 auto 0.5rem; filter: drop-shadow(0 3px 4px rgba(43, 27, 14, 0.4)); }
+.tpl-vijnaptipatra .vp-seal__svg { display: block; width: 100%; height: auto; }
+.tpl-vijnaptipatra[data-live] .vp-seal { opacity: 0; }
+.tpl-vijnaptipatra[data-live][data-sealed] .vp-seal { animation: vp-stamp 300ms cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+@keyframes vp-stamp { from { opacity: 0; transform: scale(1.2); } to { opacity: 1; transform: scale(1); } }
+
+@media (max-width: 380px) {
+  .tpl-vijnaptipatra .vp-reel { width: calc(100% - 44px); }
+  .tpl-vijnaptipatra .vp-roller { margin-inline: -14px; }
+  .tpl-vijnaptipatra .vp-roller--low { margin-inline: -14px; }
+  .tpl-vijnaptipatra .vp-panel { padding-inline: 1rem; }
+  .tpl-vijnaptipatra .vp-cart { gap: 0.3rem; }
+}

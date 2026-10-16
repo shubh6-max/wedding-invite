@@ -1,0 +1,219 @@
+/* Haveli Fresco: lime-wash wall, ultramarine dado, ochre + chrome-red tempera. Scoped to .tpl-havelifresco. */
+.tpl-havelifresco {
+  --wash: #eef1f6;
+  --wash-d: #dde3ee;
+  --wash-l: #f9fafc;
+  --ultra: #2b4c9b;
+  --ultra-d: #1d3878;
+  --ultra-t: #cfd9ee;
+  --ochre: #d9a441;
+  --ochre-l: #f1dca6;
+  --ochre-t: #f6ecd0;
+  --red: #b3261e;
+  --red-t: #f0d6d1;
+  --ink: #2a1a0e;
+  --ink-soft: #5b4636;
+  --display: 'Tiro Devanagari Hindi', 'Noto Serif Devanagari', serif;
+  --body: 'Hind', 'Mukta', system-ui, sans-serif;
+
+  min-height: 100svh;
+  overflow-x: clip;
+  padding-bottom: 80px; /* room for the gallery pill */
+  color: var(--ink);
+  background-color: var(--wash);
+  font: 1.0625rem/1.6 var(--body);
+}
+.tpl-havelifresco *, .tpl-havelifresco *::before, .tpl-havelifresco *::after { box-sizing: border-box; }
+.tpl-havelifresco h1, .tpl-havelifresco h2, .tpl-havelifresco h3, .tpl-havelifresco p,
+.tpl-havelifresco dl, .tpl-havelifresco dd, .tpl-havelifresco ol, .tpl-havelifresco ul { margin: 0; padding: 0; }
+.tpl-havelifresco ol, .tpl-havelifresco ul { list-style: none; }
+.tpl-havelifresco h1, .tpl-havelifresco h2, .tpl-havelifresco h3 { font-family: var(--display); font-weight: 400; line-height: 1.15; }
+.tpl-havelifresco .hf-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.tpl-havelifresco a:focus-visible, .tpl-havelifresco button:focus-visible, .tpl-havelifresco input:focus-visible,
+.tpl-havelifresco select:focus-visible, .tpl-havelifresco textarea:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+
+/* ---------- the wall: sticky viewport, scroll mapped to translateX ---------- */
+.tpl-havelifresco .hf-wall { position: relative; height: calc(100svh + var(--dist, 0px) * 1.15); --p: 0; }
+.tpl-havelifresco .hf-view { position: sticky; top: 0; height: 100svh; display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+.tpl-havelifresco .hf-stage {
+  position: relative; container-type: size; overflow-x: auto; overflow-y: hidden; min-height: 0;
+  background:
+    radial-gradient(ellipse 40% 30% at 18% 22%, rgba(43, 76, 155, 0.05), transparent),
+    radial-gradient(ellipse 35% 28% at 78% 60%, rgba(217, 164, 65, 0.08), transparent),
+    var(--wash);
+}
+/* With script running the stage is panned by scroll instead of a native scrollbar. */
+.tpl-havelifresco .hf-wall[data-pan] .hf-stage { overflow: hidden; }
+.tpl-havelifresco .hf-frieze {
+  --ph: 74cqh; /* panel height budget */
+  --pw: min(84cqw, calc(var(--ph) / 1.2));
+  --gap: clamp(2rem, 9vw, 6rem); /* vw, not cqw: the pilaster pseudo resolves cq units against its panel, so both must read one value */
+  position: relative; z-index: 1; display: flex; align-items: flex-start; gap: var(--gap);
+  width: max-content; height: 100%; padding-top: 5cqh;
+  transform: translate3d(calc(var(--p) * var(--dist, 0px) * -1), 0, 0);
+  will-change: transform;
+}
+.tpl-havelifresco .hf-frieze::before, .tpl-havelifresco .hf-frieze::after {
+  content: ''; flex: 0 0 max(0px, calc(50cqw - var(--pw) / 2 - var(--gap)));
+}
+
+/* Dado: ultramarine band with an ochre rule and a painted diamond course. */
+.tpl-havelifresco .hf-dado {
+  position: absolute; z-index: 0; inset: auto 0 0; height: 15cqh; background-color: var(--ultra);
+  border-top: 5px solid var(--ochre); box-shadow: inset 0 3px 0 var(--red);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='24' viewBox='0 0 36 24'%3E%3Cpath d='M18 4l10 8-10 8-10-8z' fill='none' stroke='%23d9a441' stroke-width='1.6'/%3E%3Ccircle cx='18' cy='12' r='2.2' fill='%23b3261e'/%3E%3C/svg%3E");
+  background-position: 0 50%; background-size: 36px 24px; background-repeat: repeat-x;
+}
+
+/* ---------- panels: painted tempera, each draws in once ---------- */
+.tpl-havelifresco .hf-panel {
+  position: relative; flex: none; width: var(--pw); aspect-ratio: 5 / 6; container-type: size;
+  background: var(--wash-l); outline: 1px solid rgba(42, 26, 14, 0.18); outline-offset: 5px;
+}
+.tpl-havelifresco .hf-panel:nth-child(2) { background: var(--ochre-t); }
+.tpl-havelifresco .hf-panel:nth-child(3) { background: var(--ultra-t); }
+.tpl-havelifresco .hf-panel:nth-child(4) { background: var(--wash-l); }
+.tpl-havelifresco .hf-panel:nth-child(5) { background: var(--red-t); }
+.tpl-havelifresco .hf-panel > svg { display: block; width: 100%; height: 100%; overflow: visible; }
+/* Painted pilaster on the wall between panels. */
+.tpl-havelifresco .hf-panel:not(:last-child)::after {
+  content: ''; position: absolute; top: 0; bottom: -6%; left: calc(100% + var(--gap) / 2 - 7px); width: 14px;
+  background: repeating-linear-gradient(var(--ochre) 0 14px, var(--red) 14px 20px);
+  opacity: 0.85; clip-path: inset(0 0 0 0);
+}
+
+/* Line art: stroke-dashoffset draw over 900ms, then fill arrives. Stays drawn. */
+.tpl-havelifresco .ln {
+  fill: transparent; stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round;
+  stroke-dasharray: 1 1; stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.45, 0.05, 0.3, 1), fill 0.7s ease;
+  transition-delay: calc(var(--s, 0) * 60ms), calc(0.9s + var(--s, 0) * 60ms);
+}
+.tpl-havelifresco .hf-panel.in .ln { stroke-dashoffset: 0; }
+.tpl-havelifresco .hf-panel.in .f.fo { fill: var(--ochre); }
+.tpl-havelifresco .hf-panel.in .f.fb { fill: var(--ultra); }
+.tpl-havelifresco .hf-panel.in .f.fr { fill: var(--red); }
+.tpl-havelifresco .hf-panel.in .f.fw { fill: var(--wash-l); }
+
+/* Names panel (floral spandrels). Text sits inside the arch. */
+.tpl-havelifresco .hf-names {
+  position: absolute; inset: 21% 14% 8%; display: flex; flex-direction: column; align-items: center;
+  justify-content: space-between; text-align: center;
+}
+.tpl-havelifresco .hf-invo { display: grid; gap: 0.1rem; font-size: 0.8125rem; line-height: 1.3; color: var(--ink-soft); }
+.tpl-havelifresco .hf-invo__s { font: 1.3rem/1.3 var(--display); color: var(--ultra-d); }
+.tpl-havelifresco .hf-names h1 {
+  display: grid; justify-items: center; color: var(--ultra-d); line-height: 1;
+  font-size: min(54px, 17cqw, 10.5cqh);
+}
+.tpl-havelifresco .hf-amp { font-size: 0.5em; color: var(--red); line-height: 1.1; }
+.tpl-havelifresco .hf-date { font: 0.9rem/1.3 var(--body); font-weight: 500; color: var(--ink); }
+
+/* ---------- ledge: stone shelf carrying the active panel's text ---------- */
+.tpl-havelifresco .hf-ledge {
+  position: relative; display: grid; align-content: start; padding: 1.1rem max(1rem, 5vw) 1.4rem;
+  background: var(--wash-d); border-top: 6px solid var(--ochre); font: 1.125rem/1.45 var(--display);
+}
+.tpl-havelifresco .hf-bar { position: absolute; inset: -6px 0 auto; height: 2px; background: rgba(42, 26, 14, 0.15); }
+.tpl-havelifresco .hf-bar i { display: block; height: 100%; background: var(--red); transform-origin: 0 50%; transform: scaleX(var(--p)); }
+.tpl-havelifresco .hf-ledge__b {
+  grid-area: 1 / 1; max-width: 46rem; margin-inline: auto; width: 100%; display: grid; gap: 0.45rem; align-content: start;
+  visibility: hidden; opacity: 0; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+.tpl-havelifresco .hf-ledge__b[data-on='true'] { visibility: visible; opacity: 1; transition-delay: 0s; }
+.tpl-havelifresco .hf-led-h { font-size: 1.375rem; color: var(--ultra-d); line-height: 1.2; }
+.tpl-havelifresco .hf-soft { font: 0.9375rem/1.45 var(--body); color: var(--ink-soft); }
+.tpl-havelifresco .hf-yrs { display: grid; gap: 0.2rem; }
+.tpl-havelifresco .hf-yrs b { font-weight: 400; color: var(--red); margin-right: 0.35rem; }
+
+.tpl-havelifresco .hf-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.3rem; }
+.tpl-havelifresco .hf-btn {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0.5rem 1.2rem;
+  border: 2px solid var(--ultra-d); border-bottom: 5px solid var(--ochre); border-radius: 0; cursor: pointer;
+  background: var(--ultra); color: #fff; font: 500 1rem/1.2 var(--body); text-decoration: none;
+}
+.tpl-havelifresco .hf-btn:hover { background: var(--ultra-d); }
+.tpl-havelifresco .hf-btn--alt { background: transparent; color: var(--ultra-d); }
+.tpl-havelifresco .hf-btn--alt:hover { background: var(--ultra-t); }
+
+/* ---------- register: plain wall below the frieze ---------- */
+.tpl-havelifresco .hf-reg { border-top: 14px solid var(--ultra); box-shadow: inset 0 6px 0 var(--ochre); padding: 2rem 0 1rem; }
+.tpl-havelifresco .hf-sec { max-width: 62rem; margin: 0 auto; padding: 2.75rem max(1.25rem, 5vw); display: grid; gap: 0.9rem; justify-items: start; }
+.tpl-havelifresco .hf-sec + .hf-sec { border-top: 1px solid rgba(42, 26, 14, 0.16); }
+.tpl-havelifresco .hf-sec h2 { font-size: clamp(1.75rem, 6vw, 2.5rem); color: var(--ultra-d); }
+.tpl-havelifresco .hf-sec > p { max-width: 60ch; }
+.tpl-havelifresco .hf-script { font: 1.5rem/1.3 var(--display); color: var(--red); }
+
+.tpl-havelifresco .hf-count { display: grid; grid-template-columns: repeat(4, minmax(0, 7rem)); width: 100%; max-width: 30rem; }
+.tpl-havelifresco .hf-count div { display: grid; padding: 0.2rem 0 0.2rem 0.8rem; border-left: 2px solid var(--ochre); }
+.tpl-havelifresco .hf-count b { font: 400 clamp(2rem, 9vw, 3rem)/1.1 var(--display); color: var(--ultra); font-variant-numeric: tabular-nums; }
+.tpl-havelifresco .hf-count span { font-size: 0.9375rem; color: var(--ink-soft); }
+
+.tpl-havelifresco .hf-log { width: 100%; display: grid; }
+.tpl-havelifresco .hf-log li { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: 1.25rem; padding: 1.2rem 0; border-top: 1px solid rgba(42, 26, 14, 0.16); }
+.tpl-havelifresco .hf-log li:first-child { border-top: 0; }
+.tpl-havelifresco .hf-log__when { display: grid; align-content: start; padding-left: 0.8rem; border-left: 5px solid var(--ultra); }
+.tpl-havelifresco .hf-log li.is-main .hf-log__when { border-left-color: var(--red); }
+.tpl-havelifresco .hf-log__when b { font: 400 1.25rem/1.25 var(--display); }
+.tpl-havelifresco .hf-log__when span { color: var(--ink-soft); }
+.tpl-havelifresco .hf-log h3 { font-size: 1.5rem; color: var(--ultra-d); }
+.tpl-havelifresco .hf-log dl { display: grid; gap: 0.1rem; margin: 0.4rem 0; }
+.tpl-havelifresco .hf-log dl div { display: grid; grid-template-columns: 4rem minmax(0, 1fr); }
+.tpl-havelifresco .hf-log dt { color: var(--ink-soft); font-size: 0.9375rem; }
+.tpl-havelifresco .hf-log li > div:last-child > p { max-width: 54ch; }
+
+/* Story niches: arch-topped, like the cypress arch on the wall. */
+.tpl-havelifresco .hf-niches { width: 100%; display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(14.5rem, 1fr)); padding-top: 0.5rem; }
+.tpl-havelifresco .hf-niches li {
+  display: grid; gap: 0.5rem; align-content: start; padding: 4.5rem 1.4rem 1.6rem;
+  border: 2px solid var(--ochre); border-radius: 999px 999px 0 0; background: var(--wash-l);
+}
+.tpl-havelifresco .hf-niche__y { margin: -2.6rem auto 0.4rem; font: 400 1.5rem/1 var(--display); color: var(--red); }
+.tpl-havelifresco .hf-niches h3 { font-size: 1.25rem; color: var(--ultra-d); }
+
+/* ---------- RSVP ---------- */
+.tpl-havelifresco .hf-form .rsvp { display: grid; gap: 1rem; width: 100%; max-width: 30rem; margin-block: 0.4rem 0.6rem; }
+.tpl-havelifresco .rsvp label { display: grid; gap: 0.3rem; }
+.tpl-havelifresco .rsvp label span { font: 500 0.9375rem/1.3 var(--body); color: var(--ink); }
+.tpl-havelifresco .rsvp input, .tpl-havelifresco .rsvp select, .tpl-havelifresco .rsvp textarea {
+  width: 100%; min-height: 48px; padding: 0.55rem 0.75rem; border: 2px solid var(--ultra); border-radius: 0;
+  background: var(--wash-l); color: var(--ink); font: 1rem/1.4 var(--body);
+}
+.tpl-havelifresco .rsvp textarea { resize: vertical; }
+.tpl-havelifresco .rsvp button {
+  justify-self: start; min-height: 48px; padding: 0.5rem 1.6rem; border: 2px solid var(--ultra-d); border-bottom: 5px solid var(--ochre);
+  border-radius: 0; background: var(--ultra); color: #fff; font: 500 1rem/1.2 var(--body); cursor: pointer;
+}
+.tpl-havelifresco .rsvp button:hover { background: var(--ultra-d); }
+.tpl-havelifresco .rsvp__error { color: var(--red); font-weight: 500; }
+.tpl-havelifresco .rsvp__done { max-width: 30rem; padding: 1rem 1.2rem; border-top: 4px solid var(--ochre); background: var(--ochre-t); }
+
+/* ---------- short phones: give the stage back some height ---------- */
+@media (max-height: 700px) {
+  .tpl-havelifresco .hf-ledge { padding-block: 0.8rem 1rem; font-size: 1rem; line-height: 1.35; }
+  .tpl-havelifresco .hf-led-h { font-size: 1.2rem; }
+}
+
+/* Landscape phones: the panel is only ~180px tall, so the names text must tighten to stay inside the arch. */
+@media (max-height: 480px) {
+  .tpl-havelifresco .hf-names { inset: 19% 8% 5%; }
+  .tpl-havelifresco .hf-invo { font-size: 0.75rem; }
+  .tpl-havelifresco .hf-invo__s { font-size: 1rem; }
+  .tpl-havelifresco .hf-date { font-size: 0.75rem; text-wrap: balance; }
+}
+
+/* ---------- reduced motion: the drawn, painted end state, no transitions ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tpl-havelifresco .ln { stroke-dashoffset: 0; transition: none; }
+  .tpl-havelifresco .f.fo { fill: var(--ochre); }
+  .tpl-havelifresco .f.fb { fill: var(--ultra); }
+  .tpl-havelifresco .f.fr { fill: var(--red); }
+  .tpl-havelifresco .f.fw { fill: var(--wash-l); }
+  .tpl-havelifresco .hf-ledge__b, .tpl-havelifresco .hf-ledge__b[data-on='true'] { transition: none; }
+}
+
+/* ---------- small screens ---------- */
+@media (max-width: 640px) {
+  .tpl-havelifresco .hf-log li { grid-template-columns: minmax(0, 1fr); gap: 0.6rem; }
+  .tpl-havelifresco .hf-count { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 0.8rem; }
+}

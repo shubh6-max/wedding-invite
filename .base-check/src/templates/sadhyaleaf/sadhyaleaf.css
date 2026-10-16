@@ -1,0 +1,250 @@
+/* Sadhya Leaf: pale lime page, banana leaf, ink servings; vermilion only on the RSVP. Scoped to .tpl-sadhyaleaf. */
+.tpl-sadhyaleaf {
+  --lime: #eef2d6;
+  --leaf: #5b8a2b;
+  --leaf-d: #3e6420;
+  --leaf-l: #b7d07f;
+  --paper: #f8fae8;
+  --ink: #12301b;
+  --verm: #a8341a;
+  --verm-d: #8c2813;
+  --display: 'DM Serif Display', 'Tiro Devanagari Hindi', serif;
+  --script: 'Tiro Devanagari Hindi', 'Noto Serif Devanagari', serif;
+
+  min-height: 100svh;
+  overflow-x: clip;
+  background: var(--lime);
+  color: var(--ink);
+  font: 1.0625rem/1.55 'Hind', 'Mukta', system-ui, sans-serif;
+}
+.tpl-sadhyaleaf *, .tpl-sadhyaleaf *::before, .tpl-sadhyaleaf *::after { box-sizing: border-box; }
+.tpl-sadhyaleaf h1, .tpl-sadhyaleaf h2, .tpl-sadhyaleaf h3, .tpl-sadhyaleaf p,
+.tpl-sadhyaleaf ul, .tpl-sadhyaleaf ol { margin: 0; padding: 0; }
+.tpl-sadhyaleaf ul, .tpl-sadhyaleaf ol { list-style: none; }
+.tpl-sadhyaleaf h2 { font: 400 clamp(2rem, 6vw, 2.75rem) / 1.1 var(--display); }
+.tpl-sadhyaleaf h3 { font: 400 1.75rem / 1.15 var(--display); }
+.tpl-sadhyaleaf a:focus-visible, .tpl-sadhyaleaf button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.tpl-sadhyaleaf h2:focus-visible { outline: 3px solid var(--verm); outline-offset: 4px; }
+
+/* ---------- opening: invocation, hosts, tagline ---------- */
+.tpl-sadhyaleaf .open { max-width: 44rem; margin-inline: auto; padding: 3rem 1.25rem 2rem; text-align: center; }
+.tpl-sadhyaleaf .inv__script { font: 400 clamp(1.875rem, 7vw, 2.5rem) / 1.35 var(--script); }
+.tpl-sadhyaleaf .inv__text { margin-top: 0.25rem; font: 400 1.375rem / 1.3 var(--display); }
+.tpl-sadhyaleaf .inv__meaning { margin-top: 0.15rem; }
+.tpl-sadhyaleaf .hosts { max-width: 40ch; margin: 1.75rem auto 0; font-weight: 600; text-wrap: balance; }
+.tpl-sadhyaleaf .tagline { max-width: 36ch; margin: 0.35rem auto 0; text-wrap: balance; }
+
+/* ---------- the leaf ---------- */
+.tpl-sadhyaleaf .feast { padding-inline: clamp(0.75rem, 3vw, 2rem); }
+.tpl-sadhyaleaf .feast__track { position: relative; max-width: 1360px; margin-inline: auto; }
+/* Sentinels sit down the track; the observer lands a serving as each one scrolls into view. */
+.tpl-sadhyaleaf .sentinel { position: absolute; left: 0; top: calc(100% * var(--i) / 12); width: 1px; height: 2px; pointer-events: none; }
+.tpl-sadhyaleaf .stage { padding-bottom: 1.5rem; }
+.tpl-sadhyaleaf .leaf { --cols: 1; perspective: 6000px; display: grid; }
+
+.tpl-sadhyaleaf .half {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  gap: 1.25rem;
+  padding: 1.75rem 1.25rem;
+  background-color: var(--leaf);
+}
+/* Veins slant away from the midrib on both halves. */
+.tpl-sadhyaleaf .half--top {
+  border-radius: 56px 56px 0 0;
+  background-image: repeating-linear-gradient(78deg, transparent 0 28px, rgba(18, 48, 27, 0.18) 28px 29px);
+}
+.tpl-sadhyaleaf .half--bot {
+  border-radius: 0 0 56px 56px;
+  background-image: repeating-linear-gradient(102deg, transparent 0 28px, rgba(18, 48, 27, 0.18) 28px 29px);
+}
+
+/* Midrib carries the one control. It stays above the flap so it is never covered. */
+.tpl-sadhyaleaf .rib {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  justify-items: center;
+  gap: 0.45rem;
+  padding: 0.9rem 1rem;
+  background: var(--leaf-d);
+  color: var(--lime);
+  text-align: center;
+}
+.tpl-sadhyaleaf .fold {
+  min-height: 48px;
+  padding: 0.5rem 1.75rem;
+  border: 2px solid var(--lime);
+  border-radius: 999px;
+  background: var(--verm);
+  color: var(--lime);
+  font: 600 1.0625rem / 1.2 'Hind', 'Mukta', sans-serif;
+  cursor: pointer;
+}
+.tpl-sadhyaleaf .fold:hover:not(:disabled) { background: var(--verm-d); }
+.tpl-sadhyaleaf .fold:disabled { cursor: default; }
+.tpl-sadhyaleaf .rib .fold:focus-visible { outline-color: var(--lime); }
+.tpl-sadhyaleaf .rib__hint { max-width: 52ch; font-size: 0.9375rem; }
+
+/* Lower half hinges on the rib: rotateX(160deg) carries it up and toward the viewer. */
+.tpl-sadhyaleaf .flap {
+  position: relative;
+  z-index: 4;
+  transform-origin: 50% 0;
+  transform-style: preserve-3d;
+  transition: transform 1.2s cubic-bezier(0.55, 0, 0.25, 1);
+}
+.tpl-sadhyaleaf .flap[data-folded='true'] { transform: rotateX(160deg); }
+.tpl-sadhyaleaf .flap__front { backface-visibility: hidden; }
+/* Underside of the leaf: pre-flipped so it reads upright once the flap has folded. */
+.tpl-sadhyaleaf .flap__back {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: 1.5rem;
+  border-radius: 56px 56px 0 0;
+  background-color: var(--leaf-l);
+  background-image: repeating-linear-gradient(78deg, transparent 0 28px, rgba(18, 48, 27, 0.14) 28px 29px);
+  text-align: center;
+  transform: rotateX(180deg);
+  backface-visibility: hidden;
+}
+.tpl-sadhyaleaf .flap__title { font: 400 clamp(2.25rem, 8vw, 3.5rem) / 1.1 var(--display); }
+
+/* ---------- servings ---------- */
+.tpl-sadhyaleaf .plate {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 15rem);
+  aspect-ratio: 1;
+  justify-self: center;
+  container-type: inline-size;
+  opacity: 0;
+  transform: translateY(-70px) scale(1.18);
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1) var(--d, 0ms), opacity 0.25s linear var(--d, 0ms);
+}
+.tpl-sadhyaleaf .plate[data-in='true'] { opacity: 1; transform: none; }
+.tpl-sadhyaleaf .plate__svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tpl-sadhyaleaf .pl-disc { fill: var(--paper); stroke: var(--ink); stroke-width: 1; }
+.tpl-sadhyaleaf .pl-edge { fill: none; stroke: var(--leaf-l); stroke-width: 0.8; }
+.tpl-sadhyaleaf .pl-dot--0, .tpl-sadhyaleaf .pl-dot--5 { fill: var(--leaf); }
+.tpl-sadhyaleaf .pl-dot--1, .tpl-sadhyaleaf .pl-dot--4 { fill: var(--leaf-d); }
+.tpl-sadhyaleaf .pl-dot--2 { fill: var(--leaf-l); }
+.tpl-sadhyaleaf .pl-dot--3 { fill: var(--ink); }
+
+.tpl-sadhyaleaf .plate__body { position: relative; display: grid; justify-items: center; grid-template-columns: minmax(0, 1fr); gap: 0.1rem; width: 100%; padding: 14%; text-align: center; line-height: 1.2; }
+.tpl-sadhyaleaf .plate__label { color: var(--leaf-d); font-size: 0.9375rem; font-weight: 600; }
+.tpl-sadhyaleaf .plate__val { font-size: 1.0625rem; }
+.tpl-sadhyaleaf .plate__val--b { font-weight: 600; }
+.tpl-sadhyaleaf .plate__name { font: 400 1.375rem / 1.1 var(--display); }
+.tpl-sadhyaleaf .plate__big { font: 400 2.75rem / 1 var(--display); }
+.tpl-sadhyaleaf .plate__big--sm { font-size: 2rem; }
+.tpl-sadhyaleaf .plate__clock { font-variant-numeric: tabular-nums; }
+.tpl-sadhyaleaf .plate__script { font: 400 1.875rem / 1.2 var(--script); }
+.tpl-sadhyaleaf .years { display: grid; font: 400 1.375rem / 1.25 var(--display); }
+.tpl-sadhyaleaf .names { display: grid; justify-items: center; font: 400 min(48px, 20cqw) / 0.95 var(--display); }
+.tpl-sadhyaleaf .names span { max-width: 100%; overflow-wrap: anywhere; }
+.tpl-sadhyaleaf .names .amp { font-size: 1.5rem; line-height: 1.1; }
+
+/* ---------- reply: opens when the leaf is folded ---------- */
+.tpl-sadhyaleaf .reply { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.7s ease; }
+.tpl-sadhyaleaf .reply[data-open='true'] { grid-template-rows: 1fr; }
+.tpl-sadhyaleaf .reply__clip { min-height: 0; overflow: hidden; }
+.tpl-sadhyaleaf .reply__in { max-width: 42rem; margin-inline: auto; padding: 2rem 1.25rem 1rem; }
+.tpl-sadhyaleaf .reply h2 { display: inline-block; margin-bottom: 0.75rem; border-bottom: 3px solid var(--verm); color: var(--verm); }
+
+.tpl-sadhyaleaf .rsvp { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem 1.25rem; margin-top: 1.25rem; }
+.tpl-sadhyaleaf .rsvp label { display: grid; gap: 0.3rem; }
+.tpl-sadhyaleaf .rsvp label:has(textarea) { grid-column: 1 / -1; }
+.tpl-sadhyaleaf .rsvp label span { font-size: 0.9375rem; font-weight: 600; }
+.tpl-sadhyaleaf .rsvp input, .tpl-sadhyaleaf .rsvp select, .tpl-sadhyaleaf .rsvp textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.55rem 0.8rem;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+.tpl-sadhyaleaf .rsvp input:focus-visible, .tpl-sadhyaleaf .rsvp select:focus-visible,
+.tpl-sadhyaleaf .rsvp textarea:focus-visible, .tpl-sadhyaleaf .rsvp button:focus-visible { outline: 3px solid var(--verm); outline-offset: 2px; }
+.tpl-sadhyaleaf .rsvp button {
+  grid-column: 1 / -1;
+  justify-self: start;
+  min-height: 48px;
+  padding: 0.5rem 1.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--verm);
+  color: var(--lime);
+  font: 600 1.0625rem / 1.2 'Hind', 'Mukta', sans-serif;
+  cursor: pointer;
+}
+.tpl-sadhyaleaf .rsvp button:hover { background: var(--verm-d); }
+.tpl-sadhyaleaf .rsvp__error { grid-column: 1 / -1; color: var(--verm); font-weight: 600; }
+.tpl-sadhyaleaf .rsvp__done { margin-top: 1.25rem; padding-top: 1rem; border-top: 3px dotted var(--verm); font: 400 1.5rem / 1.3 var(--display); }
+
+/* ---------- full details ---------- */
+.tpl-sadhyaleaf .menu { max-width: 60rem; margin-inline: auto; padding: 3rem 1.25rem calc(80px + 3rem); }
+.tpl-sadhyaleaf .menu h2 { margin-bottom: 1rem; }
+.tpl-sadhyaleaf .event { display: grid; grid-template-columns: 4rem 1fr; gap: 0 1.25rem; padding: 1.25rem 0; border-top: 3px dotted var(--leaf); }
+.tpl-sadhyaleaf .event__mark { width: 4rem; height: 4rem; }
+.tpl-sadhyaleaf .event__when { font-weight: 600; }
+.tpl-sadhyaleaf .event__note { max-width: 60ch; margin-top: 0.35rem; }
+.tpl-sadhyaleaf .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.75rem; padding-top: 1.25rem; border-top: 3px dotted var(--leaf); }
+.tpl-sadhyaleaf .btn {
+  min-height: 48px;
+  padding: 0.5rem 1.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--lime);
+  font: 600 1.0625rem / 1.2 'Hind', 'Mukta', sans-serif;
+  cursor: pointer;
+}
+.tpl-sadhyaleaf .btn:hover { background: var(--leaf-d); }
+.tpl-sadhyaleaf .map { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.tpl-sadhyaleaf .menu__story { margin-top: 3.5rem; }
+/* Story chapters step in one by one, like servings down the leaf. */
+.tpl-sadhyaleaf .story { display: grid; gap: 1.5rem; }
+.tpl-sadhyaleaf .story li { display: grid; grid-template-columns: 5rem 1fr; gap: 0 1rem; margin-left: calc(var(--k) * clamp(0rem, 7vw, 5rem)); }
+.tpl-sadhyaleaf .story__year { color: var(--leaf-d); font: 400 2.25rem / 1.1 var(--display); }
+.tpl-sadhyaleaf .story p { max-width: 52ch; }
+
+/* ---------- wider screens ---------- */
+@media (min-width: 700px) {
+  .tpl-sadhyaleaf .leaf { --cols: 3; }
+  .tpl-sadhyaleaf .half { gap: 1.5rem 1rem; padding: 2rem 1.5rem; }
+  .tpl-sadhyaleaf .half--top, .tpl-sadhyaleaf .flap__back { border-radius: 110px 110px 0 0 / 80px 80px 0 0; }
+  .tpl-sadhyaleaf .half--bot { border-radius: 0 0 110px 110px / 0 0 80px 80px; }
+  .tpl-sadhyaleaf .event { grid-template-columns: 5rem 1fr; }
+}
+/* Wide: six across, and the leaf pins while servings land. */
+@media (min-width: 1280px) {
+  .tpl-sadhyaleaf .leaf { --cols: 6; }
+  .tpl-sadhyaleaf .feast__track { height: 300svh; }
+  .tpl-sadhyaleaf .stage { position: sticky; top: 2svh; }
+  .tpl-sadhyaleaf .sentinel { top: calc((100% - 100svh) * var(--i) / 12); }
+  .tpl-sadhyaleaf .half { gap: 0.5rem; padding: 1.75rem; }
+  .tpl-sadhyaleaf .plate__body { padding: 12%; }
+  .tpl-sadhyaleaf .plate__label { font-size: 0.8125rem; }
+  .tpl-sadhyaleaf .plate__val { font-size: 0.9375rem; }
+  .tpl-sadhyaleaf .plate__name { font-size: 1.125rem; }
+  .tpl-sadhyaleaf .plate__big { font-size: 2.25rem; }
+  .tpl-sadhyaleaf .plate__big--sm { font-size: 1.625rem; }
+  .tpl-sadhyaleaf .plate__script { font-size: 1.5rem; }
+  .tpl-sadhyaleaf .years { font-size: 1.125rem; }
+  .tpl-sadhyaleaf .half--top, .tpl-sadhyaleaf .flap__back { border-radius: 220px 220px 0 0 / 160px 160px 0 0; }
+  .tpl-sadhyaleaf .half--bot { border-radius: 0 0 220px 220px / 0 0 160px 160px; }
+}
+
+/* Static end state: everything landed, nothing waits on an animation. */
+@media (prefers-reduced-motion: reduce) {
+  .tpl-sadhyaleaf .plate { opacity: 1; transform: none; transition: none; }
+  .tpl-sadhyaleaf .flap, .tpl-sadhyaleaf .reply { transition: none; }
+}

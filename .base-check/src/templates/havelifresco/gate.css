@@ -1,0 +1,189 @@
+/* Haveli Fresco gate. Palette and ornament mirror havelifresco.css; everything scoped to .gate-havelifresco.
+   Opening (1800ms): leaves hinge up 0-950ms, fresco draws 350-1250ms, window pushes forward, wall dissolves from 750ms. */
+.gate-havelifresco {
+  --wash: #eef1f6;
+  --wash-d: #dde3ee;
+  --wash-l: #f9fafc;
+  --ultra: #2b4c9b;
+  --ultra-d: #1d3878;
+  --ultra-t: #cfd9ee;
+  --ochre: #d9a441;
+  --ochre-t: #f6ecd0;
+  --red: #b3261e;
+  --ink: #2a1a0e;
+  --ink-soft: #5b4636;
+  --display: 'Tiro Devanagari Hindi', 'Noto Serif Devanagari', serif;
+  --body: 'Hind', 'Mukta', system-ui, sans-serif;
+  --wh: min(36svh, 17rem); /* window height drives everything: art scales by svh, never overflows */
+  --ww: calc(var(--wh) * 0.8);
+
+  color: var(--ink);
+  background: var(--wash);
+  font-family: var(--body);
+  transition: opacity 1s ease-in 0.75s;
+}
+.gate-havelifresco *, .gate-havelifresco *::before, .gate-havelifresco *::after { box-sizing: border-box; }
+.gate-havelifresco p { margin: 0; }
+.gate-havelifresco.is-opening { opacity: 0; will-change: opacity; }
+
+/* ---------- wall + dado (static) ---------- */
+.gate-havelifresco__wall {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 40% 30% at 18% 22%, rgba(43, 76, 155, 0.07), transparent),
+    radial-gradient(ellipse 35% 28% at 78% 60%, rgba(217, 164, 65, 0.1), transparent);
+}
+/* Painted pilasters flank the stage on wide screens, like the ones between the page's panels. */
+@media (min-width: 760px) {
+  .gate-havelifresco__wall::before, .gate-havelifresco__wall::after {
+    content: ''; position: absolute; top: 0; bottom: 0; width: 14px;
+    background: repeating-linear-gradient(var(--ochre) 0 14px, var(--red) 14px 20px); opacity: 0.85;
+  }
+  .gate-havelifresco__wall::before { left: calc(50% - 19rem); }
+  .gate-havelifresco__wall::after { left: calc(50% + 19rem - 14px); }
+}
+.gate-havelifresco__dado {
+  position: absolute; inset: auto 0 0; height: 14svh; background-color: var(--ultra);
+  border-top: 5px solid var(--ochre); box-shadow: inset 0 3px 0 var(--red);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='24' viewBox='0 0 36 24'%3E%3Cpath d='M18 4l10 8-10 8-10-8z' fill='none' stroke='%23d9a441' stroke-width='1.6'/%3E%3Ccircle cx='18' cy='12' r='2.2' fill='%23b3261e'/%3E%3C/svg%3E");
+  background-size: 36px 24px; background-repeat: repeat-x; background-position: 0 50%;
+}
+
+/* ---------- stage ---------- */
+.gate-havelifresco__stage {
+  position: relative; z-index: 1; display: grid; justify-items: center; align-content: center;
+  gap: clamp(8px, 1.8svh, 16px); width: min(100%, 30rem); padding: 4px 16px; text-align: center;
+}
+.gate-havelifresco__head { display: grid; justify-items: center; gap: 4px; transition: opacity 0.35s ease; }
+.gate-havelifresco.is-opening .gate-havelifresco__head,
+.gate-havelifresco.is-opening .gate-havelifresco__btn { opacity: 0; }
+
+/* Invocation: static, reverent, a painted rule beneath. */
+.gate-havelifresco__invo { display: grid; justify-items: center; gap: 2px; padding-bottom: 8px; }
+.gate-havelifresco__invo::after {
+  content: ''; width: 3.5rem; height: 6px; margin-top: 4px;
+  border-block: 2px solid var(--ochre); background: linear-gradient(var(--red), var(--red)) center / 100% 2px no-repeat;
+}
+.gate-havelifresco__invo-s { font: 1.35rem/1.35 var(--display); color: var(--ultra-d); }
+.gate-havelifresco__invo-t { font-size: 0.9375rem; line-height: 1.3; letter-spacing: 0.04em; color: var(--ink-soft); }
+
+.gate-havelifresco__names {
+  font: 400 clamp(1.9rem, min(10vw, 7svh), 2.8rem)/1.1 var(--display); color: var(--ultra-d);
+  text-wrap: balance;
+}
+.gate-havelifresco__amp { font-size: 0.55em; color: var(--red); }
+.gate-havelifresco__date { font: 500 0.9375rem/1.3 var(--body); color: var(--ink); }
+.gate-havelifresco__guest { font: 0.9375rem/1.3 var(--display); color: var(--ink-soft); }
+
+/* ---------- the window ---------- */
+.gate-havelifresco__window {
+  position: relative; width: var(--ww); height: var(--wh); margin-block: 16px 12px;
+  border: 6px solid var(--ochre); box-shadow: 0 0 0 3px var(--ultra-d); background: var(--ochre-t);
+  transform-origin: 50% 40%;
+}
+/* lintel course above, sill below */
+.gate-havelifresco__window::before {
+  content: ''; position: absolute; left: -12px; right: -12px; top: -22px; height: 12px;
+  background: repeating-linear-gradient(90deg, var(--ochre) 0 14px, var(--red) 14px 20px); border-bottom: 3px solid var(--ultra-d);
+}
+.gate-havelifresco__window::after {
+  content: ''; position: absolute; left: -12px; right: -12px; bottom: -20px; height: 10px;
+  background: var(--ultra-d); border-top: 3px solid var(--ochre);
+}
+.gate-havelifresco.is-opening .gate-havelifresco__window {
+  transform: scale(1.7); will-change: transform; transition: transform 1.15s cubic-bezier(0.6, 0, 0.3, 1) 0.65s;
+}
+
+.gate-havelifresco__room { position: absolute; inset: 0; overflow: hidden; }
+.gate-havelifresco__room svg { display: block; width: 100%; height: 100%; }
+.gate-havelifresco__ln {
+  fill: none; stroke: var(--ink); stroke-width: 2; stroke-linejoin: round;
+  stroke-dasharray: 1 1; stroke-dashoffset: 1;
+}
+.gate-havelifresco__fills { opacity: 0; }
+.gate-havelifresco.is-opening .gate-havelifresco__ln {
+  stroke-dashoffset: 0; transition: stroke-dashoffset 0.9s cubic-bezier(0.45, 0.05, 0.3, 1) 0.35s;
+}
+.gate-havelifresco.is-opening .gate-havelifresco__fills { opacity: 1; transition: opacity 0.5s ease 0.9s; }
+
+/* Two lattice leaves, hinged on the top edge. Lattice = crossed ultramarine lines over open diamonds. */
+.gate-havelifresco__leaves {
+  position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+  perspective: 800px; perspective-origin: 50% 30%;
+}
+.gate-havelifresco__leaf {
+  position: relative; display: block; transform-origin: 50% 0;
+  border: 5px solid var(--ultra); box-shadow: inset 0 0 0 2px var(--ochre);
+  background-color: rgba(246, 236, 208, 0.35);
+  background-image:
+    repeating-linear-gradient(45deg, var(--ultra) 0 2px, transparent 2px 11px),
+    repeating-linear-gradient(-45deg, var(--ultra) 0 2px, transparent 2px 11px);
+  transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+.gate-havelifresco__leaf::before { /* mid rail */
+  content: ''; position: absolute; left: 0; right: 0; top: 46%; height: 9px;
+  background: var(--ultra); border-block: 2px solid var(--ochre);
+}
+.gate-havelifresco__leaf::after { /* latch knob on the meeting edge */
+  content: ''; position: absolute; top: 55%; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--red); border: 2px solid var(--ochre);
+}
+.gate-havelifresco__leaf--l::after { right: 3px; }
+.gate-havelifresco__leaf--r::after { left: 3px; }
+.gate-havelifresco.is-opening .gate-havelifresco__leaf {
+  transform: rotateX(98deg); will-change: transform; transition: transform 0.85s cubic-bezier(0.5, 0, 0.15, 1);
+}
+.gate-havelifresco.is-opening .gate-havelifresco__leaf--r { transition-delay: 0.12s; }
+
+/* Tactile affordance: the shutters lift a hair under the finger or pointer, never while opening. */
+.gate-havelifresco:not(.is-opening) .gate-havelifresco__stage:has(.gate-havelifresco__btn:active) .gate-havelifresco__leaf { transform: rotateX(6deg); }
+@media (hover: hover) and (pointer: fine) {
+  .gate-havelifresco:not(.is-opening) .gate-havelifresco__stage:has(.gate-havelifresco__btn:hover) .gate-havelifresco__leaf { transform: rotateX(6deg); }
+  .gate-havelifresco__btn:hover { background: var(--ultra-d); }
+}
+
+/* ---------- button (same painted-wood look as the page's buttons) ---------- */
+.gate-havelifresco__btn {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0.5rem 1.4rem;
+  border: 2px solid var(--ultra-d); border-bottom: 5px solid var(--ochre); border-radius: 0; cursor: pointer;
+  background: var(--ultra); color: #fff; font: 500 1rem/1.2 var(--body); transition: opacity 0.35s ease;
+}
+.gate-havelifresco__btn:active { transform: translateY(2px); border-bottom-width: 3px; }
+.gate-havelifresco__btn:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.gate-havelifresco__btn:disabled { cursor: default; }
+
+/* ---------- landscape phones: text left, window right, scaled by svh ---------- */
+@media (max-height: 480px) and (orientation: landscape) {
+  .gate-havelifresco { --wh: min(58svh, 15rem); }
+  .gate-havelifresco__stage {
+    width: min(100%, 40rem); grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'head win' 'btn win';
+    column-gap: 24px; row-gap: 10px; align-items: center;
+  }
+  .gate-havelifresco__head { grid-area: head; align-self: end; gap: 2px; }
+  .gate-havelifresco__window { grid-area: win; margin-block: 24px; }
+  .gate-havelifresco__btn { grid-area: btn; justify-self: center; align-self: start; }
+  .gate-havelifresco__invo { padding-bottom: 4px; }
+  .gate-havelifresco__invo-s { font-size: 1.25rem; line-height: 1.25; }
+  .gate-havelifresco__names { font-size: clamp(1.6rem, 9svh, 2.4rem); }
+}
+
+/* ---------- reduced motion: the mechanic becomes a 250ms fade; the tap gate stays ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .gate-havelifresco { transition: opacity 0.25s ease; }
+  .gate-havelifresco.is-opening { will-change: auto; }
+  .gate-havelifresco__head, .gate-havelifresco__btn, .gate-havelifresco__leaf,
+  .gate-havelifresco.is-opening .gate-havelifresco__window,
+  .gate-havelifresco.is-opening .gate-havelifresco__leaf,
+  .gate-havelifresco.is-opening .gate-havelifresco__ln,
+  .gate-havelifresco.is-opening .gate-havelifresco__fills { transition: none; }
+  .gate-havelifresco.is-opening .gate-havelifresco__head,
+  .gate-havelifresco.is-opening .gate-havelifresco__btn { opacity: 1; }
+  .gate-havelifresco.is-opening .gate-havelifresco__window,
+  .gate-havelifresco.is-opening .gate-havelifresco__leaf { transform: none; will-change: auto; }
+  .gate-havelifresco.is-opening .gate-havelifresco__ln { stroke-dashoffset: 1; }
+  .gate-havelifresco.is-opening .gate-havelifresco__fills { opacity: 0; }
+  .gate-havelifresco:not(.is-opening) .gate-havelifresco__stage:has(.gate-havelifresco__btn:active) .gate-havelifresco__leaf { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) and (hover: hover) and (pointer: fine) {
+  .gate-havelifresco:not(.is-opening) .gate-havelifresco__stage:has(.gate-havelifresco__btn:hover) .gate-havelifresco__leaf { transform: none; }
+}

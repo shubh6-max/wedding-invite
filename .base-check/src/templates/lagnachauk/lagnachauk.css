@@ -1,0 +1,250 @@
+/* Lagnachauk: Warli dancers on a mud-red wall. Every selector is scoped to .tpl-lagnachauk. */
+.tpl-lagnachauk {
+  --wall: #7a3320;
+  --ink: #fff3e2;
+  --gold: #e8b96a;
+  --deep: #4a1d12;
+  --ink-2: #ebd7c2; /* secondary text, 6.5:1 on the wall */
+  --line: rgba(255, 243, 226, 0.4);
+  --disp: 'Yatra One', 'Noto Serif Devanagari', serif;
+  --body: 'Hind', 'Mukta', system-ui, sans-serif;
+  min-height: 100svh;
+  overflow-x: clip;
+  color: var(--ink);
+  font: 400 17px/1.6 var(--body);
+  background-color: var(--wall);
+  /* Faint mud-plaster speckle, two offset dot grids. */
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(74, 29, 18, 0.35) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 60%, rgba(255, 243, 226, 0.07) 0 1px, transparent 1.6px);
+  background-size: 29px 31px, 17px 19px;
+}
+.tpl-lagnachauk *, .tpl-lagnachauk *::before, .tpl-lagnachauk *::after { box-sizing: border-box; }
+.tpl-lagnachauk p, .tpl-lagnachauk h1, .tpl-lagnachauk h2, .tpl-lagnachauk h3, .tpl-lagnachauk dl, .tpl-lagnachauk dd, .tpl-lagnachauk ol { margin: 0; padding: 0; }
+.tpl-lagnachauk ol { list-style: none; }
+.tpl-lagnachauk .sr {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+.tpl-lagnachauk :is(button, a, input, select, textarea):focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* ---------- page grid ---------- */
+.tpl-lagnachauk .wrap {
+  max-width: 1240px;
+  margin-inline: auto;
+  padding: 24px 16px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+}
+.tpl-lagnachauk .pin { display: grid; justify-items: center; gap: 16px; text-align: center; }
+@media (min-width: 960px) and (min-height: 720px) {
+  .tpl-lagnachauk .wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 56px; padding-top: 16px; }
+  /* The stage stays pinned while the three rings of detail scroll past. */
+  .tpl-lagnachauk .pin { position: sticky; top: 16px; align-self: start; }
+  .tpl-lagnachauk .stage { width: min(100%, 44vw, calc(100svh - 400px)); }
+}
+
+/* ---------- invocation (fixed, upright, never on the ring) ---------- */
+.tpl-lagnachauk .invoc { display: grid; justify-items: center; gap: 2px; }
+.tpl-lagnachauk .om { font: 400 40px/1.1 var(--disp); color: var(--gold); }
+.tpl-lagnachauk .invoc__script { font: 400 24px/1.3 var(--disp); }
+.tpl-lagnachauk .invoc__text { color: var(--ink-2); font-size: 15px; line-height: 1.4; max-width: 46ch; }
+
+/* ---------- stage ---------- */
+.tpl-lagnachauk .stage {
+  --from: 0deg; /* set from script on direction change so the ring never jumps */
+  position: relative;
+  width: min(100%, 560px);
+  aspect-ratio: 1;
+  container-type: inline-size;
+}
+.tpl-lagnachauk .stage__wall, .tpl-lagnachauk .ring, .tpl-lagnachauk .ring > svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+}
+.tpl-lagnachauk .wall__dots { fill: none; stroke: var(--gold); stroke-width: 3.6; stroke-linecap: round; stroke-dasharray: 0.1 7.4; }
+.tpl-lagnachauk .wall__edge { fill: none; stroke: var(--line); stroke-width: 1; }
+
+/* Dancers and pictograms share one figure style. */
+.tpl-lagnachauk .fig circle, .tpl-lagnachauk .fig path, .tpl-lagnachauk .scene path, .tpl-lagnachauk .scene circle { fill: var(--ink); }
+.tpl-lagnachauk .fig .fig__l, .tpl-lagnachauk .scene .fig__l, .tpl-lagnachauk svg > g > .fig__l { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tpl-lagnachauk .scene .gold, .tpl-lagnachauk .scene .gold circle { fill: var(--gold); }
+.tpl-lagnachauk .chain { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; }
+
+.tpl-lagnachauk .ring { transform-origin: 50% 50%; }
+.tpl-lagnachauk .stage[data-dir='cw'] .ring { animation: lc-cw 40s linear infinite; }
+.tpl-lagnachauk .stage[data-dir='ccw'] .ring { animation: lc-ccw 40s linear infinite; }
+.tpl-lagnachauk .stage[data-dir='cw'] .lbl__in { animation: lc-un-cw 40s linear infinite; }
+.tpl-lagnachauk .stage[data-dir='ccw'] .lbl__in { animation: lc-un-ccw 40s linear infinite; }
+/* Rest: freeze at the current angle (--from) and keep the labels upright. */
+.tpl-lagnachauk .stage[data-dir='rest'] .ring { rotate: var(--from, 0deg); }
+.tpl-lagnachauk .stage[data-dir='rest'] .lbl__in { rotate: calc(var(--from, 0deg) * -1); }
+@media (hover: hover) {
+  .tpl-lagnachauk .stage:hover .ring, .tpl-lagnachauk .stage:hover .lbl__in { animation-play-state: paused; }
+}
+@keyframes lc-cw { from { rotate: var(--from, 0deg); } to { rotate: calc(var(--from, 0deg) + 360deg); } }
+@keyframes lc-ccw { from { rotate: var(--from, 0deg); } to { rotate: calc(var(--from, 0deg) - 360deg); } }
+/* Labels counter-rotate by exactly the ring's angle, so they stay upright. */
+@keyframes lc-un-cw { from { rotate: calc(var(--from, 0deg) * -1); } to { rotate: calc(var(--from, 0deg) * -1 - 360deg); } }
+@keyframes lc-un-ccw { from { rotate: calc(var(--from, 0deg) * -1); } to { rotate: calc(var(--from, 0deg) * -1 + 360deg); } }
+
+.tpl-lagnachauk .slot { position: absolute; transform: translate(-50%, -50%); }
+.tpl-lagnachauk .lbl {
+  display: block;
+  max-width: 6.2em;
+  padding: 0.35em 0.55em;
+  background: var(--deep);
+  border: 2px dotted var(--gold);
+  font: 400 clamp(12px, 2.9cqw, 16px) / 1.15 var(--disp);
+  text-align: center;
+}
+.tpl-lagnachauk .lbl small { display: block; margin-top: 0.15em; color: var(--gold); font: 600 max(12px, 0.8em)/1.2 var(--body); }
+
+/* The chauk: a square wall painting that holds the names. */
+.tpl-lagnachauk .chauk {
+  position: absolute; left: 30%; top: 30%; width: 40%; height: 40%;
+  display: grid; place-items: center;
+  background: var(--deep);
+  border: 2px solid var(--ink);
+}
+.tpl-lagnachauk .chauk::before { content: ''; position: absolute; inset: 5px; border: 2px dotted var(--gold); pointer-events: none; }
+.tpl-lagnachauk .chauk h1 {
+  position: relative;
+  font: 400 clamp(22px, 8cqw, 44px) / 1.05 var(--disp);
+  overflow-wrap: anywhere;
+}
+.tpl-lagnachauk .chauk h1 > span:not(.sr) { display: block; }
+.tpl-lagnachauk .amp { font-size: 0.5em; line-height: 1.3; color: var(--gold); }
+.tpl-lagnachauk .chauk__sun, .tpl-lagnachauk .chauk__moon, .tpl-lagnachauk .chauk__hut {
+  position: absolute; width: clamp(14px, 5cqw, 28px); height: auto; fill: var(--gold);
+}
+.tpl-lagnachauk .chauk__sun { left: clamp(9px, 3cqw, 14px); top: clamp(9px, 3cqw, 14px); }
+.tpl-lagnachauk .chauk__moon { right: clamp(9px, 3cqw, 14px); top: clamp(9px, 3cqw, 14px); }
+.tpl-lagnachauk .chauk__hut { left: 50%; bottom: clamp(9px, 3cqw, 14px); width: clamp(16px, 5.5cqw, 30px); transform: translateX(-50%); fill: var(--ink); }
+
+/* ---------- signature controls ---------- */
+.tpl-lagnachauk .dir { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.tpl-lagnachauk .dir button {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 48px; padding: 0 20px;
+  background: transparent; color: var(--gold);
+  border: 2px solid var(--gold); border-radius: 0;
+  font: 400 17px/1 var(--disp);
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.tpl-lagnachauk .dir button[aria-pressed='true'] { background: var(--gold); color: var(--deep); }
+.tpl-lagnachauk .dir__ccw svg { transform: scaleX(-1); }
+.tpl-lagnachauk .dir__still { display: none; color: var(--ink-2); font-size: 15px; }
+@media (prefers-reduced-motion: reduce) {
+  .tpl-lagnachauk .ring, .tpl-lagnachauk .lbl__in { animation: none !important; }
+  .tpl-lagnachauk .dir { display: none; }
+  .tpl-lagnachauk .dir__still { display: block; }
+}
+
+.tpl-lagnachauk .when { font-size: 17px; max-width: 40ch; }
+.tpl-lagnachauk .rsvp-line {
+  min-height: 44px; padding: 0 4px;
+  background: none; border: 0; color: var(--gold);
+  font: 400 17px/1.4 var(--body);
+  text-decoration: underline dotted 2px; text-underline-offset: 6px;
+  cursor: pointer;
+}
+
+/* ---------- the three rings of detail ---------- */
+.tpl-lagnachauk .rings { min-width: 0; padding-bottom: 8px; }
+.tpl-lagnachauk .ring-sec { padding: 36px 0; border-top: 4px dotted var(--line); }
+.tpl-lagnachauk .ring-sec:first-child { border-top: 0; padding-top: 8px; }
+.tpl-lagnachauk .rl {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 18px;
+  color: var(--gold);
+  font: 400 16px/1.2 var(--disp);
+  letter-spacing: 0.16em; text-transform: uppercase;
+}
+.tpl-lagnachauk .rmark { width: 40px; height: 40px; flex: none; }
+.tpl-lagnachauk .rmark circle { fill: none; stroke: var(--ink-2); stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 0.1 5; }
+.tpl-lagnachauk .rmark circle.on { stroke: var(--gold); stroke-width: 3; stroke-dasharray: none; }
+.tpl-lagnachauk .ring-sec p, .tpl-lagnachauk .ring-sec dd { max-width: 60ch; }
+.tpl-lagnachauk .greet { margin-bottom: 8px; color: var(--ink-2); }
+.tpl-lagnachauk .hosts { font: 400 clamp(22px, 5.4vw, 28px) / 1.35 var(--disp); }
+.tpl-lagnachauk .tag { margin-top: 10px; color: var(--ink-2); }
+
+/* Countdown: digits plus a tally of suns (100s), rings (10s) and dots (1s). */
+.tpl-lagnachauk .count { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 16px; }
+@media (min-width: 520px) { .tpl-lagnachauk .count { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.tpl-lagnachauk .count__cell { display: grid; grid-template-rows: auto auto auto; align-content: start; gap: 8px; padding-top: 10px; border-top: 2px dotted var(--gold); }
+.tpl-lagnachauk .count__cell b { font: 400 36px/1 var(--disp); font-variant-numeric: tabular-nums; }
+.tpl-lagnachauk .count__cell > span { color: var(--ink-2); font-size: 15px; }
+.tpl-lagnachauk .tally { display: grid; gap: 6px; min-height: 52px; align-content: start; }
+.tpl-lagnachauk .tally__tens { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; min-height: 18px; }
+.tpl-lagnachauk .tally i { display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); }
+.tpl-lagnachauk .tally .tens { width: 14px; height: 14px; background: none; border: 2px solid var(--ink); }
+.tpl-lagnachauk .tally .sun { width: 18px; height: 18px; background: var(--gold); box-shadow: 0 0 0 2px var(--wall), 0 0 0 4px var(--gold); margin-right: 6px; }
+.tpl-lagnachauk .tally__ones { display: grid; grid-template-columns: repeat(5, 8px); gap: 4px; min-height: 20px; }
+
+/* Days: a dotted line with one ring-node per day. */
+.tpl-lagnachauk .days { border-left: 3px dotted var(--gold); margin-left: 8px; }
+.tpl-lagnachauk .days li { position: relative; padding: 0 0 28px 26px; }
+.tpl-lagnachauk .days li:last-child { padding-bottom: 0; }
+.tpl-lagnachauk .days li::before {
+  content: ''; position: absolute; left: -11px; top: 6px; width: 19px; height: 19px;
+  background: var(--wall); border: 3px solid var(--gold); border-radius: 50%;
+}
+.tpl-lagnachauk .days h3 { font: 400 24px/1.25 var(--disp); }
+.tpl-lagnachauk .days__when { color: var(--gold); font-weight: 600; }
+.tpl-lagnachauk .days dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 2px 16px; margin: 8px 0; }
+.tpl-lagnachauk .days dt { color: var(--ink-2); }
+.tpl-lagnachauk .days__note { color: var(--ink-2); }
+
+/* Venue */
+.tpl-lagnachauk .venue { display: flex; align-items: center; gap: 20px; }
+.tpl-lagnachauk .venue__hut { width: 64px; flex: none; fill: var(--ink); }
+.tpl-lagnachauk .venue__name { font: 400 24px/1.3 var(--disp); }
+.tpl-lagnachauk .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.tpl-lagnachauk .btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 0 22px;
+  background: var(--gold); color: var(--deep);
+  border: 2px solid var(--gold); border-radius: 0;
+  font: 400 17px/1.2 var(--disp); text-decoration: none; cursor: pointer;
+}
+.tpl-lagnachauk .btn--line { background: transparent; color: var(--gold); }
+.tpl-lagnachauk .btn:hover { background: var(--ink); border-color: var(--ink); color: var(--deep); }
+
+/* Story: three wall paintings */
+.tpl-lagnachauk .story { display: grid; gap: 28px; }
+.tpl-lagnachauk .story li { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 20px; align-items: center; }
+.tpl-lagnachauk .scene { width: 120px; height: auto; background: var(--deep); border: 2px dotted var(--line); padding: 6px; }
+.tpl-lagnachauk .story__year { color: var(--gold); font: 400 26px/1.1 var(--disp); }
+.tpl-lagnachauk .story h3 { font: 400 20px/1.3 var(--disp); margin: 2px 0 4px; }
+.tpl-lagnachauk .story p:last-child { color: var(--ink-2); max-width: 52ch; }
+@media (max-width: 400px) { .tpl-lagnachauk .story li { grid-template-columns: minmax(0, 1fr); } }
+
+/* RSVP form (markup comes from the shared component) */
+.tpl-lagnachauk .rsvp { display: grid; gap: 16px; max-width: 520px; margin-top: 20px; }
+.tpl-lagnachauk .rsvp label { display: grid; gap: 6px; }
+.tpl-lagnachauk .rsvp label span { color: var(--gold); font-weight: 600; }
+.tpl-lagnachauk .rsvp :is(input, select, textarea) {
+  width: 100%; min-height: 48px; padding: 10px 12px;
+  background: var(--deep); color: var(--ink);
+  border: 2px solid var(--ink-2); border-radius: 0;
+  font: 400 17px/1.4 var(--body);
+}
+.tpl-lagnachauk .rsvp textarea { resize: vertical; }
+.tpl-lagnachauk .rsvp button {
+  justify-self: start; min-height: 48px; padding: 0 28px;
+  background: var(--gold); color: var(--deep);
+  border: 2px solid var(--gold); border-radius: 0;
+  font: 400 17px/1 var(--disp); cursor: pointer;
+}
+.tpl-lagnachauk .rsvp button:hover { background: var(--ink); border-color: var(--ink); }
+.tpl-lagnachauk .rsvp__error { padding: 8px 12px; background: var(--deep); border: 2px dotted var(--gold); font-weight: 600; }
+.tpl-lagnachauk .rsvp__done { max-width: 52ch; margin-top: 20px; padding: 16px; background: var(--deep); border: 2px dotted var(--gold); }
+
+/* Footer, with the 80px the gallery pill needs */
+.tpl-lagnachauk .end { display: grid; justify-items: center; gap: 8px; padding: 36px 16px 80px; text-align: center; border-top: 4px dotted var(--line); max-width: 1240px; margin-inline: auto; }
+.tpl-lagnachauk .end__sun { width: 36px; fill: var(--gold); }
+.tpl-lagnachauk .end p { font: 400 24px/1.3 var(--disp); }

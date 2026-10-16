@@ -1,0 +1,136 @@
+/* Bandhani Untie gate. Palette/fonts mirror bandhaniuntie.css. Only transform/opacity animate. */
+.gate-bandhaniuntie {
+  --cream: #fff6e5;
+  --rani: #b3124f;
+  --rani-d: #8f0d3e;
+  --haldi: #ffc93c;
+  --plum: #4a0f2a;
+  --dots: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cg fill='%23ffc93c' fill-opacity='.2'%3E%3Ccircle cx='6' cy='6' r='1.6'/%3E%3Ccircle cx='19' cy='6' r='1.6'/%3E%3Ccircle cx='6' cy='19' r='1.6'/%3E%3Ccircle cx='19' cy='19' r='1.6'/%3E%3Ccircle cx='13' cy='13' r='2'/%3E%3C/g%3E%3C/svg%3E");
+  background: transparent;
+  color: var(--cream);
+  font: 400 1rem/1.5 'Mukta', 'Hind', system-ui, sans-serif;
+}
+.gate-bandhaniuntie *, .gate-bandhaniuntie *::before, .gate-bandhaniuntie *::after { box-sizing: border-box; }
+.gate-bandhaniuntie p { margin: 0; }
+
+/* ---------- backdrop and cloth ---------- */
+.gate-bandhaniuntie .gb-bg { position: absolute; inset: 0; background: var(--cream); }
+.gate-bandhaniuntie .gb-half {
+  position: absolute;
+  inset: 0;
+  background: var(--dots) 0 0 / 26px 26px, var(--rani);
+}
+/* Gota stitching just inside the edge, as on the page's bundles. */
+.gate-bandhaniuntie .gb-half::before { content: ''; position: absolute; inset: 10px; border: 2px dotted var(--haldi); border-radius: 22px 6px 22px 6px; opacity: 0.9; }
+/* Halves overlap by 0.6% so no hairline shows at the seam. */
+.gate-bandhaniuntie .gb-half--l { clip-path: inset(0 49.7% 0 0); transform-origin: 0 0; }
+.gate-bandhaniuntie .gb-half--r { clip-path: inset(0 0 0 49.7%); transform-origin: 100% 0; }
+
+/* ---------- content ---------- */
+.gate-bandhaniuntie .gb-stage {
+  position: relative;
+  width: min(100%, 30rem);
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  justify-items: center;
+  padding: clamp(1rem, 4svh, 2rem) 1.5rem clamp(0.5rem, 2svh, 1rem);
+  text-align: center;
+}
+.gate-bandhaniuntie .gb-inv { display: grid; gap: 0.1rem; justify-items: center; max-width: 24rem; }
+.gate-bandhaniuntie .gb-inv__script { font: 600 clamp(1.375rem, 6vw, 1.75rem)/1.4 'Noto Serif Devanagari', 'Tiro Devanagari Hindi', serif; }
+.gate-bandhaniuntie .gb-inv__text { font-weight: 700; }
+.gate-bandhaniuntie .gb-inv__meaning { margin-top: 0.15rem; font-size: 0.875rem; line-height: 1.4; opacity: 0.92; }
+.gate-bandhaniuntie .gb-main { align-self: center; display: grid; gap: 0.4rem; justify-items: center; min-width: 0; }
+.gate-bandhaniuntie .gb-guest { font-size: 1rem; overflow-wrap: anywhere; }
+.gate-bandhaniuntie .gb-names {
+  font: 400 clamp(1.75rem, min(9vw, 6.5svh), 3rem)/1.2 'Shrikhand', 'Noto Serif Gujarati', serif;
+  color: var(--haldi);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.gate-bandhaniuntie .gb-date { font-weight: 700; letter-spacing: 0.02em; }
+
+/* ---------- the master knot (also the button) ---------- */
+.gate-bandhaniuntie .gb-btn {
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+  min-height: 48px;
+  padding: 0.25rem 0.75rem;
+  border: 0;
+  border-radius: 1.75rem;
+  background: none;
+  color: var(--plum);
+  font: inherit;
+  cursor: pointer;
+}
+.gate-bandhaniuntie .gb-btn:disabled { cursor: default; }
+.gate-bandhaniuntie .gb-btn:focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
+.gate-bandhaniuntie .gb-btn__label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 1.5rem;
+  border-radius: 999px;
+  background: var(--haldi);
+  font: 700 1.0625rem 'Mukta', 'Hind', system-ui, sans-serif;
+  box-shadow: 0 3px 0 var(--rani-d);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.gate-bandhaniuntie .gb-btn:active:not(:disabled) .gb-btn__label { transform: translateY(2px); box-shadow: 0 1px 0 var(--rani-d); }
+
+.gate-bandhaniuntie .gb-knot { width: min(5.5rem, 12svh); height: auto; overflow: visible; animation: gb-wobble 3.2s ease-in-out infinite; transform-origin: 50% 46%; }
+@keyframes gb-wobble { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+.gate-bandhaniuntie .gb-tail { fill: var(--haldi); stroke: var(--rani-d); stroke-width: 2; stroke-linejoin: round; transform-box: fill-box; }
+.gate-bandhaniuntie .gb-tail--l { transform-origin: 100% 0; }
+.gate-bandhaniuntie .gb-tail--r { transform-origin: 0 0; }
+.gate-bandhaniuntie .gb-core { transform-box: fill-box; transform-origin: center; }
+.gate-bandhaniuntie .gb-core__ring { fill: var(--rani-d); }
+.gate-bandhaniuntie .gb-core__disc { fill: var(--haldi); }
+.gate-bandhaniuntie .gb-core__dot { fill: var(--rani); }
+
+@media (hover: hover) and (pointer: fine) {
+  .gate-bandhaniuntie .gb-btn:hover:not(:disabled) .gb-btn__label { transform: translateY(-2px); box-shadow: 0 5px 0 var(--rani-d); }
+}
+
+/* ---------- opening: the knot slackens (0-0.6s), then the cloth drops away (0.35-1.6s) ---------- */
+.gate-bandhaniuntie.is-opening .gb-half,
+.gate-bandhaniuntie.is-opening .gb-bg,
+.gate-bandhaniuntie.is-opening .gb-stage,
+.gate-bandhaniuntie.is-opening .gb-core,
+.gate-bandhaniuntie.is-opening .gb-tail,
+.gate-bandhaniuntie.is-opening .gb-btn__label { will-change: transform, opacity; }
+.gate-bandhaniuntie.is-opening .gb-knot { animation: none; }
+.gate-bandhaniuntie.is-opening .gb-core { transform: rotate(-110deg) scale(1.35); opacity: 0; transition: transform 0.65s cubic-bezier(0.3, 0, 0.2, 1), opacity 0.25s 0.35s; }
+.gate-bandhaniuntie.is-opening .gb-tail--l { transform: rotate(28deg) translateY(10%); opacity: 0; transition: transform 0.6s ease-out, opacity 0.3s 0.3s; }
+.gate-bandhaniuntie.is-opening .gb-tail--r { transform: rotate(-28deg) translateY(10%); opacity: 0; transition: transform 0.6s ease-out, opacity 0.3s 0.3s; }
+.gate-bandhaniuntie.is-opening .gb-btn__label { opacity: 0; transition: opacity 0.2s; }
+.gate-bandhaniuntie.is-opening .gb-stage { opacity: 0; transition: opacity 0.4s 0.2s; }
+.gate-bandhaniuntie.is-opening .gb-bg { opacity: 0; transition: opacity 0.25s 0.35s; }
+.gate-bandhaniuntie.is-opening .gb-half--l { animation: gb-drop-l 1.2s cubic-bezier(0.55, 0, 0.75, 0.4) 0.35s forwards; }
+.gate-bandhaniuntie.is-opening .gb-half--r { animation: gb-drop-r 1.2s cubic-bezier(0.55, 0, 0.75, 0.4) 0.4s forwards; }
+/* A small lift first (the bundle sags as the knot gives), then the fall with a slight swing. */
+@keyframes gb-drop-l { 0% { transform: none; } 18% { transform: translateY(-1.5svh) rotate(0.6deg); animation-timing-function: cubic-bezier(0.5, 0, 0.8, 0.5); } 100% { transform: rotate(-8deg) translateY(118%); } }
+@keyframes gb-drop-r { 0% { transform: none; } 18% { transform: translateY(-1.5svh) rotate(-0.6deg); animation-timing-function: cubic-bezier(0.5, 0, 0.8, 0.5); } 100% { transform: rotate(8deg) translateY(118%); } }
+
+/* ---------- short screens (landscape phones): text left, knot right ---------- */
+@media (max-height: 600px) { .gate-bandhaniuntie .gb-inv__meaning { display: none; } }
+@media (max-height: 460px) and (orientation: landscape) {
+  .gate-bandhaniuntie .gb-stage { width: min(100%, 42rem); grid-template-columns: 1fr auto; grid-template-rows: auto 1fr; column-gap: 1rem; padding-block: 0.75rem 0.25rem; }
+  .gate-bandhaniuntie .gb-inv { grid-column: 1 / -1; }
+  .gate-bandhaniuntie .gb-main { grid-column: 1; }
+  .gate-bandhaniuntie .gb-btn { grid-column: 2; align-self: center; }
+  .gate-bandhaniuntie .gb-knot { width: 4.25rem; }
+}
+
+/* ---------- reduced motion: no knot play, a 250ms fade; the tap gate remains ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .gate-bandhaniuntie .gb-knot { animation: none; }
+  .gate-bandhaniuntie.is-opening .gb-half--l,
+  .gate-bandhaniuntie.is-opening .gb-half--r { animation: none; opacity: 0; transition: opacity 0.25s; }
+  .gate-bandhaniuntie.is-opening .gb-core,
+  .gate-bandhaniuntie.is-opening .gb-tail { transform: none; transition: none; }
+  .gate-bandhaniuntie.is-opening .gb-stage,
+  .gate-bandhaniuntie.is-opening .gb-bg { transition: opacity 0.25s; }
+}

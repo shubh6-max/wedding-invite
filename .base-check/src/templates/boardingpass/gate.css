@@ -1,0 +1,233 @@
+/* Boarding Pass gate. Scoped to .gate-boardingpass; only transform/opacity animate.
+   Timeline (1600ms): ticket slides in 0.1-0.7s, scan 0.35-0.95s, bar + board 0.85-1.4s,
+   backdrop fades from 0.7s (page reveal), stage fades 1.0-1.55s. */
+.gate-boardingpass {
+  --navy: #0f2a4a;
+  --navy-deep: #0a1f38;
+  --ink: #061528;
+  --flap: #14305a;
+  --cream: #f4f1e8;
+  --paper: #e7e2d0;
+  --amber: #ffb400;
+  --mute-ink: #4d5c75;
+  --display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --dip: 3.5rem;
+  color: var(--cream);
+  font: 500 1.15rem/1.3 var(--display);
+}
+.gate-boardingpass *,
+.gate-boardingpass *::before,
+.gate-boardingpass *::after { box-sizing: border-box; }
+.gate-boardingpass p { margin: 0; }
+
+/* Full-bleed backdrop with a runway dash line; separate layer so it can fade on its own. */
+.gate-boardingpass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, rgb(255 180 0 / 0.5) 0 28px, transparent 28px 56px) left bottom 70px / 100% 4px no-repeat,
+    var(--navy);
+  transition: opacity 0.85s ease-in 0.7s;
+}
+.gate-boardingpass.is-opening::before { opacity: 0; }
+
+.gate-boardingpass__stage {
+  position: relative;
+  display: grid;
+  width: min(30rem, calc(100% - 3rem));
+  transition: opacity 0.55s ease-in 1s;
+}
+.gate-boardingpass.is-opening .gate-boardingpass__stage { opacity: 0; }
+
+/* Departure board: a row of blank split-flaps that flip to amber at the end. */
+.gate-boardingpass__board { display: flex; gap: 4px; margin-bottom: 14px; perspective: 400px; }
+.gate-boardingpass__board i {
+  position: relative;
+  flex: 1;
+  height: 1.9rem;
+  border-radius: 3px;
+  background: var(--flap);
+  box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.5);
+}
+.gate-boardingpass__board i::before { /* flap hinge */
+  content: '';
+  position: absolute;
+  inset: calc(50% - 1px) 0 auto;
+  height: 2px;
+  background: var(--ink);
+}
+.gate-boardingpass__board i::after { /* lit face */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  background: var(--amber);
+  opacity: 0;
+}
+.gate-boardingpass__board i:nth-child(3n + 1)::before { background: var(--navy-deep); }
+
+/* Ticket */
+.gate-boardingpass__ticket {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 14px 14px 0 0;
+  background: var(--cream);
+  color: var(--navy);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 0.35);
+  transition: transform 0.6s cubic-bezier(0.6, 0, 0.2, 1) 0.1s;
+}
+.gate-boardingpass.is-opening .gate-boardingpass__ticket { transform: translateY(var(--dip)); will-change: transform; }
+.gate-boardingpass__band { height: 14px; background: var(--amber); }
+.gate-boardingpass__body { padding: 16px 20px 14px; }
+.gate-boardingpass__guest { margin-bottom: 4px; font-size: 1.15rem; font-weight: 500; color: var(--mute-ink); overflow-wrap: anywhere; }
+.gate-boardingpass__names {
+  font: 700 clamp(2.4rem, min(13vw, 8.5svh), 4.4rem) / 0.95 var(--display);
+  text-transform: uppercase;
+}
+.gate-boardingpass__names span { display: block; overflow-wrap: anywhere; }
+.gate-boardingpass__names i { font-style: normal; color: var(--mute-ink); }
+.gate-boardingpass__date { margin-top: 10px; font-size: 1.35rem; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
+/* Stub: perforation plus a barcode that is swallowed by the slot. */
+.gate-boardingpass__stub {
+  position: relative;
+  height: 3.4rem;
+  border-top: 2px dashed var(--mute-ink);
+  background:
+    repeating-linear-gradient(90deg, var(--navy) 0 3px, transparent 3px 6px, var(--navy) 6px 7px, transparent 7px 12px, var(--navy) 12px 16px, transparent 16px 19px) center / calc(100% - 40px) 1.6rem no-repeat,
+    var(--paper);
+  background-position: center;
+}
+.gate-boardingpass__stub::before,
+.gate-boardingpass__stub::after { /* punched notches */
+  content: '';
+  position: absolute;
+  top: -11px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--navy);
+}
+.gate-boardingpass__stub::before { left: -10px; }
+.gate-boardingpass__stub::after { right: -10px; }
+
+/* Scan line sweeps the ticket top to bottom, leaving a faint amber wash behind it. */
+.gate-boardingpass__scan {
+  position: absolute;
+  inset: 0;
+  border-bottom: 3px solid var(--amber);
+  background: linear-gradient(to bottom, transparent, rgb(255 180 0 / 0.35));
+  box-shadow: 0 2px 12px rgb(255 180 0 / 0.8);
+  opacity: 0;
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+.gate-boardingpass.is-opening .gate-boardingpass__scan { animation: gate-bp-scan 0.6s ease-in-out 0.35s both; will-change: transform; }
+@keyframes gate-bp-scan {
+  0% { transform: translateY(-100%); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Scanner housing: dark slab holding the slot, the barrier arm and the CTA. */
+.gate-boardingpass__reader {
+  position: relative;
+  z-index: 2;
+  margin: -1rem -0.5rem 0;
+  padding: 24px 14px 14px;
+  border-radius: 12px;
+  background: var(--navy-deep);
+  box-shadow: 0 0 0 2px var(--ink), 0 14px 30px rgb(0 0 0 / 0.4);
+}
+.gate-boardingpass__reader::before { /* slot */
+  content: '';
+  position: absolute;
+  inset: 9px 14px auto;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--ink);
+}
+.gate-boardingpass__reader::after { /* slot light */
+  content: '';
+  position: absolute;
+  inset: 11px 18px auto;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--amber);
+  opacity: 0.35;
+  transition: opacity 0.2s 0.35s;
+}
+.gate-boardingpass.is-opening .gate-boardingpass__reader::after { opacity: 1; }
+
+/* Barrier arm: hazard stripes along the slot lip, pivoting up from the left post. */
+.gate-boardingpass__bar {
+  position: absolute;
+  left: 8px;
+  top: -6px;
+  width: 70%;
+  height: 12px;
+  border-radius: 6px;
+  background: repeating-linear-gradient(-45deg, var(--amber) 0 12px, var(--ink) 12px 24px);
+  box-shadow: 0 0 0 2px var(--ink);
+  transform-origin: 6px 50%;
+  transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1) 0.85s;
+}
+.gate-boardingpass.is-opening .gate-boardingpass__bar { transform: rotate(-84deg); will-change: transform; }
+
+.gate-boardingpass__btn {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--amber);
+  color: var(--navy);
+  font: 700 1.3rem/1 var(--display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.gate-boardingpass__btn:disabled { cursor: default; }
+.gate-boardingpass__btn:active:not(:disabled) { transform: scale(0.98); }
+.gate-boardingpass__btn:focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
+@media (hover: hover) and (pointer: fine) {
+  .gate-boardingpass__btn:hover:not(:disabled) { background: #ffc43a; }
+}
+
+/* Board flips: each tile folds and lands lit, staggered left to right. */
+.gate-boardingpass.is-opening .gate-boardingpass__board i {
+  animation: gate-bp-flip 0.3s ease-in-out calc(0.85s + var(--i) * 0.045s) both;
+  will-change: transform;
+}
+.gate-boardingpass.is-opening .gate-boardingpass__board i::after { animation: gate-bp-lit 0.3s steps(1, end) calc(0.85s + var(--i) * 0.045s) both; }
+@keyframes gate-bp-flip { 50% { transform: rotateX(-90deg); } 100% { transform: rotateX(0); } }
+@keyframes gate-bp-lit { 50%, 100% { opacity: 1; } }
+
+/* Short landscape phones: tighten the stack so the CTA is never clipped. */
+@media (max-height: 480px) {
+  .gate-boardingpass { --dip: 2.6rem; }
+  .gate-boardingpass__board { margin-bottom: 8px; }
+  .gate-boardingpass__board i { height: 1.2rem; }
+  .gate-boardingpass__band { height: 10px; }
+  .gate-boardingpass__body { padding: 8px 18px 8px; }
+  .gate-boardingpass__names { font-size: clamp(1.8rem, 9svh, 2.6rem); }
+  .gate-boardingpass__names span { display: inline; }
+  .gate-boardingpass__date { margin-top: 4px; font-size: 1.15rem; }
+  .gate-boardingpass__stub { height: 2.2rem; background-size: calc(100% - 40px) 1rem; }
+  .gate-boardingpass__reader { padding: 20px 12px 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gate-boardingpass::before { transition: opacity 0.25s; }
+  .gate-boardingpass__stage { transition: opacity 0.25s; }
+  .gate-boardingpass.is-opening .gate-boardingpass__stage { opacity: 0; }
+  .gate-boardingpass__ticket,
+  .gate-boardingpass__bar,
+  .gate-boardingpass__reader::after { transition: none; }
+  .gate-boardingpass.is-opening .gate-boardingpass__ticket,
+  .gate-boardingpass.is-opening .gate-boardingpass__bar { transform: none; }
+  .gate-boardingpass.is-opening .gate-boardingpass__scan,
+  .gate-boardingpass.is-opening .gate-boardingpass__board i,
+  .gate-boardingpass.is-opening .gate-boardingpass__board i::after { animation: none; }
+}

@@ -1,0 +1,49 @@
+/* Reference gate styles. Only transform/opacity animate (compositor-friendly, smooth on low-end phones). */
+.gate-reference { background: #15121a; color: #f3eee8; font-family: 'Hanken Grotesk', system-ui, sans-serif; }
+
+.gate-reference__panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background: #2a2230;
+  transition: transform 1.2s cubic-bezier(0.7, 0, 0.2, 1);
+}
+.gate-reference__panel--l { left: 0; border-right: 1px solid #f2c66d; }
+.gate-reference__panel--r { right: 0; }
+.gate-reference.is-opening .gate-reference__panel--l { transform: translateX(-101%); }
+.gate-reference.is-opening .gate-reference__panel--r { transform: translateX(101%); }
+
+.gate-reference__center {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 24px;
+  justify-items: center;
+  padding: 0 24px;
+  text-align: center;
+  transition: opacity 0.4s;
+}
+.gate-reference.is-opening .gate-reference__center { opacity: 0; }
+
+.gate-reference__names { margin: 0; font-size: clamp(2rem, 9vw, 3.4rem); }
+
+.gate-reference__btn {
+  min-height: 48px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 999px;
+  background: #f2c66d;
+  color: #15121a;
+  font: 600 1rem inherit;
+  cursor: pointer;
+}
+.gate-reference__btn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+.gate-reference__guest, .gate-reference__date { margin: 0; font-size: 1rem; color: #cfc6d4; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gate-reference__panel { transition: opacity 0.25s; }
+  .gate-reference.is-opening .gate-reference__panel--l,
+  .gate-reference.is-opening .gate-reference__panel--r { transform: none; opacity: 0; }
+}

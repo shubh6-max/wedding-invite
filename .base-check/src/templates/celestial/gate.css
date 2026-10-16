@@ -1,0 +1,200 @@
+/* Celestial gate: a lilac letter sealed with a navy wax star, on the night sky. Scoped to .gate-celestial.
+   Timeline (ms): 0-220 press, 200-1100 seal cracks and falls, 300-900 flap swings away,
+   500-1500 sky fades to the page, 750-1500 card lifts off. Total 1800. */
+.gate-celestial {
+  --night: #0b1130;
+  --lilac: #e9e6ff;
+  --peri: #9bb0ff;
+  --gold: #ffd98a;
+  --S: clamp(4.75rem, 20svh, 8rem); /* seal diameter, scales with height */
+  --F: calc(var(--S) * 1.1); /* flap height */
+  color: var(--night);
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+/* ---------- Sky backdrop (fades out as the page is revealed) ---------- */
+.gate-celestial__sky {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 42%, rgb(155 176 255 / 0.2), transparent 58%),
+    linear-gradient(180deg, #0b1130 0%, #101650 55%, #1b1b66 100%);
+  transition: opacity 1s ease-in-out 0.5s;
+}
+.gate-celestial__sky span {
+  position: absolute;
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: var(--lilac);
+  opacity: 0.7;
+  animation: gate-cel-twinkle var(--d) ease-in-out var(--l) infinite;
+}
+@keyframes gate-cel-twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* ---------- Stage + letter ---------- */
+.gate-celestial__stage {
+  position: relative;
+  z-index: 1;
+  width: min(30rem, calc(100% - 2.5rem));
+  display: grid;
+  justify-items: center;
+  gap: 1.1rem;
+}
+.gate-celestial__card {
+  width: 100%;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.75s, opacity 0.5s ease-out 0.75s;
+}
+.gate-celestial__body {
+  position: relative;
+  padding: 1.75rem 1.25rem calc(var(--S) * 0.5 + 0.5rem);
+  text-align: center;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(180deg, #f1efff, #e4e1ff);
+  box-shadow: 0 18px 46px rgb(0 0 0 / 0.45);
+}
+/* Fine inner keyline, like engraved stationery. */
+.gate-celestial__body::before {
+  content: '';
+  position: absolute;
+  inset: 8px 8px 0;
+  border: 1px solid rgb(11 17 48 / 0.2);
+  border-bottom: 0;
+  pointer-events: none;
+}
+.gate-celestial__guest { margin: 0 0 0.6rem; font-size: 0.9375rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #343c92; overflow-wrap: anywhere; }
+.gate-celestial__names {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0 0.28em;
+  font: 400 clamp(2.1rem, 10vw, 3.1rem) / 1.1 'Italiana', Georgia, serif;
+  letter-spacing: 0.02em;
+}
+.gate-celestial__names svg { width: 0.36em; height: 0.36em; fill: #4a5ccf; flex: none; }
+.gate-celestial__date { margin: 0.7rem 0 0; font-size: 1rem; font-weight: 600; color: #2a3175; }
+
+/* ---------- Fold: flap (pointed tab) with the seal on the crease ---------- */
+.gate-celestial__fold { position: relative; height: var(--F); perspective: 700px; }
+.gate-celestial__flap {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #d3d0f7, #e2dfff 70%);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: 50% 0;
+  transition: transform 0.6s cubic-bezier(0.5, 0, 0.3, 1) 0.3s, opacity 0.25s linear 0.65s;
+}
+
+.gate-celestial__seal {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 0;
+  width: var(--S);
+  height: var(--S);
+  margin: calc(var(--S) * -0.42) 0 0 calc(var(--S) / -2);
+  cursor: pointer;
+  transition: transform 0.22s ease-in;
+}
+/* Soft ring that invites the press; stops once opening. */
+.gate-celestial__seal::before {
+  content: '';
+  position: absolute;
+  inset: -6%;
+  border-radius: 50%;
+  border: 1.5px solid #4a5ccf;
+  opacity: 0;
+  animation: gate-cel-ring 2.6s ease-out 0.6s infinite;
+}
+@keyframes gate-cel-ring {
+  0% { opacity: 0.55; transform: scale(0.96); }
+  100% { opacity: 0; transform: scale(1.3); }
+}
+.gate-celestial__piece { position: absolute; inset: 0; }
+.gate-celestial__piece svg { display: block; width: 100%; height: 100%; overflow: visible; }
+/* One jagged crack through the middle; the right piece overlaps by a hair so the whole seal shows no seam. */
+.gate-celestial__piece--l { clip-path: polygon(0 0, 54% 0, 46% 18%, 56% 36%, 44% 54%, 55% 72%, 47% 88%, 52% 100%, 0 100%); }
+.gate-celestial__piece--r { clip-path: polygon(53.4% 0, 100% 0, 100% 100%, 51.4% 100%, 46.4% 88%, 54.4% 72%, 43.4% 54%, 55.4% 36%, 45.4% 18%); }
+
+.gate-celestial .sh { fill: rgb(11 17 48 / 0.35); }
+.gate-celestial .wax { fill: #0f1749; stroke: rgb(155 176 255 / 0.4); stroke-width: 0.7; }
+.gate-celestial .rim { fill: #18247b; stroke: var(--peri); stroke-opacity: 0.6; stroke-width: 0.9; }
+.gate-celestial .glyph { fill: #cdd5ff; }
+.gate-celestial .shine { fill: none; stroke: #fff; stroke-opacity: 0.35; stroke-width: 2; stroke-linecap: round; }
+
+/* ---------- CTA ---------- */
+.gate-celestial__btn {
+  min-height: 48px;
+  padding: 0.7rem 2rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--peri);
+  color: var(--night);
+  font: 700 1rem 'Manrope', system-ui, sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s, background 0.2s;
+}
+.gate-celestial__btn:active { transform: scale(0.97); }
+.gate-celestial__btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.gate-celestial:not(.is-opening) .gate-celestial__seal:active { transform: scale(0.93); }
+
+@media (hover: hover) and (pointer: fine) {
+  .gate-celestial__btn:hover:not(:disabled) { background: var(--lilac); }
+  .gate-celestial:not(.is-opening) .gate-celestial__seal:hover { transform: scale(1.04); }
+}
+
+/* ---------- Opening ---------- */
+.gate-celestial.is-opening .gate-celestial__sky,
+.gate-celestial.is-opening .gate-celestial__card,
+.gate-celestial.is-opening .gate-celestial__flap,
+.gate-celestial.is-opening .gate-celestial__piece { will-change: transform, opacity; }
+
+.gate-celestial.is-opening .gate-celestial__btn { opacity: 0; pointer-events: none; }
+.gate-celestial.is-opening .gate-celestial__sky { opacity: 0; }
+.gate-celestial.is-opening .gate-celestial__seal { transform: scale(0.88); }
+.gate-celestial.is-opening .gate-celestial__seal::before { animation: none; }
+.gate-celestial.is-opening .gate-celestial__flap { transform: rotateX(-96deg); opacity: 0; }
+.gate-celestial.is-opening .gate-celestial__card { transform: translateY(-4%) scale(1.08); opacity: 0; }
+.gate-celestial.is-opening .gate-celestial__piece--l { animation: gate-cel-crack-l 0.9s ease-in 0.2s forwards; }
+.gate-celestial.is-opening .gate-celestial__piece--r { animation: gate-cel-crack-r 0.9s ease-in 0.2s forwards; }
+@keyframes gate-cel-crack-l {
+  0% { transform: none; opacity: 1; animation-timing-function: ease-out; }
+  22% { transform: translate(-8%, 1%) rotate(-5deg); opacity: 1; animation-timing-function: ease-in; }
+  100% { transform: translate(-48%, 125%) rotate(-32deg); opacity: 0; }
+}
+@keyframes gate-cel-crack-r {
+  0% { transform: none; opacity: 1; animation-timing-function: ease-out; }
+  22% { transform: translate(8%, 0) rotate(6deg); opacity: 1; animation-timing-function: ease-in; }
+  100% { transform: translate(44%, 140%) rotate(24deg); opacity: 0; }
+}
+
+/* ---------- Landscape / short screens: tighter letter so the CTA is never clipped ---------- */
+@media (max-height: 480px) {
+  .gate-celestial { --S: clamp(4rem, 18svh, 5rem); --F: calc(var(--S) * 0.75); }
+  .gate-celestial__stage { gap: 0.6rem; }
+  .gate-celestial__body { padding-top: 0.9rem; }
+  .gate-celestial__names { font-size: clamp(1.7rem, 8svh, 2.2rem); }
+  .gate-celestial__guest { margin-bottom: 0.2rem; }
+  .gate-celestial__date { margin-top: 0.3rem; }
+}
+
+/* ---------- Reduced motion: the tap gate stays; the mechanic becomes a 250ms fade ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .gate-celestial__sky span,
+  .gate-celestial__seal::before { animation: none; }
+  .gate-celestial.is-opening .gate-celestial__piece--l,
+  .gate-celestial.is-opening .gate-celestial__piece--r { animation: none; }
+  .gate-celestial__sky,
+  .gate-celestial__card,
+  .gate-celestial__flap { transition: opacity 0.25s linear; }
+  .gate-celestial.is-opening .gate-celestial__seal,
+  .gate-celestial.is-opening .gate-celestial__flap,
+  .gate-celestial.is-opening .gate-celestial__card { transform: none; }
+  .gate-celestial.is-opening .gate-celestial__card { transition-delay: 0s; }
+  .gate-celestial.is-opening .gate-celestial__sky { transition-delay: 0s; }
+}

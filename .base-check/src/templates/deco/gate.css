@@ -1,0 +1,234 @@
+/* Gatsby Deco gate. Everything scoped under .gate-deco; only transform/opacity animate. */
+.gate-deco {
+  --bk: #0c0c0f;
+  --g1: #c9a24a;
+  --g2: #f0dfae;
+  --g3: #7a6128;
+  --D: min(70vw, 38svh, 17rem); /* iris diameter */
+  color: var(--g2);
+  font: 400 1rem/1.4 'Josefin Sans', 'Segoe UI', sans-serif;
+  /* the whole gate dissolves onto the page once the aperture is wide open */
+  transition: opacity 1.1s ease 0.55s;
+}
+.gate-deco *, .gate-deco *::before, .gate-deco *::after { box-sizing: border-box; }
+.gate-deco.is-opening { opacity: 0; }
+.gate-deco p { margin: 0; }
+.gate-deco .gd-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, #1b1709 0, var(--bk) 72%); }
+
+.gate-deco .gd-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  width: 100%;
+  max-width: 30rem;
+  padding: 0 16px;
+}
+
+/* ---------- the iris ---------- */
+.gate-deco .gd-disc { --r: calc(var(--D) / 2); position: relative; flex: none; width: var(--D); height: var(--D); margin-block: 14px; }
+/* bezel ring the bulbs sit on */
+.gate-deco .gd-disc::before { content: ''; position: absolute; inset: -14px; border: 1px solid var(--g3); border-radius: 50%; }
+/* polished rim, goes as the blades leave */
+.gate-deco .gd-disc::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  z-index: 2;
+  border: 2px solid var(--g2);
+  border-radius: 50%;
+  transition: opacity 0.3s ease;
+}
+.gate-deco.is-opening .gd-disc::after { opacity: 0; }
+
+/* full-bleed sunburst fanning out from the iris centre */
+.gate-deco .gd-rays {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 120vmax;
+  height: 120vmax;
+  margin: -60vmax 0 0 -60vmax;
+  background:
+    repeating-conic-gradient(rgba(201, 162, 74, 0.26) 0 0.7deg, transparent 0.7deg 7.5deg),
+    repeating-conic-gradient(from 3.75deg, rgba(201, 162, 74, 0.07) 0 3.75deg, transparent 3.75deg 7.5deg);
+  -webkit-mask-image: radial-gradient(circle closest-side, transparent 0 14%, #000 28%, transparent 100%);
+  mask-image: radial-gradient(circle closest-side, transparent 0 14%, #000 28%, transparent 100%);
+}
+
+/* what the aperture opens onto: gold light on black */
+.gate-deco .gd-core {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffbe9 0, var(--g2) 16%, var(--g1) 40%, #4a3a12 68%, var(--bk) 100%);
+  transform: scale(0.7);
+  transition: transform 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s;
+}
+.gate-deco.is-opening .gd-core { transform: scale(1.3); }
+
+/* Each blade is the right half of the disc; it pivots about its rim point (0,-r), then is placed at --a. */
+.gate-deco .gd-blade {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  clip-path: inset(0 0 0 50%);
+  background:
+    repeating-radial-gradient(circle at 50% 50%, transparent 0 15px, rgba(12, 12, 15, 0.14) 15px 16px),
+    linear-gradient(90deg, transparent 0 50%, #fffbe9 50% calc(50% + 1.5px), var(--g2) calc(50% + 1.5px), var(--g1) 72%, #a07f2c 100%);
+  transform: rotate(var(--a)) translateY(calc(var(--r) * -1)) rotate(0deg) translateY(var(--r));
+  transition:
+    transform 0.85s cubic-bezier(0.6, 0, 0.2, 1) calc(var(--i) * 28ms + 0.12s),
+    opacity 0.35s ease calc(var(--i) * 28ms + 0.6s);
+}
+.gate-deco.is-opening .gd-blade {
+  opacity: 0;
+  transform: rotate(var(--a)) translateY(calc(var(--r) * -1)) rotate(-100deg) translateY(var(--r));
+}
+
+/* monogram medallion hides the pinwheel hub */
+.gate-deco .gd-mono {
+  position: absolute;
+  inset: 28%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--D) * 0.03);
+  border-radius: 50%;
+  background: var(--bk);
+  box-shadow: 0 0 0 2px var(--g2), 0 0 0 5px var(--bk), 0 0 0 6.5px var(--g1);
+  color: var(--g2);
+  font: 400 calc(var(--D) * 0.16) / 1 'Limelight', Georgia, serif;
+  transition: opacity 0.25s ease;
+}
+.gate-deco .gd-mono i { flex: none; width: calc(var(--D) * 0.03); height: calc(var(--D) * 0.03); background: var(--g1); transform: rotate(45deg); }
+.gate-deco.is-opening .gd-mono { opacity: 0; }
+
+/* marquee bulbs: a bright head chases clockwise with a fading tail (period 1.8s over 18 bulbs) */
+.gate-deco .gd-bulb {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  width: 0;
+  height: 0;
+  transform: rotate(calc(var(--k) * 20deg)) translateY(calc(var(--r) * -1 - 14px));
+}
+.gate-deco .gd-bulb::before {
+  content: '';
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%;
+  background: #fff6d0;
+  box-shadow: 0 0 7px 2px rgba(240, 223, 174, 0.75);
+  opacity: 0.28;
+  animation: deco-gate-chase 1.8s linear infinite;
+  animation-delay: calc(var(--k) * 100ms - 1800ms);
+}
+.gate-deco.is-opening .gd-bulb::before { animation: deco-gate-flare 1.2s ease both; }
+@keyframes deco-gate-chase {
+  0% { opacity: 1; transform: scale(1.25); }
+  30%, 100% { opacity: 0.28; transform: scale(1); }
+}
+@keyframes deco-gate-flare {
+  0% { opacity: 0.28; transform: scale(1); }
+  18% { opacity: 1; transform: scale(1.4); }
+  60% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+/* only promote layers while they are moving */
+.gate-deco.is-opening .gd-blade,
+.gate-deco.is-opening .gd-core,
+.gate-deco.is-opening .gd-bulb::before { will-change: transform, opacity; }
+
+/* ---------- cover copy ---------- */
+.gate-deco .gd-copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+.gate-deco.is-opening .gd-copy { opacity: 0; }
+.gate-deco .gd-guest { color: var(--g1); font-size: 0.9rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; overflow-wrap: anywhere; }
+.gate-deco .gd-names {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0 0.3em;
+  color: var(--g2);
+  font: 400 clamp(1.7rem, min(8.4vw, 7.5svh), 2.9rem) / 1.15 'Limelight', Georgia, serif;
+  letter-spacing: 0.04em;
+}
+.gate-deco .gd-names span { overflow-wrap: anywhere; }
+.gate-deco .gd-amp { color: var(--g1); font-size: 0.6em; }
+.gate-deco .gd-date {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  color: var(--g2);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+.gate-deco .gd-date::before, .gate-deco .gd-date::after { content: ''; flex: 1 1 16px; max-width: 44px; height: 5px; border-block: 1px solid var(--g1); }
+
+.gate-deco .gd-btn {
+  min-height: 48px;
+  margin-top: 8px;
+  padding: 10px 34px;
+  border: 0;
+  background: var(--g1);
+  /* double-line deco frame: dark hairline inside a gold slab */
+  box-shadow: inset 0 0 0 3px var(--g1), inset 0 0 0 4px var(--bk);
+  color: var(--bk);
+  font: 600 0.95rem / 1.2 'Josefin Sans', 'Segoe UI', sans-serif;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.12s ease;
+}
+.gate-deco .gd-btn:active { background: var(--g2); transform: scale(0.97); }
+.gate-deco .gd-btn:focus-visible { outline: 3px solid #fffbe9; outline-offset: 4px; background: var(--g2); }
+.gate-deco .gd-btn:disabled { cursor: default; }
+@media (hover: hover) and (pointer: fine) {
+  .gate-deco .gd-btn:hover:not(:disabled) { background: var(--g2); }
+}
+
+/* very narrow: date wraps to two lines, so the flanking rules would dangle at the edges */
+@media (max-width: 359px) {
+  .gate-deco .gd-date::before, .gate-deco .gd-date::after { display: none; }
+}
+
+/* short landscape phones: iris left, copy right, art scales by svh */
+@media (orientation: landscape) and (max-height: 520px) {
+  .gate-deco { --D: min(46svh, 15rem); }
+  .gate-deco .gd-stage { flex-direction: row; justify-content: center; gap: 40px; max-width: 46rem; }
+  .gate-deco .gd-copy { flex: 1 1 0; max-width: 22rem; }
+}
+
+/* reduced motion: no chase, no iris; a plain 250ms fade replaces the opening */
+@media (prefers-reduced-motion: reduce) {
+  .gate-deco, .gate-deco .gd-copy { transition: opacity 0.25s ease; }
+  .gate-deco .gd-bulb::before,
+  .gate-deco.is-opening .gd-bulb::before { animation: none; opacity: 0.8; }
+  .gate-deco .gd-blade, .gate-deco .gd-core, .gate-deco .gd-mono, .gate-deco .gd-disc::after { transition: none; }
+  .gate-deco.is-opening .gd-blade { opacity: 1; transform: rotate(var(--a)) translateY(calc(var(--r) * -1)) rotate(0deg) translateY(var(--r)); }
+  .gate-deco.is-opening .gd-core { transform: scale(0.7); }
+  .gate-deco.is-opening .gd-mono, .gate-deco.is-opening .gd-disc::after { opacity: 1; }
+  .gate-deco.is-opening .gd-copy { opacity: 1; }
+  .gate-deco.is-opening .gd-blade, .gate-deco.is-opening .gd-core, .gate-deco.is-opening .gd-bulb::before { will-change: auto; }
+  .gate-deco .gd-btn { transition: none; }
+}
