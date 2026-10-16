@@ -1,5 +1,7 @@
 # Tap-to-Open Gates for 25 Invitations: Implementation Plan
 
+> The Studio (editing and sharing) is specified in docs/superpowers/specs/2026-10-15-invitation-studio-design.md and planned in docs/superpowers/plans/2026-10-15-invitation-studio.md.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Every one of the 25 designs opens with its own tap-to-open animation, works at 320 to 430px wide, and ships the free shared features that paid competitors gate behind a plan.
