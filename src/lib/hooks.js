@@ -1,26 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import { remaining } from './countdown.js'
+import { parseHash } from './route.js'
 
 const pad = (n) => String(n).padStart(2, '0')
 
-// Live countdown to an ISO date. Returns zeros once the date has passed.
+// Live countdown to an ISO date. Recomputed from `iso` on every render, so editing the date in the
+// Studio updates the numbers at once; the 1 s tick only advances the clock.
 export function useCountdown(iso) {
-  const calc = () => {
-    const diff = Math.max(0, new Date(iso).getTime() - Date.now())
-    return {
-      days: Math.floor(diff / 864e5),
-      hours: Math.floor(diff / 36e5) % 24,
-      minutes: Math.floor(diff / 6e4) % 60,
-      seconds: Math.floor(diff / 1e3) % 60,
-      done: diff === 0,
-    }
-  }
-  const [t, setT] = useState(calc)
+  const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
-    const id = setInterval(() => setT(calc()), 1000)
+    const id = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [iso])
-  return { ...t, pad }
+  }, [])
+  return { ...remaining(iso, now), pad }
 }
 
 // Adds `.in` to every `[data-reveal]` under `root` the first time it scrolls into view.
@@ -50,17 +42,13 @@ export function useReveal(rootRef, deps = []) {
   }, deps)
 }
 
-// Hash route: '#/t/<id>' -> '<id>', anything else -> null (gallery).
+// The current route, parsed from the hash (see lib/route.js). Re-renders on every hash change, so a
+// changed `?d=` payload is noticed as well as a changed design.
+const onHash = (cb) => {
+  window.addEventListener('hashchange', cb)
+  return () => window.removeEventListener('hashchange', cb)
+}
 export function useRoute() {
-  const read = () => (window.location.hash.match(/^#\/t\/([\w-]+)/) || [])[1] || null
-  const [id, setId] = useState(read)
-  useEffect(() => {
-    const on = () => {
-      setId(read())
-      window.scrollTo(0, 0)
-    }
-    window.addEventListener('hashchange', on)
-    return () => window.removeEventListener('hashchange', on)
-  }, [])
-  return id
+  const hash = useSyncExternalStore(onHash, () => window.location.hash, () => '')
+  return useMemo(() => parseHash(hash), [hash])
 }

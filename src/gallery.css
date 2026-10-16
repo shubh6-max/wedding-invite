@@ -186,23 +186,40 @@
   list-style: none;
 }
 
+/* A card is a container: the preview link (thumbnail and text) plus its actions underneath. */
 .card {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: 1fr auto;
   height: 100%;
   overflow: hidden;
   border: 1px solid var(--g-line);
   border-radius: 14px;
-  color: inherit;
-  text-decoration: none;
   transition: transform 220ms cubic-bezier(0.2, 0.9, 0.25, 1), border-color 220ms;
 }
 
 .card:hover,
-.card:focus-visible {
+.card:focus-within {
   transform: translateY(-6px);
   border-color: var(--g-accent);
 }
+
+.card__open {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  color: inherit;
+  text-decoration: none;
+}
+
+.card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 18px 18px;
+}
+
+.card__soon { color: var(--g-muted); font-size: 0.92rem; }
+.card__peek { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; color: var(--g-ink); font-weight: 600; text-underline-offset: 3px; }
 
 .card .thumb {
   aspect-ratio: 4 / 3;
@@ -304,7 +321,17 @@
 .pill .pill__icon { display: inline-grid; place-items: center; width: 44px; min-width: 44px; padding: 0; }
 .pill button.pill__icon:hover { background: rgba(255, 255, 255, 0.14); }
 .pill button.pill__icon:focus-visible { outline: 3px solid var(--g-accent, #f2c66d); outline-offset: 3px; }
+.pill__home, .pill__edit { display: inline-flex; align-items: center; gap: 8px; }
+.pill a.pill__edit { background: var(--g-accent, #f2c66d); color: #15121a; }
+.pill--guest { padding: 4px 6px; }
 .pill__label { padding: 0 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* A personalised link that could not be read. */
+.problem { display: grid; gap: 16px; justify-items: start; align-content: start; max-width: 32rem; margin: 0 auto; padding: 20vh 16px 48px; background: #15121a; color: #f3eee8; min-height: 100svh; font: 1rem/1.6 'Hanken Grotesk', system-ui, sans-serif; }
+.problem h1 { margin: 0; font: 400 clamp(1.8rem, 6vw, 2.6rem)/1.1 'Gloock', Georgia, serif; }
+.problem p { margin: 0; color: #b9b0bd; }
 
 .loading {
   display: grid;
@@ -336,6 +363,7 @@
   /* The design name stays available to screen readers; the pill needs the room for its controls. */
   .pill__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; padding: 0; }
   .pill a { padding: 0 10px; }
+  .pill__home-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
 
 /* ---------- opening gates ---------- */

@@ -1,191 +1,58 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
-import { templates, traditions } from './data/templates.js'
+import { templates } from './data/templates.js'
 import { sample } from './data/sample.js'
-import { hinduSample } from './data/samples/hindu.js'
-import { marwadiSample } from './data/samples/marwadi.js'
-import { jainSample } from './data/samples/jain.js'
-import { guestName, InviteContext } from './lib/guest.js'
+import Gallery from './gallery/Gallery.jsx'
+import Pill from './components/Pill.jsx'
+import { InviteContext } from './lib/guest.js'
 import { useRoute } from './lib/hooks.js'
+import { useInviteSource } from './lib/useInviteSource.js'
 import './gallery.css'
 
-// Each tradition's designs render its own fictional sample (events, invocation, copy).
-const samples = { contemporary: sample, hindu: hinduSample, marwadi: marwadiSample, jain: jainSample }
-const initialsOf = (t) => {
-  const { a, b } = samples[t.tradition].couple
-  return `${a[0]}&${b[0]}`
-}
-// Nine designs, three per area, fanned in the hero.
-const FAN_IDS = ['rajmahal', 'kohbarghar', 'marigold', 'leheriyasafa', 'editorial', 'goldmantapa', 'celestial', 'panchrangdhvaj', 'boho']
+// The existing invite lives outside the registry of designs; load it only when asked for.
+const Original = lazy(() => import('./templates/seal/SealInvite.jsx'))
+const Studio = lazy(() => import('./studio/Studio.jsx'))
 
-// Miniature of a design: palette, display font and a signature silhouette (see .thumb__shape--*).
-function Thumb({ t }) {
-  const [bg, ink, accent] = t.palette
-  return (
-    <span className="thumb" style={{ '--bg': bg, '--ink': ink, '--accent': accent, fontFamily: t.font }} aria-hidden="true">
-      <span className={`thumb__shape thumb__shape--${t.shape}`}>
-        <span className="thumb__mono">{initialsOf(t)}</span>
-      </span>
-    </span>
-  )
+const PROBLEM = {
+  unsupported: 'This link needs a newer phone or browser. Ask the sender for the link for older phones.',
+  version: 'This link was made with a newer version of the studio. Ask the sender to share it again.',
 }
 
-// Ten thumbs fanned out like a hand of cards; fans open once on load.
-const fanned = FAN_IDS.map((id) => templates.find((t) => t.id === id)).filter(Boolean)
-
-function Fan() {
+// A personalised link that cannot be read. A guest must never be shown a different couple's sample.
+function LinkProblem({ code }) {
   return (
-    <div className="fan">
-      {fanned.map((t, i) => {
-        const mid = (fanned.length - 1) / 2
-        return (
-          <a
-            key={t.id}
-            className="fan__card"
-            href={`#/t/${t.id}`}
-            style={{ '--r': `${(i - mid) * 7}deg`, '--x': `${(i - mid) * 9}%`, '--d': `${i * 60}ms` }}
-            aria-label={`Open ${t.name}`}
-          >
-            <Thumb t={t} />
-          </a>
-        )
-      })}
-    </div>
-  )
-}
-
-function Gallery() {
-  const [area, setArea] = useState('all')
-  const shown = templates.filter((t) => area === 'all' || t.tradition === area)
-
-  return (
-    <main className="gallery">
-      <header className="hero">
-        <h1 className="hero__title">Twenty-five invitations,<br />each one a <em>yes, come.</em></h1>
-        <p className="hero__lede">
-          Open any design to see it as your guests will: countdown, schedule, story and RSVP, all moving.
-          Ten contemporary designs, plus five each for Hindu, Marwadi and Jain weddings, each drawn from that tradition's own art and ceremonies. Every one opens with a tap.
-        </p>
-        <Fan />
-      </header>
-
-      <section aria-labelledby="designs-h" className="designs">
-        <div className="designs__bar">
-          <h2 id="designs-h">The collection <span className="count">{shown.length}</span></h2>
-          <div className="chips" role="group" aria-label="Filter by tradition">
-            {traditions.map((g) => (
-              <button key={g.id} type="button" className="chip" aria-pressed={g.id === area} onClick={() => setArea(g.id)}>
-                {g.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <ul className="grid">
-          {shown.map((t) => (
-            <li key={t.id}>
-              <a className="card" href={`#/t/${t.id}`}>
-                <Thumb t={t} />
-                <span className="card__body">
-                  <span className="card__name">{t.name}</span>
-                  <span className="card__blurb">{t.blurb}</span>
-                  <span className="card__sig">{t.signature}</span>
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <aside className="original">
-        <div>
-          <h2>Already have one in the wild?</h2>
-          <p>The live Sundowner invitation (wax seal, team picker, event timeline) is kept as-is.</p>
-        </div>
-        <a className="btn" href="#/t/original">Open the original invite</a>
-      </aside>
-
-      <footer className="foot">
-        All couples, names, venues and dates shown are fictional samples.
-      </footer>
+    <main className="problem" role="alert">
+      <h1>This invitation link did not open</h1>
+      <p>{PROBLEM[code] || 'The link looks damaged or incomplete. Ask the sender to send it again.'}</p>
+      <a className="btn" href="#/">See the designs</a>
     </main>
   )
 }
 
-// Floating nav over any template: back to gallery + previous/next design.
-const Icon = ({ d }) => (
-  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d={d} />
-  </svg>
-)
-const SHARE_ICON = 'M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13'
-const REPLAY_ICON = 'M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5'
-
-// Floating nav over any design: back to gallery, previous/next, share the link, replay the opening.
-function Pill({ id, onReplay }) {
-  const i = templates.findIndex((t) => t.id === id)
-  const prev = templates[(i + templates.length - 1) % templates.length]
-  const next = templates[(i + 1) % templates.length]
-  const label = i === -1 ? 'Original invite' : templates[i].name
-  const guest = guestName()
-  const title = i === -1 ? 'Wedding invitation' : `${templates[i].name} wedding invitation`
-  // Share the gate version of the link (never the ?open=1 skip) and keep the guest's name.
-  const url = `${window.location.origin}${window.location.pathname}#/t/${id}${guest ? `?to=${encodeURIComponent(guest)}` : ''}`
-  const canShare = typeof navigator !== 'undefined' && !!navigator.share
-
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === 'Escape') window.location.hash = '#/'
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
-
-  const share = () => navigator.share({ title, url }).catch(() => {}) // user dismissing the sheet rejects
-
-  return (
-    <nav className="pill" aria-label="Design navigation">
-      <a href="#/">All designs</a>
-      {i !== -1 && <a href={`#/t/${prev.id}`} aria-label={`Previous: ${prev.name}`}>‹</a>}
-      <span className="pill__label" aria-live="polite">
-        {label}
-        {i !== -1 && <span className="pill__count">{i + 1}/{templates.length}</span>}
-      </span>
-      {i !== -1 && <a href={`#/t/${next.id}`} aria-label={`Next: ${next.name}`}>›</a>}
-      {onReplay && (
-        <button type="button" className="pill__icon" onClick={onReplay} aria-label="Replay the opening">
-          <Icon d={REPLAY_ICON} />
-        </button>
-      )}
-      {i !== -1 && (canShare ? (
-        <button type="button" className="pill__icon" onClick={share} aria-label="Share this invitation">
-          <Icon d={SHARE_ICON} />
-        </button>
-      ) : (
-        <a className="pill__icon" href={`https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}`} aria-label="Share on WhatsApp">
-          <Icon d={SHARE_ICON} />
-        </a>
-      ))}
-    </nav>
-  )
-}
-
-// The existing invite lives outside the registry of ten; load it only when asked for.
-const Original = lazy(() => import('./templates/seal/SealInvite.jsx'))
-
-// Open sequence per design: 'closed' (only the gate shows) -> 'opening' (the page mounts under the
-// animating gate, so its entrance animations start fresh after the tap) -> 'open' (gate removed).
-// Designs without a Gate, the original invite, and `#/t/<id>?open=1` skip straight to 'open'.
-export default function App() {
-  const id = useRoute()
+// One design on screen. Open sequence: 'closed' (only the gate shows) -> 'opening' (the page mounts
+// under the animating gate, so its entrance animations start fresh after the tap) -> 'open' (gate
+// removed). Designs without a Gate, the original invite and `?open=1` go straight to 'open'.
+// Content comes from useInviteSource: the sample, a personalised link (?d=), or the Studio's preview
+// (?embed=1). A new draft only swaps the invite prop; it never changes `phase`, so the gate is not replayed.
+function Design({ id, params }) {
+  const embed = params.get('embed') === '1'
   const tpl = templates.find((t) => t.id === id)
   const isOriginal = id === 'original'
-  const hasGate = !!tpl?.Gate && !/[?&]open=1/.test(window.location.hash)
+  const hasGate = !!tpl?.Gate && params.get('open') !== '1'
   const [seq, setSeq] = useState({ id: null, phase: 'closed' })
   const phase = !hasGate ? 'open' : seq.id === id ? seq.phase : 'closed'
 
+  const onReplay = useCallback(() => {
+    window.scrollTo(0, 0)
+    setSeq({ id: null, phase: 'closed' })
+  }, [])
+  const source = useInviteSource(tpl, params, onReplay)
+  const couple = source.invite?.couple
+  const guestTitle = source.personal && couple ? `${couple.a} & ${couple.b} | Wedding invitation` : ''
+
   useEffect(() => {
-    document.title = tpl ? `${tpl.name} | Wedding invitation designs` : isOriginal ? 'Original invite' : 'Wedding invitation designs'
-  }, [tpl, isOriginal])
+    if (embed) return
+    document.title = guestTitle || (tpl ? `${tpl.name} | Wedding invitation designs` : isOriginal ? 'Original invite' : 'Wedding invitation designs')
+  }, [embed, guestTitle, tpl, isOriginal])
 
   // Warm the invitation's chunk while the gate is on screen so the tap never waits on the network.
   useEffect(() => {
@@ -224,10 +91,6 @@ export default function App() {
   }, [tpl])
 
   const onOpen = useCallback(() => setSeq({ id, phase: 'opening' }), [id])
-  const onReplay = useCallback(() => {
-    window.scrollTo(0, 0)
-    setSeq({ id: null, phase: 'closed' })
-  }, [])
   const onDone = useCallback(() => {
     setSeq({ id, phase: 'open' })
     // Hand keyboard / screen-reader focus to the invitation's heading once the gate is gone. The page
@@ -245,11 +108,19 @@ export default function App() {
     requestAnimationFrame(focusHeading)
   }, [id])
 
-  if (!tpl && !isOriginal) return <Gallery />
+  if (source.status === 'error') return <LinkProblem code={source.code} />
+  const invite = tpl ? source.invite : sample
+  if (!invite) {
+    // Decoding a link, or waiting for the Studio's first draft: show the design's ground colour, never the sample.
+    return (
+      <div className="loading" role="status" style={{ background: tpl.palette[0] }}>
+        <span className="sr-only">Opening the invitation…</span>
+      </div>
+    )
+  }
 
   const Page = tpl ? tpl.Component : Original
   const Gate = tpl?.Gate
-  const invite = tpl ? samples[tpl.tradition] : sample
   return (
     <>
       {phase !== 'closed' && (
@@ -266,7 +137,29 @@ export default function App() {
           <Gate key={id} invite={invite} onOpen={onOpen} onDone={onDone} />
         </Suspense>
       )}
-      <Pill id={id} onReplay={hasGate ? onReplay : undefined} />
+      {!embed && <Pill id={id} params={params} onReplay={hasGate ? onReplay : undefined} />}
     </>
   )
+}
+
+export default function App() {
+  const { view, id, params } = useRoute()
+  const tpl = templates.find((t) => t.id === id)
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [view, id])
+  useEffect(() => {
+    if (view === 'gallery' || !(tpl || id === 'original')) document.title = 'Wedding invitation designs'
+  }, [view, tpl, id])
+
+  if (view === 'studio' && tpl) {
+    return (
+      <Suspense fallback={<div className="loading" role="status">Opening the studio…</div>}>
+        <Studio key={tpl.id} tpl={tpl} params={params} />
+      </Suspense>
+    )
+  }
+  if (view === 'design' && (tpl || id === 'original')) return <Design id={id} params={params} />
+  return <Gallery />
 }
