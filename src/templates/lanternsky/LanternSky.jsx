@@ -23,6 +23,8 @@ const DRIFT = [
   [13, 1.18, 24, -2], [33, 1.05, 22, -33], [49, 1.0, 25, -21], [68, 1.08, 23, -11],
   [84, 1.3, 22, -25], [58, 0.45, 48, -37], [4, 0.75, 32, -20], [24, 0.65, 36, -14],
   [44, 0.6, 41, -30], [63, 0.5, 45, -23], [78, 0.68, 34, -3], [96, 0.72, 31, -10],
+  [9, 1.5, 21, -6], [28, 1.25, 23, -30], [73, 1.4, 21, -32], [88, 1.2, 24, -17],
+  [19, 0.9, 28, -36], [39, 0.82, 29, -1], [54, 0.75, 31, -34], [64, 0.88, 27, -4],
 ]
 const BLESS_DRIFT = [
   [6, 0.6, 36, -10], [18, 0.8, 30, -24], [34, 0.5, 40, -6], [52, 0.7, 32, -18],
@@ -33,36 +35,71 @@ const DAY_DRIFT = [
   [38, 0.46, 46, -34], [14, 0.85, 30, -8], [60, 0.75, 33, -26], [92, 0.55, 41, -19], [30, 0.7, 35, -3],
 ]
 
-// Pointer tilt for the hero's 3D scene: the sky, names and pavilion lean a few degrees toward the
-// cursor (fine pointers only; reduced motion and touch leave the scene still).
+// 3D tilt for the hero scene AND the lantern field: on laptops the scene leans toward the cursor;
+// on phones/tablets physically tilting the device leans it (deviceorientation, offset from the
+// resting grip so however you hold it starts level). Reduced motion leaves everything still.
 function useTilt(ref) {
   useEffect(() => {
     const el = ref.current
     if (!el || typeof window === 'undefined') return undefined
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined
-    if (!window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) return undefined
     const stage = el.parentElement
+    const field = stage.querySelector('.lsk-field')
     let raf = 0
-    const move = (e) => {
-      const r = stage.getBoundingClientRect()
-      const x = (e.clientX - r.left) / r.width - 0.5
-      const y = (e.clientY - r.top) / r.height - 0.5
+    const apply = (rx, ry) => {
       cancelAnimationFrame(raf)
       raf = requestAnimationFrame(() => {
-        el.style.transform = `rotateX(${(-y * 4).toFixed(2)}deg) rotateY(${(x * 5).toFixed(2)}deg)`
+        const t = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`
+        el.style.transform = t
+        if (field) field.style.transform = t
       })
     }
-    const leave = () => {
-      cancelAnimationFrame(raf)
-      el.style.transform = ''
+    const offs = [() => cancelAnimationFrame(raf)]
+
+    if (window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) {
+      const move = (e) => {
+        const r = stage.getBoundingClientRect()
+        const x = (e.clientX - r.left) / r.width - 0.5
+        const y = (e.clientY - r.top) / r.height - 0.5
+        apply(-y * 4, x * 5)
+      }
+      const leave = () => {
+        cancelAnimationFrame(raf)
+        el.style.transform = ''
+        if (field) field.style.transform = ''
+      }
+      stage.addEventListener('pointermove', move)
+      stage.addEventListener('pointerleave', leave)
+      offs.push(() => {
+        stage.removeEventListener('pointermove', move)
+        stage.removeEventListener('pointerleave', leave)
+      })
+    } else if (typeof DeviceOrientationEvent !== 'undefined') {
+      let base = null
+      const turn = (e) => {
+        if (e.beta == null || e.gamma == null) return
+        if (!base) base = { b: e.beta, g: e.gamma }
+        // ponytail: fixed first-reading baseline; re-baseline on orientationchange if it bothers anyone
+        const clamp = (v) => Math.max(-8, Math.min(8, v))
+        apply(clamp((base.b - e.beta) * 0.35), clamp((e.gamma - base.g) * 0.35))
+      }
+      const listen = () => window.addEventListener('deviceorientation', turn)
+      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+        // iOS only hands out motion data after a user-gesture permission: ask on the first tap
+        const ask = () => {
+          DeviceOrientationEvent.requestPermission()
+            .then((s) => s === 'granted' && listen())
+            .catch(() => {})
+        }
+        window.addEventListener('pointerdown', ask, { once: true })
+        offs.push(() => window.removeEventListener('pointerdown', ask))
+      } else {
+        listen()
+      }
+      offs.push(() => window.removeEventListener('deviceorientation', turn))
     }
-    stage.addEventListener('pointermove', move)
-    stage.addEventListener('pointerleave', leave)
-    return () => {
-      stage.removeEventListener('pointermove', move)
-      stage.removeEventListener('pointerleave', leave)
-      cancelAnimationFrame(raf)
-    }
+
+    return () => offs.forEach((f) => f())
   }, [ref])
 }
 

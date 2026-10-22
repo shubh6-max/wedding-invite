@@ -99,7 +99,7 @@
   transition: transform 0.35s ease-out;
   will-change: transform;
 }
-.tpl-lanternsky .lsk-head { transform: translateZ(56px); }
+.tpl-lanternsky .lsk-head { transform: translateZ(56px); transform-style: preserve-3d; }
 .tpl-lanternsky .lsk-pavilion { transform: translateZ(28px); }
 
 .tpl-lanternsky .lsk-head {
@@ -123,14 +123,34 @@
   text-transform: uppercase;
   text-shadow: 0 2px 30px rgb(12 30 64 / 0.6), 0 0 22px rgb(255 214 140 / 0.3);
   text-wrap: balance;
+  transform-style: preserve-3d;
+}
+/* the name lines float on their own plane with a gold extrusion: 3D lettering under the pointer tilt */
+.tpl-lanternsky .lsk-names > span:not(.lsk-names__weds) {
+  transform: translateZ(34px);
+  text-shadow:
+    0 1px 0 #e8c37c, 0 2px 0 #c89a48, 0 3px 0 #8f6524,
+    0 2px 30px rgb(12 30 64 / 0.6), 0 0 22px rgb(255 214 140 / 0.3);
 }
 .tpl-lanternsky .lsk-names__weds {
   font: 400 clamp(0.8rem, 2.6vw, 1.05rem)/1.2 var(--caps);
   letter-spacing: 0.62em;
   text-indent: 0.62em;
   opacity: 0.94;
+  transform: translateZ(14px);
 }
-.tpl-lanternsky.via-gate .lsk-head { animation: lsk-in 1.3s var(--ease) 0.15s both; }
+
+/* arriving from the gate: the lantern field sweeps up first, then names and pavilion
+   rise from the bottom of the screen, swinging flat through the 3D stage */
+.tpl-lanternsky.via-gate .lsk-head { --z-end: 56px; animation: lsk-up3d 1.5s var(--ease) 0.25s both; }
+.tpl-lanternsky.via-gate .lsk-pavilion { --z-end: 28px; animation: lsk-up3d 1.5s var(--ease) 0.45s both; }
+/* backwards, not both: once the sweep ends the tilt JS owns the field's transform */
+.tpl-lanternsky.via-gate .lsk-hero .lsk-field { animation: lsk-sweep 1.6s var(--ease) backwards; }
+@keyframes lsk-up3d {
+  from { opacity: 0; transform: translate3d(0, 56vh, 0) rotateX(26deg); }
+  to { opacity: 1; transform: translateZ(var(--z-end, 0px)); }
+}
+@keyframes lsk-sweep { from { transform: translateY(70vh); } to { transform: none; } }
 
 /* the chhatri: SVG frame over the clipped couple photo; window % matches the arch in the 320x440 drawing */
 .tpl-lanternsky .lsk-pavilion {
@@ -189,8 +209,9 @@
   position: absolute;
   left: var(--x);
   bottom: -20vh;
-  width: calc(58px * var(--s));
+  width: calc(66px * var(--s));
   transform: translateZ(var(--z, 0px));
+  animation: lsk-turn calc(var(--d) / 3) ease-in-out infinite alternate;
   will-change: transform;
 }
 .tpl-lanternsky .lsk-riser {
@@ -204,10 +225,14 @@
 .tpl-lanternsky .lsk-lantern--far { --z: -240px; opacity: 0.55; filter: blur(0.8px); }
 .tpl-lanternsky .lsk-lantern--near { --z: 170px; z-index: 3; opacity: 0.96; filter: blur(1.1px); }
 @keyframes lsk-rise { to { transform: translateY(-140vh); } }
+/* each lantern slowly turns on its vertical axis under the field's perspective: real 3D, not a squash */
+@keyframes lsk-turn {
+  from { transform: translateZ(var(--z, 0px)) rotateY(-14deg); }
+  to { transform: translateZ(var(--z, 0px)) rotateY(14deg); }
+}
 @keyframes lsk-sway { from { transform: translateX(-6%) rotate(-2.5deg); } to { transform: translateX(6%) rotate(2.5deg); } }
 @keyframes lsk-flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
 @keyframes lsk-bob { 0%, 100% { transform: rotate(45deg) translate(0, 0); } 50% { transform: rotate(45deg) translate(4px, 4px); } }
-@keyframes lsk-in { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
 
 /* ================= the courtyard of blessings ================= */
 .tpl-lanternsky .lsk-blessing {
@@ -476,6 +501,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tpl-lanternsky .lsk-lantern { bottom: auto; top: var(--rest); }
+  .tpl-lanternsky .lsk-lantern,
+  .tpl-lanternsky.via-gate .lsk-pavilion,
+  .tpl-lanternsky.via-gate .lsk-hero .lsk-field,
   .tpl-lanternsky .lsk-riser,
   .tpl-lanternsky .lsk-lantern svg,
   .tpl-lanternsky .lsk-lantern .lsk-flame { animation: none; }
