@@ -1,0 +1,164 @@
+/* Two Become One gate. Two half-portraits sit apart behind a plum wedge: an open zipper, its edges stitched in gold.
+   Tap: the wedge shrinks toward the top while a gold pull rides up the seam, so the halves "zip" shut (0-800 ms);
+   the whole gate lifts away and fades from 600 ms (useGate ms = 1500). Only transform and opacity animate.
+   Geometry is in percent of the picture box: the seam runs from (56%, top) to (44%, bottom), the open wedge is
+   17% to each side of the seam at the top and a point at the bottom. */
+.gate-duomerge.gate {
+  --plum: #1f1b24;
+  --cream: #f6f0ea;
+  --cream-2: #cdc3d2;
+  --gold: #c9a24a;
+  --gold-hi: #e6cb88;
+  --rose-hi: #f0a5b8;
+  --zip: cubic-bezier(0.65, 0, 0.35, 1);
+  --rw: min(calc(100vw - 32px), 420px); /* picture width; the pull's travel is worked out from these two lengths */
+  --rh: clamp(150px, calc(100dvh - 88px - 290px), 460px);
+
+  background: radial-gradient(ellipse at 50% 28%, #30273a, #1a161e 78%);
+  color: var(--cream);
+  font: 400 1rem/1.5 'Josefin Sans', 'Hind', system-ui, sans-serif;
+}
+.gate-duomerge *,
+.gate-duomerge *::before,
+.gate-duomerge *::after { box-sizing: border-box; }
+.gate-duomerge p { margin: 0; }
+
+.gate-duomerge .gate-duomerge__stage { display: grid; justify-items: center; gap: 22px; width: var(--rw); }
+
+/* ---- the picture: two halves, the zipper between them ---- */
+.gate-duomerge .gate-duomerge__pic {
+  position: relative;
+  width: 100%;
+  height: var(--rh);
+  outline: 1px dashed rgb(230 203 136 / 0.55); /* a stitched edge, like a patch sewn on */
+  outline-offset: 7px;
+}
+.gate-duomerge .gate-duomerge__half { position: absolute; inset: 0; }
+.gate-duomerge .gate-duomerge__half--a { clip-path: polygon(0 0, 56% 0, 44% 100%, 0 100%); }
+.gate-duomerge .gate-duomerge__half--b { clip-path: polygon(56% 0, 100% 0, 100% 100%, 44% 100%); }
+/* A frame is sized by its box, never by the picture; its own colour shows if the photo is missing. */
+.gate-duomerge .gate-duomerge__frame { position: absolute; top: 0; bottom: 0; width: 72%; overflow: hidden; }
+.gate-duomerge .gate-duomerge__half--a .gate-duomerge__frame { left: -10%; background: #c8a1ae; }
+.gate-duomerge .gate-duomerge__half--b .gate-duomerge__frame { right: -10%; background: #9d98b5; }
+.gate-duomerge .gate-duomerge__frame img { display: block; width: 100%; height: 100%; }
+
+/* The closed part of the zipper runs the whole seam; the wedge hides it where the zipper is still open. */
+.gate-duomerge .gate-duomerge__seam {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(calc(56% - 2px) 0, calc(56% + 2px) 0, calc(44% + 2px) 100%, calc(44% - 2px) 100%);
+  background: repeating-linear-gradient(180deg, var(--gold-hi) 0 4px, var(--gold) 4px 7px, #8a6a22 7px 8px);
+}
+.gate-duomerge .gate-duomerge__wedge {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 56% 0;
+  transition: transform 0.8s var(--zip);
+}
+.gate-duomerge .gate-duomerge__wedge polygon { fill: #1a161e; }
+.gate-duomerge .gate-duomerge__wedge polyline {
+  fill: none;
+  stroke: var(--gold-hi);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.gate-duomerge .gate-duomerge__pull {
+  position: absolute;
+  left: 44%;
+  top: 100%;
+  width: 22px;
+  height: 36px;
+  translate: -50% -50%;
+  border-radius: 11px 11px 13px 13px;
+  background: linear-gradient(180deg, var(--gold-hi), var(--gold) 55%, #9a7a2e);
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.5);
+  transition: transform 0.8s var(--zip);
+  animation: dm-tug 2.2s ease-in-out infinite;
+}
+.gate-duomerge .gate-duomerge__pull::after { /* the hole */
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 9px;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  border-radius: 50%;
+  background: #1a161e;
+}
+@keyframes dm-tug { 50% { rotate: -9deg; } }
+
+/* ---- words ---- */
+.gate-duomerge .gate-duomerge__side { display: grid; justify-items: center; align-content: center; gap: 14px; text-align: center; }
+.gate-duomerge .gate-duomerge__text { display: grid; gap: 4px; transition: opacity 0.3s ease 0.3s; }
+.gate-duomerge .gate-duomerge__guest { font-size: 0.9375rem; font-weight: 600; letter-spacing: 0.04em; color: var(--gold-hi); }
+.gate-duomerge .gate-duomerge__guest[data-fit='1'] { font-size: 0.875rem; }
+.gate-duomerge .gate-duomerge__guest[data-fit='2'] { font-size: 0.8125rem; }
+.gate-duomerge .gate-duomerge__names {
+  font: 400 clamp(1.7rem, 8vw, 2.25rem)/1.12 'Gloock', 'Noto Serif Devanagari', Georgia, serif;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.gate-duomerge .gate-duomerge__names[data-fit='1'] { font-size: clamp(1.45rem, 6.6vw, 1.9rem); }
+.gate-duomerge .gate-duomerge__names[data-fit='2'] { font-size: clamp(1.2rem, 5.4vw, 1.55rem); }
+.gate-duomerge .gate-duomerge__names i { font-style: normal; font-size: 0.7em; color: var(--rose-hi); }
+.gate-duomerge .gate-duomerge__date { font-size: 0.9375rem; letter-spacing: 0.03em; color: var(--cream-2); }
+
+.gate-duomerge .gate-duomerge__btn {
+  min-height: 52px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--gold);
+  color: var(--plum);
+  font: 600 1rem 'Josefin Sans', 'Hind', system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: opacity 0.3s ease 0.3s;
+}
+.gate-duomerge .gate-duomerge__btn:focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
+
+/* ---- opening: zip shut, then lift away ---- */
+.gate-duomerge.is-opening { animation: dm-lift 0.8s ease 0.6s forwards; }
+.gate-duomerge.is-opening .gate-duomerge__wedge { transform: scale(0); }
+.gate-duomerge.is-opening .gate-duomerge__pull {
+  animation: none;
+  transform: translate(calc(var(--rw) * 0.12), calc(var(--rh) * -1)); /* up the seam: 12% across, the full height up */
+}
+.gate-duomerge.is-opening .gate-duomerge__text,
+.gate-duomerge.is-opening .gate-duomerge__btn { opacity: 0; }
+@keyframes dm-lift { to { opacity: 0; transform: translateY(-1.5%); } }
+@keyframes dm-fade { to { opacity: 0; } }
+
+/* Phone held sideways: the picture and the words sit side by side. */
+@media (max-height: 520px) {
+  .gate-duomerge.gate {
+    --rw: min(44vw, 270px);
+    --rh: min(calc(100dvh - 88px - 24px), 300px);
+  }
+  .gate-duomerge .gate-duomerge__stage { grid-template-columns: var(--rw) minmax(0, 1fr); gap: 28px; align-items: center; width: min(92vw, 640px); }
+  .gate-duomerge .gate-duomerge__names { font-size: clamp(1.4rem, 4vw, 1.9rem); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gate-duomerge:not(.is-opening) .gate-duomerge__btn:hover { background: var(--gold-hi); }
+}
+
+/* Reduced motion: no zip, no swing; the gate simply fades out (lib/gate.js also shortens its timer). */
+@media (prefers-reduced-motion: reduce) {
+  .gate-duomerge .gate-duomerge__pull { animation: none; }
+  .gate-duomerge.is-opening { animation: dm-fade 0.25s ease both; }
+  .gate-duomerge.is-opening .gate-duomerge__wedge,
+  .gate-duomerge.is-opening .gate-duomerge__pull,
+  .gate-duomerge .gate-duomerge__text,
+  .gate-duomerge .gate-duomerge__btn { transition: none; }
+  .gate-duomerge.is-opening .gate-duomerge__wedge { transform: none; }
+  .gate-duomerge.is-opening .gate-duomerge__pull { transform: none; }
+  .gate-duomerge.is-opening .gate-duomerge__text,
+  .gate-duomerge.is-opening .gate-duomerge__btn { opacity: 1; }
+}

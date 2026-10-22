@@ -156,7 +156,7 @@ export default function SadhyaLeaf({ invite }) {
                 </button>
                 <p id="sl-hint" className="rib__hint" aria-live="polite">
                   {reply === 'declined'
-                    ? 'Your reply has been sent.'
+                    ? 'Your reply is ready. Send it below.'
                     : folded
                       ? 'The reply form is open just below.'
                       : 'Fold the leaf toward you to open the reply form.'}
@@ -165,7 +165,7 @@ export default function SadhyaLeaf({ invite }) {
               <div className="flap" data-folded={folded ? 'true' : 'false'}>
                 <ul className="half half--bot flap__front" inert={folded}>{half(6)}</ul>
                 <div className="flap__back" aria-hidden="true">
-                  <p className="flap__title">{reply === 'declined' ? 'Reply sent' : 'Accepted'}</p>
+                  <p className="flap__title">{reply === 'declined' ? 'Reply ready' : 'Accepted'}</p>
                   <p>The leaf is folded toward you.</p>
                 </div>
               </div>
@@ -181,7 +181,6 @@ export default function SadhyaLeaf({ invite }) {
             <p>Tell us your name and how many will join. Please reply by {invite.rsvpBy}.</p>
             <RsvpForm
               onSubmit={(v) => setReply(v.attending === 'yes' ? 'accepted' : 'declined')}
-              labels={{ submit: 'Send reply' }}
             />
           </div>
         </div>

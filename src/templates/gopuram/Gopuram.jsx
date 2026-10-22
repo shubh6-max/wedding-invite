@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { useCountdown, useReveal } from '../../lib/hooks.js'
+import { fitStep } from '../../lib/fit.js'
 import { downloadIcs } from '../../lib/ics.js'
 import RsvpForm from '../../components/RsvpForm.jsx'
 import './gopuram.css'
@@ -164,10 +165,12 @@ export default function Gopuram({ invite, viaGate }) {
     ['Minutes', cd.minutes],
     ['Seconds', cd.seconds],
   ]
+  // Longer names and lines step down in size (see data-fit in gopuram.css) so the text never leaves its column.
+  const nameFit = Math.max(fitStep(invite.couple.a, [10, 16]), fitStep(invite.couple.b, [10, 16]))
 
   return (
     <div className="tpl tpl-gopuram" ref={ref}>
-      <header className="hero" data-lit={lit}>
+      <header className="hero" data-lit={lit} data-studio-section="hero">
         <Garland id="gp-swag-a" />
         <div className="hero__grid">
           <div className="hero__stage">
@@ -187,19 +190,19 @@ export default function Gopuram({ invite, viaGate }) {
             </button>
           </div>
           <div className="hero__text">
-            <p className="hero__hosts" style={{ '--d': 0 }}>{invite.hosts}</p>
-            <h1 style={{ '--d': 1 }}>
+            {invite.hosts && <p className="hero__hosts" data-fit={fitStep(invite.hosts, [60, 100])} style={{ '--d': 0 }}>{invite.hosts}</p>}
+            <h1 data-fit={nameFit} style={{ '--d': 1 }}>
               <span>{invite.couple.a}</span>
               <span className="amp" aria-hidden="true">&amp;</span>
               <span className="sr">and</span>
               <span>{invite.couple.b}</span>
             </h1>
-            <p className="hero__tag" style={{ '--d': 2 }}>{invite.tagline}</p>
+            {invite.tagline && <p className="hero__tag" data-fit={fitStep(invite.tagline, [50, 80])} style={{ '--d': 2 }}>{invite.tagline}</p>}
             <p className="hero__when" style={{ '--d': 3 }}>
               <time dateTime={invite.date}>{invite.dateLabel}</time>, {invite.timeLabel}
             </p>
-            <p className="hero__where" style={{ '--d': 4 }}>
-              {invite.venue}, {invite.city}
+            <p className="hero__where" data-fit={fitStep(`${invite.venue}${invite.city}`, [40, 70])} style={{ '--d': 4 }}>
+              {invite.venue}{invite.city && `, ${invite.city}`}
             </p>
           </div>
         </div>
@@ -215,7 +218,7 @@ export default function Gopuram({ invite, viaGate }) {
             <div className="count__row" role="group" aria-label="Time remaining">
               {units.map(([label, v]) => (
                 <div className="count__cell" key={label}>
-                  <b>{label === 'Days' ? v : cd.pad(v)}</b>
+                  <b className={label === 'Days' && v > 9999 ? 'is-long' : undefined}>{label === 'Days' ? v : cd.pad(v)}</b>
                   <span>{label}</span>
                 </div>
               ))}
@@ -225,60 +228,64 @@ export default function Gopuram({ invite, viaGate }) {
 
         <Kolam />
 
-        <section className="events" aria-labelledby="gp-events">
+        <section className="events" aria-labelledby="gp-events" data-studio-section="events">
           <h2 id="gp-events">The ceremonies</h2>
           <ol className="ribbon">
-            {invite.events.map((e) => (
-              <li key={e.id} data-reveal>
+            {invite.events.map((e, i) => (
+              <li key={e.id || i} data-reveal>
                 <span className="ribbon__node" aria-hidden="true" />
                 <h3>{e.name}</h3>
                 <p className="ribbon__when">{e.day}, {e.time}</p>
-                <dl>
-                  <div><dt>Venue</dt><dd>{e.place}</dd></div>
-                  <div><dt>Attire</dt><dd>{e.dress}</dd></div>
-                </dl>
+                {(e.place || e.dress) && (
+                  <dl>
+                    {e.place && <div><dt>Venue</dt><dd>{e.place}</dd></div>}
+                    {e.dress && <div><dt>Attire</dt><dd>{e.dress}</dd></div>}
+                  </dl>
+                )}
               </li>
             ))}
           </ol>
         </section>
 
-        <section className="story" aria-labelledby="gp-story">
+        <section className="story" aria-labelledby="gp-story" data-studio-section="story">
           <h2 id="gp-story">Inscribed on palm leaf</h2>
           <ol className="leaves">
             {invite.story.map((s, i) => (
-              <li className="leaf" key={s.year} data-reveal style={{ '--r': i % 2 ? '0.8deg' : '-0.8deg' }}>
-                <span className="leaf__year">{s.year}</span>
+              <li className="leaf" key={i} data-reveal style={{ '--r': i % 2 ? '0.8deg' : '-0.8deg' }}>
+                {s.year && <span className="leaf__year">{s.year}</span>}
                 <div>
-                  <h3>{s.title}</h3>
-                  <p>{s.text}</p>
+                  {s.title && <h3>{s.title}</h3>}
+                  {s.text && <p>{s.text}</p>}
                 </div>
               </li>
             ))}
           </ol>
         </section>
 
-        <section className="rsvp-sec" aria-labelledby="gp-rsvp">
+        <section className="rsvp-sec" aria-labelledby="gp-rsvp" data-studio-section="replies">
           <Garland id="gp-swag-b" />
           <div className="korvai" aria-hidden="true" />
           <div className="rsvp-sec__in">
             <h2 id="gp-rsvp">Grace us with your presence</h2>
-            <p className="rsvp-sec__by">Kindly reply by {invite.rsvpBy}.</p>
+            {invite.rsvpBy && <p className="rsvp-sec__by">Kindly reply by {invite.rsvpBy}.</p>}
             <RsvpForm />
           </div>
           <div className="korvai" aria-hidden="true" />
         </section>
       </main>
 
-      <footer className="close">
+      <footer className="close" data-studio-section="venue">
         <p className="close__venue">{invite.venue}</p>
-        <p>{invite.city}</p>
+        {invite.city && <p>{invite.city}</p>}
         <div className="close__actions">
           <button type="button" className="btn" onClick={() => downloadIcs(invite)}>
             Add to calendar
           </button>
-          <a className="btn btn--ghost" href={invite.mapUrl} target="_blank" rel="noreferrer">
-            View the venue on the map
-          </a>
+          {invite.mapUrl && (
+            <a className="btn btn--ghost" href={invite.mapUrl} target="_blank" rel="noreferrer">
+              View the venue on the map
+            </a>
+          )}
         </div>
       </footer>
     </div>

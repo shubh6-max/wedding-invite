@@ -1,15 +1,15 @@
 # Wedding Invite Designs
 
-A gallery of 25 animated digital wedding invitations (10 contemporary, plus 5 each for Hindu, Marwadi and Jain weddings), plus the original Sakshi & Chinmay invite kept as-is.
+A gallery of 36 animated digital wedding invitations (10 contemporary, eleven photo invites, plus 5 each for Hindu, Marwadi and Jain weddings), plus the original Sakshi & Chinmay invite kept as-is.
 Built with React 19, Vite 8 and plain CSS (no router or animation library).
 
-## The 25 designs
+## The 36 designs
 
-Contemporary (10), Hindu (5: Kohbar Ghar, Lagnachauk, Gold Mantapa, Vastu Mandala, Sadhya Leaf), Marwadi (5: Leheriya Safa, Bandhani Untie, Haveli Fresco, Kathputli Stage, Baori Descent), Jain (5: Ranakpur Hall, Vijnapti Patra, Ratnatraya Prism, Matsyayugala, Panch Rang Dhvaj).
+Contemporary (10), Photo Invites (11), Hindu (5: Kohbar Ghar, Lagnachauk, Gold Mantapa, Vastu Mandala, Sadhya Leaf), Marwadi (5: Leheriya Safa, Bandhani Untie, Haveli Fresco, Kathputli Stage, Baori Descent), Jain (5: Ranakpur Hall, Vijnapti Patra, Ratnatraya Prism, Matsyayugala, Panch Rang Dhvaj).
 
 **Cultural review needed.** The tradition-specific designs and their sample copy (invocations, Devanagari/Gujarati phrases, ritual names, symbols) were researched from public sources and checked by automated reviewers only. Each carries open questions for a reader from that community; confirm them before any client release. See `src/data/samples/*.js` for the wording used.
 
-### The first ten
+### The first ten contemporary
 
 
 Rajmahal, Gopuram, Marigold Mela, Editorial, Botanical, Gatsby Deco, Boho Sun, Celestial, Storybook, Boarding Pass.
@@ -17,17 +17,23 @@ Each has its own layout, type, palette and one signature interaction (see `src/d
 Every design includes a live countdown, event schedule, story, RSVP form (front-end only, no backend yet),
 add-to-calendar (.ics) and a map link. All sample names, venues and dates are fictional.
 
+### The eleven photo-first designs
+
+Story Reel, Polaroid Wall, Now Showing, Jharokha Portraits, Two Become One, Locket, Toran Frames, Passport, Bento Day, Golden Hour, Velvet Seal.
+Each shows the couple's photographs in a layout of its own (see "Photo designs" below), and they have their own **Photo Invites** tab in the gallery (a design tagged `photos: true` in `src/data/templates.js` is listed there instead of under its tradition; the tab label lives in the `traditions` list at the bottom of that file).
+
 ## Project structure
 
 ```text
 src/
   App.jsx               Hash router (#/, #/t/<id>, #/studio/<id>) and the design view
   gallery.css           Gallery styles + global reduced-motion rule
-  data/sample.js        Sample couple/events for the 10 contemporary designs
+  data/sample.js        Sample couple/events for the 21 contemporary designs
   data/samples/         Per-tradition samples: hindu.js, marwadi.js, jain.js
-  data/templates.js     Registry of the ten designs (lazy-loaded)
+  data/templates.js     Registry of the designs (lazy-loaded)
   lib/                  useCountdown, useReveal, useRoute, .ics download
   components/RsvpForm   Shared RSVP form, styled per design
+  components/Photo.jsx  The one image component the photo designs use (lib/photos.js picks a safe URL or a placeholder)
   templates/<id>/       One folder per design: Component.jsx + <id>.css (scoped to .tpl-<id>)
                         and Gate.jsx + gate.css (its opening, scoped to .gate-<id>)
   templates/_reference/ The gate pattern to copy for a new design
@@ -35,14 +41,14 @@ src/
   studio/               The Studio: fields.js (schema), compose.js, sanitise.js, codec.js (links), store.js (drafts), Studio.jsx
   gallery/Gallery.jsx   The gallery page; components/Pill.jsx is the floating bar
   tests/studio/         node --test unit tests for the Studio's pure code (npm test)
-  scripts/              qa-gate.mjs / qa-all.mjs (npm run qa)
+  scripts/              qa-gate.mjs / qa-all.mjs (npm run qa), qa-photos.mjs (photo variants)
 docs/PLAN.md            Competitor research, positioning and the plan for the gates
   templates/seal/       The original invite, unchanged
 ```
 
 ## Every design opens with a tap
 
-Each of the 25 designs starts closed, behind its own themed gate (palace doors, an envelope, a wax seal, a pull-cord curtain, a scroll, knots, shutters and more; see `docs/PLAN.md` for the full table). The guest taps once, the gate opens and the invitation animates in underneath. Hold and drag gates also have an "Open now" button, and every gate works with the keyboard and with reduced motion.
+Each of the 36 designs starts closed, behind its own themed gate (palace doors, an envelope, a wax seal, a pull-cord curtain, a scroll, knots, shutters and more; see `docs/PLAN.md` for the full table). The guest taps once, the gate opens and the invitation animates in underneath. Hold and drag gates also have an "Open now" button, and every gate works with the keyboard and with reduced motion.
 
 Free features that competitors usually put behind a paid plan, none of which need a backend:
 
@@ -62,6 +68,17 @@ Free features that competitors usually put behind a paid plan, none of which nee
 - Short links are plain; long ones are compressed (`CompressionStream`, iOS 16.4 or newer) and the share sheet also offers a plain link for older phones.
 - To make the next design editable, work through the checklist in `docs/superpowers/specs/2026-10-15-invitation-studio-design.md` section 12, run `node scripts/qa-studio.mjs --only=edit-live,proof --design=<id>`, and set `editable: true` in the same commit.
 - Checks: `npm test` (pure functions, `node --test`), and with `npm run preview` running, `npm run qa:studio` (browser areas: edit-live, share, hostile, storage, gallery, mobile, focus, proof; use `--only=` and `--design=`).
+
+## Photo designs
+
+The eleven photo-first designs show four pictures: `bride`, `groom`, `couple` and `background`. A design never uses an `<img>` itself; it renders `<Photo slot="bride" />` (`src/components/Photo.jsx`), which reads `invite.photos` from the invite context.
+
+- **Where photos come from.** `invite.photos = { bride, groom, couple, background }`, every key optional, each a URL string. `src/lib/photos.js` accepts only a path on this site or an `https://` URL (no `javascript:`, `data:`, `http:`, `//host` or backslashes, no control characters, at most 300 characters); anything else is dropped.
+- **Placeholders.** With no photo, the design shows a bundled fictional illustration from `public/photos/placeholder-<slot>.svg`. If that fails to load too, the picture disappears and the design's own frame colour shows: never a broken-image icon. To try your own pictures now, put them under `public/` and set `invite.photos` in the sample data (for example `couple: '/photos/us.jpg'`). A path starting with `/` is relative to the site root and gets the deploy base added for you, so it works on GitHub Pages (served under `/wedding-invite/`) as well as locally.
+- **Not editable yet.** None of the photo designs has `editable: true`: the Studio has no photo fields, so a couple cannot add photos through it. The upload and share pipeline is the separate plan `docs/superpowers/plans/2026-10-17-photo-invitations-phase1.md`; it will fill the same `invite.photos` object (and needs a `couple` field, which that plan did not have).
+- **Real photos need a look.** The designs were built and checked on the illustrated placeholders only. Judge each on real photographs (a very bright, very dark, wide or small one) before a client sees it. Photos of people are personal data; do not commit real people's photos to this repo. `src/data/sample.js` currently points at local test photos: `/bride/bride.jpg`, `/groom/groom.jpg`, `/couple/couple.jpg` and `/background/background.jpg`, read from the folders `public/bride/`, `public/groom/`, `public/couple/` and `public/background/`. Those folders are git-ignored, so the photos are never committed or published (remove their lines from `.gitignore` to publish them), and a clone without them still works: a missing file just shows the illustrated placeholder. To use other pictures, save a web-sized copy in each folder (about 900 px wide, JPEG, ideally under 300 KB; convert iPhone HEIC first, browsers cannot show it; originals can stay beside the copy) and update `photos` in the sample. Also set `photoFocus` there: for each picture, where the face is as two percentages (for example `couple: '46% 28%'`, measured from the left and the top of the picture). Every frame crops around that point, so faces stay in view whatever shape a design's frame has; without it each design uses its own crop point, which is tuned for the illustrations. Portraits about 4:5 (for example 800x1000 px) and the background about 9:16 (for example 900x1600 px), JPEG or WebP, ideally under 300 KB and 450 KB; convert iPhone HEIC photos to JPEG first (browsers cannot show HEIC).
+- **Checks.** `node --test tests/photo-templates.test.js` checks the structure of each photo design (files, all four slots, scoped CSS, keyframe prefixes, fonts). With a build previewing, `node scripts/qa-photos.mjs [id ...]` replaces the placeholders with missing, white, black, very wide and tiny pictures and a long guest name, at several phone sizes including a short portrait one, and checks the gate and the page: no sideways scroll, no broken image, frames that keep their size, the headline really visible, text over a photo marked `data-over-photo` and at 4.5:1 contrast (decorative text may carry `data-decor`). Screenshots go to `qa-out/photos/<id>/`.
+- **Rules for a new photo design.** Keyframe names are global, so start them with a short prefix unique to the design (`sr-`, `pw-`, `cn-`, `jp-`, `dm-`, `lh-`, `tf-`, `pp-`, `bt-`, `gh-`, `vs-` are taken); no `@font-face`; fonts only from families already loaded by `index.html`; frames are aspect-ratio boxes with their own colour; the closed gate shows the names, the date and the guest line (unless the design deliberately withholds the date as a reveal, as Velvet Seal does). Velvet Seal (the wax-seal envelope, modelled on a reel) shows the couple as a cameo on the letter that slides out of the envelope, the background as a soft band above the greeting card, and the bride, groom and couple as its story polaroids.
 
 ## Testing the gates and mobile layout
 

@@ -1,0 +1,266 @@
+/* Story Reel: a wedding invitation told as a phone Story. 100svh cards, a segmented progress bar, text stickers
+   on the photographs. Everything is scoped under .tpl-storyreel. Boldness lives in the gate's ring (gate.css);
+   the page stays quiet: night ground, cream type, coral and amber only where something is tappable or counted. */
+.tpl-storyreel {
+  --night: #0e0e12;
+  --dusk: #17171d;
+  --ink: #f5f1ea;
+  --haze: #b4aea6;
+  --coral: #ff5c7a;
+  --coral-deep: #c42f50; /* the coral that still reads on a cream sticker */
+  --amber: #ffb36b;
+  --sticker-sub: #55504a;
+  --hair: rgb(245 241 234 / 0.14);
+  --serif: 'Instrument Serif', 'Noto Serif Devanagari', Georgia, serif;
+  --sans: 'Outfit', 'Mukta', system-ui, sans-serif;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --col: 30rem; /* the story is a phone-width column, also on a desktop */
+  --clear: calc(108px + env(safe-area-inset-bottom)); /* bottom room for the gallery nav pill */
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: clip;
+  background: var(--night);
+  color: var(--ink);
+  font: 400 1rem/1.55 var(--sans);
+  overflow-wrap: anywhere; /* a very long word wraps instead of pushing the page sideways */
+}
+.tpl-storyreel *,
+.tpl-storyreel *::before,
+.tpl-storyreel *::after { box-sizing: border-box; }
+.tpl-storyreel h1,
+.tpl-storyreel h2,
+.tpl-storyreel h3,
+.tpl-storyreel p,
+.tpl-storyreel ol,
+.tpl-storyreel dl { margin: 0; padding: 0; }
+.tpl-storyreel ol { list-style: none; }
+.tpl-storyreel h1,
+.tpl-storyreel h2,
+.tpl-storyreel h3 { font-family: var(--serif); font-weight: 400; text-wrap: balance; }
+.tpl-storyreel .sr-hide { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* ---------- Progress bar and Back / Next (fixed to the top; placed right after the cover in the page, so Tab reaches them first) ---------- */
+.tpl-storyreel .sr-chrome { position: fixed; top: 0; left: 0; right: 0; z-index: 30; pointer-events: none; }
+.tpl-storyreel .sr-chrome__in { width: min(100%, var(--col)); margin-inline: auto; padding: max(10px, env(safe-area-inset-top)) 12px 0; }
+.tpl-storyreel .sr-bar { display: flex; gap: 4px; }
+.tpl-storyreel .sr-seg { flex: 1; height: 3px; overflow: hidden; border-radius: 2px; background: rgb(14 14 18 / 0.4); box-shadow: 0 0 0 1px rgb(245 241 234 / 0.18); }
+.tpl-storyreel .sr-seg i { display: block; height: 100%; background: linear-gradient(90deg, var(--coral), var(--amber)); transform-origin: 0 50%; transform: scaleX(var(--f, 0)); }
+.tpl-storyreel .sr-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
+.tpl-storyreel .sr-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(14 14 18 / 0.9);
+  box-shadow: inset 0 0 0 1px rgb(245 241 234 / 0.2);
+  color: var(--ink);
+  font: 600 0.95rem/1 var(--sans);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.tpl-storyreel .sr-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.tpl-storyreel .sr-btn[aria-disabled='true'] { color: rgb(245 241 234 / 0.62); cursor: default; }
+.tpl-storyreel .sr-btn:focus-visible,
+.tpl-storyreel .sr-cta:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--night), 0 0 0 5px var(--ink); }
+.tpl-storyreel .sr-step { padding: 8px 14px; border-radius: 999px; background: rgb(14 14 18 / 0.9); box-shadow: inset 0 0 0 1px rgb(245 241 234 / 0.2); color: var(--ink); font: 500 0.85rem/1.2 var(--sans); font-variant-numeric: tabular-nums; }
+
+/* ---------- Cards ---------- */
+.tpl-storyreel .sr-card {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  justify-items: center;
+  width: min(100%, var(--col));
+  min-height: 100vh;
+  min-height: 100svh;
+  margin-inline: auto;
+  overflow: hidden;
+  scroll-snap-align: start;
+  scroll-margin-top: -84px; /* cancels the 84px scroll-padding-top the script puts on <html> for focused fields */
+  box-shadow: 0 0 0 1px rgb(245 241 234 / 0.05), 0 0 80px rgb(0 0 0 / 0.55);
+}
+.tpl-storyreel .sr-card[data-tall] { scroll-snap-align: none; } /* set by the script on a card taller than the screen */
+.tpl-storyreel .sr-card--photo { align-content: end; gap: 10px; padding: 84px 16px var(--clear); }
+.tpl-storyreel .sr-card--text { align-content: center; justify-items: stretch; padding: 84px 22px var(--clear); }
+
+/* Tap zones: the outer thirds of a card step back and forward. The middle stays free for the names. */
+.tpl-storyreel .sr-zone { position: absolute; z-index: 4; top: 0; bottom: 0; width: 34%; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.tpl-storyreel .sr-zone--prev { left: 0; }
+.tpl-storyreel .sr-zone--next { right: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .tpl-storyreel .sr-zone--prev { cursor: w-resize; }
+  .tpl-storyreel .sr-zone--next { cursor: e-resize; }
+}
+
+/* Photo frames: absolutely filled boxes with their own colour, never sized by the picture. */
+.tpl-storyreel .sr-frame { position: absolute; inset: 0; z-index: -1; overflow: hidden; background: linear-gradient(165deg, #2c2433, #15131a); }
+.tpl-storyreel .sr-frame img { display: block; width: 100%; height: 100%; }
+.tpl-storyreel .sr-frame::after { /* a little weight at the top and bottom edges; the stickers do the real work */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(14 14 18 / 0.4), transparent 24%, transparent 58%, rgb(14 14 18 / 0.5));
+}
+
+/* Text stickers: cream labels, as on a Story. Opaque, so the words keep their contrast on any photograph. */
+.tpl-storyreel .sr-sticker { z-index: 3; width: fit-content; max-width: min(100%, 22rem); padding: 16px 20px 18px; border-radius: 16px; background: var(--ink); color: var(--night); text-align: center; box-shadow: 0 14px 40px rgb(0 0 0 / 0.35); }
+.tpl-storyreel .sr-sticker__in { display: block; }
+.tpl-storyreel .sr-sticker h2 { font-size: clamp(1.9rem, 9vw, 2.5rem); line-height: 1.05; }
+.tpl-storyreel .sr-sub { margin-top: 4px; color: var(--sticker-sub); font-size: 0.95rem; }
+.tpl-storyreel .sr-amp { color: var(--coral-deep); }
+
+/* Cover */
+.tpl-storyreel .sr-card--cover .sr-sticker { width: min(100%, 22rem); }
+.tpl-storyreel .sr-for { margin-bottom: 6px; color: var(--coral-deep); font: italic 400 1.2rem/1.2 var(--serif); }
+.tpl-storyreel .sr-for[data-fit='1'] { font-size: 1.05rem; }
+.tpl-storyreel .sr-for[data-fit='2'] { font-size: 0.95rem; }
+.tpl-storyreel .sr-hosts { margin-bottom: 8px; color: var(--sticker-sub); font-size: 0.9rem; }
+.tpl-storyreel .sr-names { font-size: clamp(2.3rem, 11vw, 3.2rem); line-height: 1; }
+.tpl-storyreel .sr-names[data-fit='1'] { font-size: clamp(1.95rem, 9vw, 2.7rem); }
+.tpl-storyreel .sr-names[data-fit='2'] { font-size: clamp(1.6rem, 7.4vw, 2.2rem); }
+.tpl-storyreel .sr-tag { margin-top: 8px; color: var(--sticker-sub); }
+.tpl-storyreel .sr-sticker--date { width: fit-content; padding: 8px 16px; border-radius: 10px; background: var(--coral); color: var(--night); font-weight: 600; line-height: 1.3; }
+
+/* The page's one orchestrated moment: the cover photograph settles and the stickers rise (after the gate, if any). */
+.tpl-storyreel .sr-card--cover .sr-frame { animation: sr-settle 1.8s var(--ease) both; }
+.tpl-storyreel .sr-card--cover .sr-sticker { animation: sr-rise 0.9s var(--ease) 0.15s both; }
+.tpl-storyreel .sr-card--cover .sr-sticker--date { animation-delay: 0.35s; }
+.tpl-storyreel .sr-card--cover.via-gate .sr-frame { animation-delay: 0.3s; }
+.tpl-storyreel .sr-card--cover.via-gate .sr-sticker { animation-delay: 0.55s; }
+.tpl-storyreel .sr-card--cover.via-gate .sr-sticker--date { animation-delay: 0.75s; }
+@keyframes sr-rise { from { opacity: 0; transform: translateY(26px) scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes sr-settle { from { transform: scale(1.09); } to { transform: none; } }
+
+/* ---------- Text cards ---------- */
+.tpl-storyreel .sr-card--text h2 { font-size: clamp(2.1rem, 9.5vw, 2.8rem); line-height: 1.04; }
+.tpl-storyreel .sr-card--story { background: #13131a; }
+.tpl-storyreel .sr-chapters { display: grid; margin-top: 24px; }
+.tpl-storyreel .sr-chapters li { display: grid; grid-template-columns: 4.2rem 1fr; gap: 2px 14px; padding: 16px 0; border-top: 1px solid var(--hair); }
+.tpl-storyreel .sr-chapters li:last-child { border-bottom: 1px solid var(--hair); }
+.tpl-storyreel .sr-yr { grid-row: 1 / span 2; color: var(--amber); font: 400 1.7rem/1 var(--serif); font-variant-numeric: tabular-nums; }
+.tpl-storyreel .sr-chapters h3 { font-size: 1.4rem; line-height: 1.15; }
+.tpl-storyreel .sr-chapters p { color: var(--haze); }
+
+.tpl-storyreel .sr-card--when { background: radial-gradient(120% 55% at 50% 0%, rgb(255 92 122 / 0.22), transparent 62%), var(--night); }
+.tpl-storyreel .sr-card--text .sr-date { font-size: clamp(2.6rem, 13vw, 3.6rem); line-height: 1; }
+.tpl-storyreel .sr-time { margin-top: 14px; color: var(--amber); font-weight: 600; font-size: 1.1rem; }
+.tpl-storyreel .sr-venue { margin-top: 22px; font: 400 1.6rem/1.15 var(--serif); }
+.tpl-storyreel .sr-city { color: var(--haze); }
+.tpl-storyreel .sr-count { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 28px; border-block: 1px solid var(--hair); text-align: center; }
+.tpl-storyreel .sr-count li { padding: 14px 2px 12px; }
+.tpl-storyreel .sr-count li + li { border-left: 1px solid var(--hair); }
+.tpl-storyreel .sr-n { display: block; font: 400 clamp(2rem, 10vw, 2.8rem)/1 var(--serif); font-variant-numeric: tabular-nums; }
+.tpl-storyreel .sr-u { display: block; margin-top: 4px; color: var(--haze); font-size: 0.8rem; }
+.tpl-storyreel .sr-here { margin-top: 28px; padding: 14px 0; border-block: 1px solid var(--hair); font: 400 1.6rem/1.2 var(--serif); text-align: center; }
+
+.tpl-storyreel .sr-card--events { background: var(--dusk); }
+.tpl-storyreel .sr-events { display: grid; margin-top: 22px; }
+.tpl-storyreel .sr-events li { display: grid; grid-template-columns: 5.4rem 1fr; gap: 2px 16px; padding: 15px 0; border-top: 1px solid var(--hair); }
+.tpl-storyreel .sr-events li:last-child { border-bottom: 1px solid var(--hair); }
+.tpl-storyreel .sr-ev__t { display: block; font: 400 1.4rem/1.1 var(--serif); font-variant-numeric: tabular-nums; }
+.tpl-storyreel .sr-ev__d { display: block; margin-top: 2px; color: var(--haze); font-size: 0.85rem; }
+.tpl-storyreel .sr-events h3 { font-size: 1.55rem; line-height: 1.1; }
+.tpl-storyreel .sr-events p { color: var(--haze); }
+.tpl-storyreel .sr-events .sr-dress { margin-top: 2px; color: var(--amber); font-size: 0.9rem; }
+.tpl-storyreel .sr-events .sr-note { margin-top: 6px; font-size: 0.9rem; }
+
+/* ---------- RSVP (the shared form, styled for the night ground) ---------- */
+.tpl-storyreel .sr-by { margin-top: 10px; color: var(--haze); }
+.tpl-storyreel .rsvp,
+.tpl-storyreel .rsvp__done { display: grid; gap: 16px; margin-top: 24px; text-align: left; }
+.tpl-storyreel .rsvp label { display: grid; gap: 6px; }
+.tpl-storyreel .rsvp label span { color: var(--haze); font-size: 0.9rem; font-weight: 600; }
+.tpl-storyreel .rsvp input,
+.tpl-storyreel .rsvp select,
+.tpl-storyreel .rsvp textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid rgb(245 241 234 / 0.3);
+  border-radius: 12px;
+  background: rgb(245 241 234 / 0.07);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem; /* 16px: iOS does not zoom the page when this is focused */
+}
+.tpl-storyreel .rsvp select option { color: var(--night); }
+.tpl-storyreel .rsvp button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--coral);
+  color: var(--night);
+  font: 600 1rem/1.2 var(--sans);
+  cursor: pointer;
+}
+.tpl-storyreel .rsvp__error { color: #ff9fb0; }
+.tpl-storyreel .rsvp__msg { padding: 12px 14px; border-radius: 12px; background: rgb(245 241 234 / 0.08); white-space: pre-wrap; user-select: text; }
+.tpl-storyreel .rsvp__reply button {
+  min-height: 44px;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: 600 1rem/1.2 var(--sans);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.tpl-storyreel .rsvp__hint { min-height: 1.5em; color: var(--amber); font-size: 0.9rem; }
+.tpl-storyreel .rsvp input:focus-visible,
+.tpl-storyreel .rsvp select:focus-visible,
+.tpl-storyreel .rsvp textarea:focus-visible,
+.tpl-storyreel .rsvp button:focus-visible,
+.tpl-storyreel .rsvp__reply a:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+
+/* ---------- Save and map (the last card; clears the nav pill with room to spare) ---------- */
+.tpl-storyreel .sr-card--save { align-content: center; justify-items: center; gap: 14px; padding-bottom: calc(132px + env(safe-area-inset-bottom)); text-align: center; background: radial-gradient(100% 50% at 50% 100%, rgb(255 179 107 / 0.18), transparent 70%), var(--night); }
+.tpl-storyreel .sr-card--save h2 { font-size: clamp(2.3rem, 11vw, 3.1rem); line-height: 1.04; }
+.tpl-storyreel .sr-where { color: var(--haze); }
+.tpl-storyreel .sr-acts { display: grid; gap: 12px; width: min(100%, 20rem); margin-top: 14px; }
+.tpl-storyreel .sr-cta {
+  display: grid;
+  place-items: center;
+  min-height: 52px;
+  padding: 0 20px;
+  border: 1px solid var(--coral);
+  border-radius: 999px;
+  background: var(--coral);
+  color: var(--night);
+  font: 600 1rem/1.2 var(--sans);
+  text-decoration: none;
+  cursor: pointer;
+}
+.tpl-storyreel .sr-cta--ghost { background: transparent; color: var(--ink); border-color: rgb(245 241 234 / 0.45); }
+.tpl-storyreel .sr-love { margin-top: 18px; color: var(--ink); font: italic 400 1.4rem/1.2 var(--serif); }
+
+@media (hover: hover) and (pointer: fine) {
+  .tpl-storyreel .sr-btn[aria-disabled='false']:hover { background: var(--ink); color: var(--night); }
+  .tpl-storyreel .sr-cta:hover { background: var(--amber); border-color: var(--amber); color: var(--night); }
+}
+
+/* A phone held sideways: the cards are short, so the paddings and the stickers shrink to keep clear of the nav pill. */
+@media (max-height: 520px) {
+  .tpl-storyreel .sr-card--photo { gap: 6px; padding: 64px 16px 96px; }
+  .tpl-storyreel .sr-card--text { padding-top: 70px; }
+  .tpl-storyreel .sr-sticker { padding: 8px 16px 10px; }
+  .tpl-storyreel .sr-sticker--date { padding: 6px 14px; }
+  .tpl-storyreel .sr-for { margin-bottom: 2px; font-size: 1rem; }
+  .tpl-storyreel .sr-hosts { margin-bottom: 4px; font-size: 0.8rem; }
+  .tpl-storyreel .sr-tag { margin-top: 4px; font-size: 0.9rem; }
+  .tpl-storyreel .sr-names,
+  .tpl-storyreel .sr-names[data-fit='1'],
+  .tpl-storyreel .sr-names[data-fit='2'] { font-size: 1.9rem; }
+}
+
+/* Reduced motion: no entrance, no smooth scrolling (the buttons use instant jumps in the script). */
+@media (prefers-reduced-motion: reduce) {
+  .tpl-storyreel .sr-card--cover .sr-frame,
+  .tpl-storyreel .sr-card--cover .sr-sticker { animation: none; }
+}

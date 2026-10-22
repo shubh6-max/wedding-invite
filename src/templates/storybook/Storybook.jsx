@@ -47,7 +47,7 @@ function Plate({ big, cap, n }) {
 function Face({ side, board, children }) {
   return (
     <div className={`sb-face sb-face--${side}${board ? ' sb-face--board' : ''}`}>
-      <div className="sb-scroll">{children}</div>
+      <div className="sb-scroll" data-lenis-prevent>{children}</div>
     </div>
   )
 }

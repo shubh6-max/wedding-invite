@@ -1,0 +1,488 @@
+/* Velvet Seal: brown velvet, gold beads, cream paper. Everything scoped under .tpl-velvetseal. */
+.tpl-velvetseal {
+  --ink: #24150e;
+  --ink-2: #34201a;
+  --gold: #c9a24a;
+  --gold-hi: #f0d98c;
+  --gold-lo: #7a5a1a;
+  --cream: #f1e3cb;
+  --paper: #f6ead6;
+  --rust: #9c3a1f;
+  --wine: #5a1620;
+  --ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+
+  min-height: 100svh;
+  overflow-x: clip;
+  background: var(--ink);
+  color: var(--cream);
+  font: 500 1.15rem/1.55 'Cormorant Garamond', 'Noto Serif Devanagari', Georgia, serif;
+  overflow-wrap: anywhere; /* a very long word wraps instead of pushing the page sideways */
+}
+.tpl-velvetseal *,
+.tpl-velvetseal *::before,
+.tpl-velvetseal *::after { box-sizing: border-box; }
+.tpl-velvetseal h1,
+.tpl-velvetseal h2,
+.tpl-velvetseal h3,
+.tpl-velvetseal p,
+.tpl-velvetseal ol { margin: 0; padding: 0; }
+.tpl-velvetseal ol { list-style: none; }
+.tpl-velvetseal h1,
+.tpl-velvetseal h2,
+.tpl-velvetseal h3 { font-family: 'Gloock', 'Noto Serif Devanagari', Georgia, serif; font-weight: 400; line-height: 1.12; }
+
+.tpl-velvetseal .vs-eyebrow {
+  margin-bottom: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* Reveal on scroll. translate/rotate are separate properties so a tilted polaroid keeps its tilt. */
+.tpl-velvetseal [data-reveal] { opacity: 0; translate: 0 24px; transition: opacity 0.9s var(--ease), translate 0.9s var(--ease); }
+.tpl-velvetseal [data-reveal].in { opacity: 1; translate: 0 0; }
+
+@keyframes vs-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Music ---------- */
+.tpl-velvetseal .vs-music {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 800;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.35);
+  cursor: pointer;
+}
+.tpl-velvetseal .vs-music svg { width: 22px; height: 22px; fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tpl-velvetseal .vs-music:focus-visible { outline: 3px solid var(--gold-hi); outline-offset: 3px; }
+
+/* ---------- Greeting card ---------- */
+.tpl-velvetseal .vs-greet {
+  --band: clamp(150px, 36svh, 420px); /* the height of the photo band at the top: short, so the names stay on the first screen */
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  min-height: 100svh;
+  padding: calc(var(--band) - 84px) 16px 120px; /* the card overlaps the lower, faded part of the band */
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 35%, #f9f0df, #e9d6b6 85%);
+  color: var(--ink);
+}
+/* The background photo: a soft band at the top that fades into the cream. Its own colour shows if the picture is missing. */
+.tpl-velvetseal .vs-greet__bg {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(100%, 520px); /* a portrait photo stretched across a desktop would show giant faces: keep it a panel */
+  height: var(--band);
+  translate: -50% 0;
+  background: #d9c3a0;
+  -webkit-mask-image: linear-gradient(#000 55%, transparent);
+  mask-image: linear-gradient(#000 55%, transparent);
+}
+@media (min-width: 540px) { /* the panel is narrower than the screen: its sides fade into the cream too */
+  .tpl-velvetseal .vs-greet__bg {
+    -webkit-mask-image: linear-gradient(#000 55%, transparent), linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(#000 55%, transparent), linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+    mask-composite: intersect;
+  }
+}
+@media (max-height: 520px) and (orientation: landscape) { /* too short for a band above the card: a soft backdrop behind it */
+  .tpl-velvetseal .vs-greet { --band: 100%; padding-top: 56px; align-content: center; }
+  .tpl-velvetseal .vs-more { display: none; } /* over the backdrop there is nothing to keep it readable, and the page is short */
+  .tpl-velvetseal .vs-greet__bg { width: 100%; opacity: 0.55; -webkit-mask-image: none; mask-image: none; }
+}
+/* Taller than the band and raised: the card covers the band's lower part, so the faces sit higher than the photo's own focal point would put them (the bottom edge is faded out anyway). */
+.tpl-velvetseal .vs-greet__bg img { position: absolute; left: 0; top: -18%; display: block; width: 100%; height: 118%; }
+/* Falling glitter: streaks and gold specks drifting down. The layer is one tile (120px) taller than the
+   section and slides exactly one tile, so the loop has no seam. */
+.tpl-velvetseal .vs-glitter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -120px;
+  height: calc(100% + 120px);
+  background:
+    radial-gradient(circle, rgb(201 162 74 / 0.75) 1px, transparent 1.8px) 0 0 / 37px 60px,
+    radial-gradient(circle, rgb(255 255 255 / 0.9) 1px, transparent 1.8px) 18px 30px / 53px 120px,
+    repeating-linear-gradient(90deg, transparent 0 11px, rgb(201 162 74 / 0.28) 11px 12px, transparent 12px 23px);
+  mask: linear-gradient(#000 0%, #000 55%, transparent 100%);
+  animation: vs-fall 12s linear infinite;
+}
+@keyframes vs-fall { to { transform: translateY(120px); } }
+
+.tpl-velvetseal .vs-card {
+  position: relative;
+  width: min(100%, 360px);
+  padding: 34px 24px 30px;
+  text-align: center;
+  background: rgb(250 242 228 / 0.82);
+  box-shadow: inset 0 0 0 7px #f9f0df, inset 0 0 0 8px rgb(201 162 74 / 0.8), 0 18px 50px rgb(90 40 15 / 0.22);
+  animation: vs-rise 1s var(--ease) 0.2s both;
+}
+.tpl-velvetseal .vs-greet.via-gate .vs-card { animation-delay: 1.5s; } /* the gate is still lifting away */
+.tpl-velvetseal .vs-salute { font: italic 600 1.55rem/1.25 'Cormorant Garamond', Georgia, serif; color: var(--rust); }
+.tpl-velvetseal .vs-salute[data-fit='1'] { font-size: 1.3rem; }
+.tpl-velvetseal .vs-salute[data-fit='2'] { font-size: 1.1rem; }
+.tpl-velvetseal .vs-hosts { margin-top: 14px; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-lo); }
+.tpl-velvetseal .vs-lead { margin-top: 12px; font-style: italic; color: var(--ink-2); }
+.tpl-velvetseal .vs-names {
+  display: grid;
+  gap: 2px;
+  margin: 22px 0 8px;
+  font: 400 clamp(2rem, 9vw, 2.7rem)/1.1 'Gloock', 'Noto Serif Devanagari', Georgia, serif;
+  color: var(--rust);
+}
+.tpl-velvetseal .vs-names[data-fit='1'] { font-size: clamp(1.8rem, 7.8vw, 2.4rem); }
+.tpl-velvetseal .vs-names[data-fit='2'] { font-size: clamp(1.45rem, 6.2vw, 1.9rem); }
+.tpl-velvetseal .vs-names i { font-size: 0.6em; color: var(--gold); }
+.tpl-velvetseal .vs-tagline { font-style: italic; color: var(--ink-2); }
+.tpl-velvetseal .vs-more {
+  position: relative;
+  color: var(--rust); /* readable on the cream; it sits below the card, over the falling glitter, so it is marked data-decor */
+  margin-top: 22px; /* below the card, in the flow, so it never lands on it */
+  text-align: center;
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold-lo);
+}
+.tpl-velvetseal .vs-more::after { content: '⌄'; display: block; font-size: 1.4rem; letter-spacing: 0; animation: vs-bob 1.8s ease-in-out infinite; }
+@keyframes vs-bob { 50% { transform: translateY(6px); } }
+
+/* ---------- Our story: polaroids ---------- */
+.tpl-velvetseal .vs-story {
+  padding: 96px 16px 80px;
+  background: radial-gradient(ellipse at 50% 0%, var(--ink-2), var(--ink) 70%);
+  text-align: center;
+}
+.tpl-velvetseal .vs-story h2 { font-size: clamp(2.6rem, 12vw, 3.6rem); color: var(--cream); }
+.tpl-velvetseal .vs-polaroids { display: grid; gap: 56px; max-width: 320px; margin: 48px auto 0; }
+.tpl-velvetseal .vs-polaroid {
+  padding: 12px 12px 22px;
+  background: #f7efe0;
+  color: var(--ink);
+  box-shadow: 0 14px 34px rgb(0 0 0 / 0.5);
+  rotate: -2deg;
+}
+.tpl-velvetseal .vs-polaroid:nth-child(even) { rotate: 2deg; }
+.tpl-velvetseal .vs-polaroid__photo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  margin-bottom: 14px;
+  background: radial-gradient(circle at 30% 25%, rgb(201 162 74 / 0.35), transparent 55%), linear-gradient(135deg, #5b3a28, #2d1a10);
+}
+.tpl-velvetseal .vs-polaroid__photo b { font: italic 600 3.2rem/1 'Cormorant Garamond', Georgia, serif; color: var(--gold-hi); }
+.tpl-velvetseal .vs-polaroid__photo img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.tpl-velvetseal .vs-chip {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #f7efe0;
+  color: var(--rust);
+  font: 600 1rem/1.2 'Cormorant Garamond', Georgia, serif;
+}
+.tpl-velvetseal .vs-year { display: block; margin-bottom: 4px; font: italic 600 1.05rem/1.2 'Cormorant Garamond', Georgia, serif; color: var(--gold-lo); }
+.tpl-velvetseal .vs-polaroid h3 { font-size: 1.4rem; color: var(--rust); }
+.tpl-velvetseal .vs-polaroid p { margin-top: 6px; color: var(--ink-2); }
+
+/* ---------- The day: scratch to reveal ---------- */
+.tpl-velvetseal .vs-day { padding: 88px 16px; background: var(--paper); color: var(--ink); text-align: center; }
+.tpl-velvetseal .vs-day .vs-eyebrow { color: var(--gold-lo); }
+.tpl-velvetseal .vs-day h2 { max-width: 14ch; margin: 0 auto; font-size: clamp(1.9rem, 8.4vw, 2.6rem); color: var(--rust); }
+.tpl-velvetseal .vs-daycard {
+  max-width: 340px;
+  margin: 36px auto 0;
+  padding: 24px 18px 20px;
+  border: 1px solid rgb(201 162 74 / 0.7);
+  border-radius: 18px;
+  background: rgb(255 251 242 / 0.7);
+}
+.tpl-velvetseal .vs-scratch { position: relative; height: 132px; margin: 4px 0 2px; border-radius: 12px; overflow: hidden; }
+.tpl-velvetseal .vs-scratch__under { display: grid; place-content: center; gap: 4px; height: 100%; }
+.tpl-velvetseal .vs-scratch__under time { font: italic 600 1.65rem/1.2 'Cormorant Garamond', Georgia, serif; color: var(--rust); }
+.tpl-velvetseal .vs-scratch__under span { color: var(--ink-2); }
+.tpl-velvetseal .vs-scratch__foil {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none; /* scratching must not scroll the page */
+  cursor: crosshair;
+  transition: opacity 0.7s;
+}
+.tpl-velvetseal .vs-scratch__foil.is-done { opacity: 0; pointer-events: none; }
+.tpl-velvetseal .vs-reveal {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  background: none;
+  color: var(--rust);
+  font: inherit;
+  font-size: 1rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.tpl-velvetseal .vs-where { margin-top: 10px; font-style: italic; color: var(--ink-2); }
+.tpl-velvetseal .vs-days { margin-top: 10px; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-lo); }
+
+/* ---------- Itinerary: a tall section with a pinned panel; scroll picks the step ---------- */
+.tpl-velvetseal .vs-plan { height: calc(100svh + (var(--n) - 1) * 55svh); background: var(--ink); }
+.tpl-velvetseal .vs-plan__pin {
+  position: sticky;
+  top: 0;
+  display: grid;
+  align-content: center;
+  height: 100svh;
+  padding: 0 0 88px; /* the pill sits at the bottom */
+  text-align: center;
+}
+.tpl-velvetseal .vs-plan h2 { padding: 0 16px; font-size: clamp(2.1rem, 9.4vw, 3rem); color: var(--cream); }
+.tpl-velvetseal .vs-strip {
+  --w: clamp(104px, 30vw, 150px);
+  margin: 36px 0 24px;
+  overflow: clip;
+  mask: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+}
+/* Centre the active step: shift left by (at + half a step) steps from a start at the strip's midpoint. */
+.tpl-velvetseal .vs-strip__track {
+  display: flex;
+  width: max-content;
+  margin-left: 50%;
+  transform: translateX(calc(var(--w) * (var(--at) * -1 - 0.5)));
+  transition: transform 0.6s var(--ease);
+}
+.tpl-velvetseal .vs-tick {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 6px;
+  width: var(--w);
+  min-height: 76px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgb(241 227 203 / 0.62);
+  font: inherit;
+  cursor: pointer;
+  transition: color 0.4s;
+}
+.tpl-velvetseal .vs-tick span { order: 1; font: 600 1.1rem/1.2 'Cormorant Garamond', Georgia, serif; }
+.tpl-velvetseal .vs-tick::before {
+  content: '';
+  order: 2;
+  width: 100%;
+  height: 14px;
+  background: radial-gradient(circle, currentColor 4px, transparent 4.6px) center / 14px 14px no-repeat, linear-gradient(currentColor, currentColor) center / 100% 1px no-repeat;
+}
+.tpl-velvetseal .vs-tick small { order: 3; font-size: 0.8rem; }
+.tpl-velvetseal .vs-tick[aria-current] { color: var(--gold-hi); }
+.tpl-velvetseal .vs-tick[aria-current] span { font-weight: 700; font-size: 1.25rem; }
+.tpl-velvetseal .vs-tick:focus-visible { outline: 3px solid var(--gold-hi); outline-offset: -3px; }
+.tpl-velvetseal .vs-now { min-height: 110px; padding: 0 24px; animation: vs-rise 0.5s var(--ease) both; }
+.tpl-velvetseal .vs-now h3 { font-size: 1.8rem; color: var(--gold-hi); }
+.tpl-velvetseal .vs-now p { margin-top: 4px; color: var(--cream); }
+
+/* ---------- Wishes ---------- */
+.tpl-velvetseal .vs-wish { padding: 88px 16px 40px; background: var(--paper); color: var(--ink); text-align: center; }
+.tpl-velvetseal .vs-wish .vs-eyebrow { color: var(--gold-lo); }
+.tpl-velvetseal .vs-wish h2 { font-size: clamp(2.2rem, 10vw, 3rem); color: var(--rust); }
+.tpl-velvetseal .vs-wishform,
+.tpl-velvetseal .vs-wishdone {
+  display: grid;
+  gap: 16px;
+  max-width: 380px;
+  margin: 28px auto 0;
+  padding: 22px 18px;
+  border: 1px solid rgb(201 162 74 / 0.7);
+  border-radius: 18px;
+  background: rgb(255 251 242 / 0.7);
+  text-align: left;
+}
+.tpl-velvetseal .vs-wishform label { display: grid; gap: 6px; }
+.tpl-velvetseal .vs-wishform label span { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-lo); }
+.tpl-velvetseal .vs-wishform select,
+.tpl-velvetseal .vs-wishform textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid rgb(201 162 74 / 0.8);
+  border-radius: 12px;
+  background: #fffdf8;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem; /* 16px: iOS does not zoom the page when this is focused */
+}
+.tpl-velvetseal .vs-wishform textarea { resize: vertical; }
+.tpl-velvetseal .vs-wishform button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #7a1d2c, var(--wine));
+  color: var(--gold-hi);
+  font: 600 0.9rem 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.tpl-velvetseal .vs-wishdone__msg { padding: 12px 14px; border-radius: 12px; background: #fffdf8; white-space: pre-wrap; user-select: text; }
+.tpl-velvetseal .vs-wishdone__act { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.tpl-velvetseal .vs-wishdone__act a,
+.tpl-velvetseal .vs-wishdone__act button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--rust);
+  font: 600 1rem 'Cormorant Garamond', Georgia, serif;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.tpl-velvetseal .vs-wishdone__hint { min-height: 1.5em; font-size: 0.9rem; color: var(--ink-2); }
+
+/* ---------- Actions + venue sheet ---------- */
+.tpl-velvetseal .vs-go { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; padding: 24px 16px 88px; background: var(--paper); }
+.tpl-velvetseal .vs-act {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 4px;
+  min-height: 92px;
+  padding: 12px;
+  border: 1px solid rgb(201 162 74 / 0.8);
+  border-radius: 16px;
+  background: rgb(255 251 242 / 0.8);
+  color: var(--ink);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+.tpl-velvetseal .vs-act b { font: 400 1.15rem/1.2 'Gloock', Georgia, serif; color: var(--rust); }
+.tpl-velvetseal .vs-act small { font-size: 0.9rem; color: var(--ink-2); }
+.tpl-velvetseal .vs-act:focus-visible,
+.tpl-velvetseal .vs-btn:focus-visible,
+.tpl-velvetseal .vs-sheet__x:focus-visible { outline: 3px solid var(--rust); outline-offset: 3px; }
+
+.tpl-velvetseal .vs-sheet {
+  width: 100%;
+  max-width: 480px;
+  margin: auto auto 0; /* bottom-aligned sheet */
+  padding: 0;
+  border: 0;
+  border-radius: 24px 24px 0 0;
+  background: var(--paper);
+  color: var(--ink);
+  animation: vs-sheet 0.35s var(--ease) both;
+}
+.tpl-velvetseal .vs-sheet::backdrop { background: rgb(20 10 5 / 0.6); }
+@keyframes vs-sheet { from { transform: translateY(100%); } to { transform: none; } }
+.tpl-velvetseal .vs-sheet__body { position: relative; display: grid; gap: 8px; padding: 36px 24px calc(28px + env(safe-area-inset-bottom)); text-align: center; }
+.tpl-velvetseal .vs-sheet h3 { font-size: 1.6rem; color: var(--rust); }
+.tpl-velvetseal .vs-sheet__x {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink);
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.tpl-velvetseal .vs-btn {
+  display: inline-grid;
+  place-items: center;
+  min-height: 48px;
+  margin-top: 12px;
+  padding: 0 24px;
+  border-radius: 999px;
+  background: var(--wine);
+  color: var(--gold-hi);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+}
+
+/* ---------- RSVP (shared form, styled for the dark ground) ---------- */
+.tpl-velvetseal .vs-rsvp { padding: 88px 16px 140px; background: radial-gradient(ellipse at 50% 0%, var(--ink-2), var(--ink) 70%); text-align: center; }
+.tpl-velvetseal .vs-rsvp h2 { font-size: clamp(2.2rem, 10vw, 3rem); color: var(--cream); }
+.tpl-velvetseal .vs-rsvp__by { margin-top: 10px; font-style: italic; color: var(--gold-hi); }
+.tpl-velvetseal .rsvp,
+.tpl-velvetseal .rsvp__done { display: grid; gap: 16px; max-width: 380px; margin: 28px auto 0; text-align: left; }
+.tpl-velvetseal .rsvp label { display: grid; gap: 6px; }
+.tpl-velvetseal .rsvp label span { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+.tpl-velvetseal .rsvp input,
+.tpl-velvetseal .rsvp select,
+.tpl-velvetseal .rsvp textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid rgb(201 162 74 / 0.7);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.06);
+  color: var(--cream);
+  font: inherit;
+  font-size: 1rem;
+}
+.tpl-velvetseal .rsvp select option { color: var(--ink); }
+.tpl-velvetseal .rsvp button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--gold-hi), var(--gold));
+  color: var(--ink);
+  font: 700 0.9rem 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.tpl-velvetseal .rsvp__error { color: #ffb4a2; }
+.tpl-velvetseal .rsvp__msg { padding: 12px 14px; border-radius: 12px; background: rgb(255 255 255 / 0.08); white-space: pre-wrap; user-select: text; }
+.tpl-velvetseal .rsvp__reply button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: 600 1rem 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: 0;
+  text-transform: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.tpl-velvetseal .rsvp__hint { min-height: 1.5em; font-size: 0.9rem; color: var(--gold-hi); }
+
+.tpl-velvetseal .rsvp input:focus-visible,
+.tpl-velvetseal .rsvp select:focus-visible,
+.tpl-velvetseal .rsvp textarea:focus-visible,
+.tpl-velvetseal .rsvp button:focus-visible,
+.tpl-velvetseal .vs-wishform select:focus-visible,
+.tpl-velvetseal .vs-wishform textarea:focus-visible,
+.tpl-velvetseal .vs-wishform button:focus-visible,
+.tpl-velvetseal .vs-reveal:focus-visible { outline: 3px solid var(--gold-hi); outline-offset: 3px; }
+.tpl-velvetseal .vs-day .vs-reveal:focus-visible,
+.tpl-velvetseal .vs-wish :focus-visible { outline-color: var(--rust); }

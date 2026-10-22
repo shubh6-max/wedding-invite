@@ -1,0 +1,177 @@
+/* Golden Hour gate: the background photo under a night sky, a sun that rises into its place and is the one button.
+   Tap: the light floods in (a warm overlay), the sun lifts and swells, the names fade, the whole gate dissolves onto the
+   page, whose first chapter shows the same photo. Only transform and opacity animate.
+   Sequence (ms): sun rises on load 0-1300; on tap: names fade 0-500, flood 0-800, sun lift 0-1500, gate fades 600-1500
+   (useGate ms = 1800). */
+.gate-goldenhour.gate {
+  --night: #1a1210;
+  --cream: #fbeed8;
+  --sun: #f0a35e;
+  --haze: #ffd9a0;
+  --ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+  --d: clamp(112px, min(46vw, 30svh), 200px); /* the sun: smaller on a short screen */
+  --w: min(100vw - 48px, 40rem); /* width the names may use; landscape narrows it */
+
+  background: var(--night);
+  color: var(--cream);
+  font: 400 1rem/1.5 'Hanken Grotesk', 'Noto Serif Devanagari', system-ui, sans-serif;
+}
+.gate-goldenhour *,
+.gate-goldenhour *::before,
+.gate-goldenhour *::after { box-sizing: border-box; }
+.gate-goldenhour p { margin: 0; }
+
+/* ---- the sky: photo, then a grade from pre-dawn violet to an ember horizon ---- */
+.gate-goldenhour .gate-goldenhour__sky {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #2c1a34, #4a2418 70%, #1a1210);
+  transition: transform 1.5s cubic-bezier(0.3, 0, 0.2, 1);
+}
+.gate-goldenhour .gate-goldenhour__photo { position: absolute; inset: 0; animation: gh-gate-drift 22s ease-in-out infinite alternate; }
+.gate-goldenhour .gate-goldenhour__photo img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.gate-goldenhour .gate-goldenhour__grade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 36% at 50% 74%, rgb(255 190 120 / 0.5), transparent 70%),
+    linear-gradient(180deg, rgb(48 28 66 / 0.45) 0%, rgb(240 163 94 / 0.12) 60%, rgb(199 91 52 / 0.4) 100%);
+}
+@keyframes gh-gate-drift { from { transform: scale(1.04); } to { transform: scale(1.12) translate3d(-1.5%, -1%, 0); } }
+
+/* ---- names: a night-sky scrim fills the box behind the text and fades only below it ---- */
+.gate-goldenhour .gate-goldenhour__top {
+  position: absolute;
+  inset: 0 0 auto;
+  padding: calc(env(safe-area-inset-top) + clamp(20px, 6svh, 56px)) 24px 112px;
+  background: linear-gradient(
+    180deg,
+    rgb(26 18 16 / 0.92) 0,
+    rgb(26 18 16 / 0.9) calc(100% - 112px),
+    rgb(26 18 16 / 0.66) calc(100% - 84px),
+    rgb(26 18 16 / 0.36) calc(100% - 56px),
+    rgb(26 18 16 / 0.12) calc(100% - 28px),
+    rgb(26 18 16 / 0) 100%
+  );
+  text-align: center;
+  transition: opacity 0.5s ease, transform 0.7s var(--ease);
+}
+.gate-goldenhour .gate-goldenhour__text { display: grid; justify-items: center; gap: 8px; max-width: 40rem; margin: 0 auto; overflow-wrap: anywhere; }
+.gate-goldenhour .gate-goldenhour__guest { font: italic 400 1.15rem/1.3 'Playfair Display', 'Noto Serif Devanagari', Georgia, serif; color: var(--sun); }
+.gate-goldenhour .gate-goldenhour__guest[data-fit='1'] { font-size: 1rem; }
+.gate-goldenhour .gate-goldenhour__guest[data-fit='2'] { font-size: 0.9rem; }
+.gate-goldenhour .gate-goldenhour__hosts { font-size: 0.9375rem; font-weight: 600; color: rgb(251 238 216 / 0.88); }
+.gate-goldenhour .gate-goldenhour__names {
+  font: 400 clamp(1.6rem, calc(var(--w) / var(--chars, 13) * 1.85), 4.4rem)/1.12 'Playfair Display', 'Noto Serif Devanagari', Georgia, serif;
+  text-wrap: balance;
+}
+.gate-goldenhour .gate-goldenhour__names i { color: var(--sun); }
+.gate-goldenhour .gate-goldenhour__date { font-size: 1rem; font-weight: 600; }
+
+/* ---- the sun: a button, so the whole gesture is one real control ---- */
+.gate-goldenhour .gate-goldenhour__sun {
+  position: relative;
+  isolation: isolate;
+  align-self: end;
+  justify-self: center;
+  display: grid;
+  place-items: center;
+  width: var(--d);
+  height: var(--d);
+  margin-bottom: clamp(12px, 3.5svh, 36px);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--night);
+  font: inherit;
+  cursor: pointer;
+  animation: gh-gate-rise 1.3s var(--ease) backwards;
+  transition: transform 1.5s cubic-bezier(0.3, 0, 0.2, 1);
+}
+.gate-goldenhour .gate-goldenhour__sun:focus-visible { outline: 3px solid var(--cream); outline-offset: 8px; }
+.gate-goldenhour .gate-goldenhour__glow {
+  position: absolute;
+  inset: -75%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 200 130 / 0.5) 0, rgb(240 163 94 / 0.18) 40%, transparent 68%);
+  pointer-events: none;
+  animation: gh-gate-breathe 3.4s ease-in-out infinite;
+}
+.gate-goldenhour .gate-goldenhour__disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 36%, #fff6e0 0, var(--haze) 38%, var(--sun) 80%, #e0803f 100%);
+  box-shadow: 0 0 40px 10px rgb(240 163 94 / 0.55);
+  transition: transform 0.35s ease;
+}
+.gate-goldenhour .gate-goldenhour__cta {
+  position: relative;
+  max-width: 7ch;
+  font: italic 400 clamp(1.15rem, 5vw, 1.4rem)/1.15 'Playfair Display', Georgia, serif;
+  text-align: center;
+  text-wrap: balance;
+  transition: opacity 0.3s ease;
+}
+@keyframes gh-gate-rise { from { transform: translateY(16svh) scale(0.9); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes gh-gate-breathe { 50% { transform: scale(1.12); opacity: 0.7; } }
+
+/* ---- exposure: a warm flood laid over everything when the sun is tapped ---- */
+.gate-goldenhour .gate-goldenhour__flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 50% 64%, rgb(255 214 150 / 0.96) 0, rgb(240 163 94 / 0.93) 55%, rgb(176 78 46 / 0.92) 100%);
+  transition: opacity 0.9s ease-in 0.1s; /* it comes in beneath the sun, which is the brightest thing in the frame */
+}
+
+/* ---- opening ---- */
+.gate-goldenhour.is-opening { animation: gh-gate-out 0.9s ease 0.6s forwards; }
+.gate-goldenhour.is-opening .gate-goldenhour__top { opacity: 0; transform: translateY(-14px); }
+.gate-goldenhour.is-opening .gate-goldenhour__sky { transform: scale(1.08); }
+.gate-goldenhour.is-opening .gate-goldenhour__sun { transform: translateY(-30svh) scale(1.55); }
+.gate-goldenhour.is-opening .gate-goldenhour__cta { opacity: 0; }
+.gate-goldenhour.is-opening .gate-goldenhour__flash { opacity: 1; }
+@keyframes gh-gate-out { to { opacity: 0; } }
+
+/* A short portrait phone (browser bars showing): tighter top block so the names stay clear of the sun. */
+@media (max-height: 520px) and (orientation: portrait) {
+  .gate-goldenhour .gate-goldenhour__top { padding-top: calc(env(safe-area-inset-top) + 14px); }
+  .gate-goldenhour .gate-goldenhour__text { gap: 4px; }
+}
+
+/* Phone held sideways: names on the left half, the sun on the right. */
+@media (max-height: 520px) and (orientation: landscape) {
+  .gate-goldenhour.gate { --d: clamp(112px, 34svh, 150px); --w: calc(50vw - 80px); }
+  .gate-goldenhour .gate-goldenhour__top {
+    inset: 0 50% 0 0;
+    display: grid;
+    align-content: center;
+    padding: 16px 56px calc(88px + 8px) 24px;
+    background: linear-gradient(90deg, rgb(26 18 16 / 0.92) 0, rgb(26 18 16 / 0.9) calc(100% - 56px), rgb(26 18 16 / 0) 100%);
+  }
+  .gate-goldenhour .gate-goldenhour__sun { align-self: center; justify-self: end; margin: 0 12% 0 0; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gate-goldenhour:not(.is-opening) .gate-goldenhour__sun:hover .gate-goldenhour__disc { transform: scale(1.05); }
+}
+
+/* Reduced motion: the sun is simply there, nothing drifts or breathes, and the gate fades away. */
+@media (prefers-reduced-motion: reduce) {
+  .gate-goldenhour .gate-goldenhour__photo,
+  .gate-goldenhour .gate-goldenhour__glow,
+  .gate-goldenhour .gate-goldenhour__sun { animation: none; }
+  .gate-goldenhour.is-opening { animation: gh-gate-out 0.25s ease both; }
+  .gate-goldenhour.is-opening .gate-goldenhour__top,
+  .gate-goldenhour.is-opening .gate-goldenhour__sky,
+  .gate-goldenhour.is-opening .gate-goldenhour__sun,
+  .gate-goldenhour.is-opening .gate-goldenhour__cta,
+  .gate-goldenhour.is-opening .gate-goldenhour__flash { transition: none; transform: none; }
+  .gate-goldenhour.is-opening .gate-goldenhour__top,
+  .gate-goldenhour.is-opening .gate-goldenhour__cta { opacity: 1; }
+  .gate-goldenhour.is-opening .gate-goldenhour__flash { opacity: 0; }
+}

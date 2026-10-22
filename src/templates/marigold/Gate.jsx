@@ -1,4 +1,5 @@
 import { useGate } from '../../lib/gate.js'
+import { fitStep } from '../../lib/fit.js'
 import { guestName } from '../../lib/guest.js'
 import './gate.css'
 
@@ -12,6 +13,7 @@ export default function Gate({ invite, onOpen, onDone }) {
   const { trigger, opening } = useGate({ onOpen, onDone, ms: 1500 })
   const { a, b } = invite.couple
   const guest = guestName()
+  const nameFit = Math.max(fitStep(a, [10, 16]), fitStep(b, [10, 16])) // long names step down so the sticker never outgrows the screen
 
   return (
     <div role="region" aria-label={`Invitation for ${a} and ${b}`} className={`gate gate-marigold${opening ? ' is-opening' : ''}`}>
@@ -35,7 +37,7 @@ export default function Gate({ invite, onOpen, onDone }) {
         </svg>
 
         {guest && <p className="mg-guest">For {guest}</p>}
-        <p className="mg-names">
+        <p className="mg-names" data-fit={nameFit}>
           <span>{a}</span>
           <span className="mg-amp" aria-hidden="true">&amp;</span>
           <span>{b}</span>

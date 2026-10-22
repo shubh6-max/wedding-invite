@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 800" width="640" height="800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4dcc4"/>
+      <stop offset="0.5" stop-color="#d9a98c"/>
+      <stop offset="1" stop-color="#8d5a6c"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.4" r="0.55">
+      <stop offset="0" stop-color="#fff2d8" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#fff2d8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="skinB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a5163"/>
+      <stop offset="1" stop-color="#5b2f40"/>
+    </linearGradient>
+    <linearGradient id="skinG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7d5a52"/>
+      <stop offset="1" stop-color="#553a38"/>
+    </linearGradient>
+    <linearGradient id="suit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b4658"/>
+      <stop offset="1" stop-color="#232b3a"/>
+    </linearGradient>
+    <linearGradient id="hairB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3d1a2c"/>
+      <stop offset="1" stop-color="#26101d"/>
+    </linearGradient>
+    <linearGradient id="hairG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2d211f"/>
+      <stop offset="1" stop-color="#1c1413"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6"/></filter>
+  </defs>
+  <rect width="640" height="800" fill="url(#bg)"/>
+  <rect width="640" height="800" fill="url(#glow)"/>
+  <g fill="#fff3e2" filter="url(#soft)">
+    <circle cx="90" cy="140" r="48" opacity="0.3"/>
+    <circle cx="560" cy="100" r="34" opacity="0.32"/>
+    <circle cx="590" cy="330" r="50" opacity="0.2"/>
+    <circle cx="56" cy="400" r="36" opacity="0.22"/>
+  </g>
+  <g transform="translate(-92 92) scale(0.9)">
+    <path d="M30 800C30 660 150 590 320 590S610 660 610 800Z" fill="url(#suit)"/>
+    <path d="M283 470h74l10 130-47 56-47-56Z" fill="url(#skinG)"/>
+    <path d="M258 598L320 706 382 598 340 590 320 640 300 590Z" fill="#ece0cf" fill-opacity="0.9"/>
+    <ellipse cx="320" cy="362" rx="92" ry="110" fill="url(#skinG)"/>
+    <path d="M228 350C222 250 274 224 322 224c50 0 100 26 92 126-12-44-40-64-92-64-52 0-82 20-94 64Z" fill="url(#hairG)"/>
+  </g>
+  <g transform="translate(120 130) scale(0.88)">
+    <path d="M60 800C60 650 180 592 320 592S580 650 580 800Z" fill="url(#skinB)"/>
+    <path d="M283 470h74l8 134h-90Z" fill="url(#skinB)"/>
+    <path d="M212 360C202 250 266 212 320 212s118 38 108 148c14 100 8 190 36 252h-62c-8-56-10-120-12-176-34-18-84-18-118 0-2 56-4 120-12 176h-62c28-62 22-152 36-252Z" fill="url(#hairB)"/>
+    <ellipse cx="320" cy="368" rx="90" ry="108" fill="url(#skinB)"/>
+    <path d="M236 330c18-64 74-92 128-84 30 6 56 24 72 56-30-30-76-44-118-40-34 4-60 28-82 68Z" fill="url(#hairB)"/>
+  </g>
+</svg>

@@ -1,0 +1,260 @@
+/* Locket gate. A closed gold locket swings on its chain over blurred plum velvet; a tap opens it on its hinge.
+   Only transform and opacity animate. Sequence (ms): the swing settles upright 0-500 (Gate.jsx sets an inline
+   transform on the tap), the cover turns on the hinge 120-1120 while the locket lifts and re-centres, a glow blooms
+   300-1100, the words fade 0-350, and the whole gate fades 900-1700 onto the page, whose own open locket sits in
+   exactly the same place and angle (useGate ms = 1900). The numbers that fix that place (--lw, --hang, --notch, the
+   barrel and bail sizes) must stay identical here and in ./lockethearts.css.
+   The locket rules below are repeated in ./lockethearts.css under its own scope: the gate loads before the page. */
+.gate-lockethearts.gate {
+  --ink: #2b1420;
+  --blush: #f6e3d3;
+  --blush-dim: #dcc3b6;
+  --gold: #d8a35d;
+  --gold-hi: #f3d9a0;
+  --hinge: cubic-bezier(0.55, 0.05, 0.25, 1);
+  --lw: min(45vw, 210px, 23svh); /* width of one leaf; the open locket is 1.9 leaves wide */
+  --lh: calc(var(--lw) * 1.25);
+  --hang: clamp(20px, 6svh, 56px); /* chain showing above the leaves */
+  --notch: calc(var(--lw) * 0.355); /* how far the hinge sits below the leaf tops when open */
+
+  grid-template-rows: auto 1fr;
+  place-items: start center;
+  background: #1b0c14;
+  color: var(--blush);
+  font: 400 1.15rem/1.4 'Cormorant Garamond', 'Noto Serif Devanagari', Georgia, serif;
+}
+.gate-lockethearts *,
+.gate-lockethearts *::before,
+.gate-lockethearts *::after { box-sizing: border-box; }
+.gate-lockethearts p { margin: 0; }
+
+/* ---- the velvet behind everything (a blurred, darkened background photo; a plain plum if it is missing) ---- */
+.gate-lockethearts .gate-lockethearts__ground {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 30%, #3a1c2b, #1b0c14 75%);
+}
+.gate-lockethearts .gate-lockethearts__ground img { display: block; width: 100%; height: 100%; scale: 1.12; filter: blur(14px) saturate(0.9) brightness(0.6); }
+.gate-lockethearts .gate-lockethearts__ground::after { /* the scrim every word below is measured against */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(27 12 20 / 0.5), rgb(27 12 20 / 0.84) 50%, rgb(27 12 20 / 0.9));
+}
+
+/* ---- the locket ---- */
+.gate-lockethearts .gate-lockethearts__swing {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: calc(var(--hang) + var(--lh) + var(--notch)); /* closed, the locket hangs this much lower than when open */
+  perspective: 1100px;
+  transform-origin: 50% 0; /* hangs from the top edge, so the whole thing sways like a pendulum */
+  animation: lh-swing 6s ease-in-out infinite alternate;
+  cursor: pointer;
+}
+.gate-lockethearts .lh-chain { position: absolute; z-index: 0; left: 50%; top: 0; width: 0; height: calc(var(--hang) + var(--notch)); }
+.gate-lockethearts .lh-chain::before,
+.gate-lockethearts .lh-chain::after { /* two strands meeting at the bail, running off the top of the screen */
+  content: '';
+  position: absolute;
+  left: -4px;
+  bottom: 0;
+  width: 8px;
+  height: 420px;
+  transform-origin: 50% 100%;
+  background: radial-gradient(ellipse 3.4px 5px at 50% 50%, transparent 2px, var(--gold) 2.5px 3.3px, transparent 3.9px) 0 0 / 8px 10px repeat-y;
+}
+.gate-lockethearts .lh-chain::before { rotate: -10deg; }
+.gate-lockethearts .lh-chain::after { rotate: 10deg; }
+.gate-lockethearts .gate-lockethearts__aura {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: calc(var(--hang) + var(--lh) * 0.5);
+  width: calc(var(--lw) * 3);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: radial-gradient(circle, rgb(243 217 160 / 0.4), transparent 62%);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.8s ease 0.3s, transform 1s var(--hinge) 0.2s;
+  pointer-events: none;
+}
+
+.gate-lockethearts .lh-stage {
+  position: absolute;
+  z-index: 1;
+  top: var(--hang);
+  left: 50%;
+  width: calc(var(--lw) * 1.9);
+  height: var(--lh);
+  margin-left: calc(var(--lw) * -0.95);
+  transform-style: preserve-3d;
+  transform: translate(calc(var(--lw) * 0.45), var(--notch)); /* closed: one oval, hung from the bail */
+  transition: transform 1s var(--hinge) 0.12s;
+}
+.gate-lockethearts .lh-leaf,
+.gate-lockethearts .lh-face {
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f6dfa6 0%, #d8a35d 32%, #9d6a2a 55%, #e6bd76 78%, #c58f45 100%);
+  box-shadow: inset 0 0 0 1px rgb(255 240 200 / 0.5), 0 14px 30px rgb(0 0 0 / 0.55);
+}
+.gate-lockethearts .lh-leaf::before,
+.gate-lockethearts .lh-face::before { /* the engraved, beaded rim */
+  content: '';
+  position: absolute;
+  inset: 3.5%;
+  border-radius: 50%;
+  border: 2px dotted rgb(110 66 20 / 0.55);
+  pointer-events: none;
+}
+.gate-lockethearts .lh-leaf { position: absolute; top: 0; left: 0; width: var(--lw); height: var(--lh); }
+.gate-lockethearts .lh-cover {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--lw);
+  height: var(--lh);
+  transform-style: preserve-3d;
+  transform-origin: calc(var(--lw) * 0.05) 50%; /* the hinge line: the centre of the open locket */
+  transform: translateZ(2px) rotateY(-180deg); /* closed: turned over onto the left leaf */
+  transition: transform 1s var(--hinge) 0.12s;
+}
+.gate-lockethearts .lh-face { position: absolute; inset: 0; backface-visibility: hidden; }
+.gate-lockethearts .lh-face--out {
+  transform: rotateY(180deg);
+  background: radial-gradient(ellipse at 40% 32%, #f7e2ae, #d8a35d 58%, #a8742c);
+}
+.gate-lockethearts .lh-face--out::after { content: ''; position: absolute; inset: 13%; border-radius: 50%; border: 1px solid rgb(110 66 20 / 0.5); }
+.gate-lockethearts .lh-win {
+  position: absolute;
+  inset: 9%;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #3a1c2b;
+  box-shadow: 0 0 0 1px rgb(60 30 10 / 0.6);
+}
+.gate-lockethearts .lh-win img { display: block; width: 100%; height: 100%; }
+.gate-lockethearts .lh-win::after { /* a glint across the glass */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, rgb(255 255 255 / 0.2) 0 16%, transparent 38%);
+  pointer-events: none;
+}
+.gate-lockethearts .lh-mono { /* engraved initials: dark ink on the polished centre of the cover */
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  translate: -50% -52%;
+  display: flex;
+  align-items: baseline;
+  gap: 0.06em;
+  font: 400 calc(var(--lw) * 0.27) / 1 'Pinyon Script', 'Noto Serif Devanagari', cursive;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.gate-lockethearts .lh-mono i { font-style: normal; font-size: 0.7em; }
+.gate-lockethearts .lh-barrel { /* the hinge barrel, riding on the centre line */
+  position: absolute;
+  left: 50%;
+  top: var(--notch);
+  width: calc(var(--lw) * 0.085);
+  height: calc(var(--lw) * 0.54);
+  translate: -50% 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8f6125, #f3d9a0 35%, #d8a35d 60%, #8f6125);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.45);
+  transform: translateZ(6px);
+}
+.gate-lockethearts .lh-bail { /* the ring the chain hangs from */
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: calc(var(--hang) + var(--notch) - 9px);
+  width: 14px;
+  height: 20px;
+  translate: -50% 0;
+  border: 3px solid var(--gold-hi);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
+}
+
+/* ---- the words ---- */
+.gate-lockethearts .gate-lockethearts__text {
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  width: min(100%, 380px);
+  padding: 8px 20px;
+  text-align: center;
+  transition: opacity 0.35s ease;
+}
+.gate-lockethearts .gate-lockethearts__guest { font-size: 1.05rem; font-style: italic; color: var(--blush-dim); overflow-wrap: anywhere; }
+.gate-lockethearts .gate-lockethearts__guest[data-fit='1'] { font-size: 0.95rem; }
+.gate-lockethearts .gate-lockethearts__guest[data-fit='2'] { font-size: 0.85rem; }
+.gate-lockethearts .gate-lockethearts__names {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0 0.3em;
+  font: 400 clamp(2.3rem, 11.5vw, 3.1rem) / 1.2 'Pinyon Script', 'Noto Serif Devanagari', cursive;
+  color: var(--blush);
+  overflow-wrap: anywhere;
+}
+.gate-lockethearts .gate-lockethearts__names[data-fit='1'] { font-size: clamp(1.9rem, 9vw, 2.5rem); }
+.gate-lockethearts .gate-lockethearts__names[data-fit='2'] { font-size: clamp(1.55rem, 7.4vw, 2rem); }
+.gate-lockethearts .gate-lockethearts__names i { font-style: normal; font-size: 0.8em; color: var(--gold); }
+.gate-lockethearts .gate-lockethearts__date { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.05em; color: var(--gold-hi); }
+.gate-lockethearts .gate-lockethearts__btn {
+  margin-top: 8px;
+  min-height: 52px;
+  padding: 0 30px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f6dfa6, #d8a35d);
+  color: var(--ink);
+  font: 600 1.05rem / 1 'Karla', system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgb(0 0 0 / 0.45);
+}
+.gate-lockethearts .gate-lockethearts__btn:focus-visible { outline: 3px solid var(--gold-hi); outline-offset: 4px; }
+
+/* ---- opening ---- */
+.gate-lockethearts.is-opening { animation: lh-out 0.8s ease 0.9s forwards; }
+.gate-lockethearts.is-opening .lh-stage { transform: none; }
+.gate-lockethearts.is-opening .lh-cover { transform: translateZ(2px) rotateY(0deg); }
+.gate-lockethearts.is-opening .gate-lockethearts__aura { opacity: 1; transform: none; }
+.gate-lockethearts.is-opening .gate-lockethearts__text { opacity: 0; }
+
+@keyframes lh-swing { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
+@keyframes lh-out { to { opacity: 0; } }
+
+/* Phone held sideways: the locket on the left, the words and the button on the right. */
+@media (max-height: 520px) {
+  .gate-lockethearts.gate { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; place-items: center; }
+  .gate-lockethearts .gate-lockethearts__swing { align-self: start; }
+  .gate-lockethearts .gate-lockethearts__names { font-size: clamp(1.8rem, 6vw, 2.4rem); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gate-lockethearts:not(.is-opening) .gate-lockethearts__btn:hover { background: linear-gradient(180deg, #fbebc3, #e3b36a); }
+}
+
+/* Reduced motion: no swing and no hinge; the gate simply fades out (lib/gate.js also shortens its timer). */
+@media (prefers-reduced-motion: reduce) {
+  .gate-lockethearts .gate-lockethearts__swing { animation: none; }
+  .gate-lockethearts .lh-stage,
+  .gate-lockethearts .lh-cover,
+  .gate-lockethearts .gate-lockethearts__aura,
+  .gate-lockethearts .gate-lockethearts__text { transition: none; }
+  .gate-lockethearts.is-opening { animation: lh-out 0.2s ease both; }
+}

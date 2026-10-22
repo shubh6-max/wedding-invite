@@ -4,7 +4,7 @@ import { sample } from './data/sample.js'
 import Gallery from './gallery/Gallery.jsx'
 import Pill from './components/Pill.jsx'
 import { InviteContext } from './lib/guest.js'
-import { useRoute } from './lib/hooks.js'
+import { useRoute, useSmoothScroll } from './lib/hooks.js'
 import { useInviteSource } from './lib/useInviteSource.js'
 import './gallery.css'
 
@@ -134,7 +134,10 @@ function Design({ id, params }) {
       )}
       {phase !== 'open' && Gate && (
         <Suspense fallback={<div className="loading" role="status">Preparing your invitation…</div>}>
-          <Gate key={id} invite={invite} onOpen={onOpen} onDone={onDone} />
+          {/* Same context as the page, so a gate can show the couple's photos (components/Photo.jsx). */}
+          <InviteContext.Provider value={invite}>
+            <Gate key={id} invite={invite} onOpen={onOpen} onDone={onDone} />
+          </InviteContext.Provider>
         </Suspense>
       )}
       {!embed && <Pill id={id} params={params} onReplay={hasGate ? onReplay : undefined} />}
@@ -149,6 +152,8 @@ export default function App() {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [view, id])
+  // Not in the studio: its editor panels scroll on their own, and its preview is an iframe that runs its own.
+  useSmoothScroll(view !== 'studio', `${view}/${id}`)
   useEffect(() => {
     if (view === 'gallery' || !(tpl || id === 'original')) document.title = 'Wedding invitation designs'
   }, [view, tpl, id])

@@ -1,0 +1,381 @@
+/* Toran Frames: a sunlit courtyard under a marigold toran, three portraits hanging from it, deep maroon for the
+   rest of the house. Everything scoped under .tpl-toranframes. Motion: the toran drops in, the frames settle and
+   then sway (transform only, off under reduced motion). Nothing else moves by itself. */
+.tpl-toranframes {
+  --maroon: #5b1d12;
+  --deep: #3f130b;
+  --cream: #fff3df;
+  --haldi: #fde9b8;
+  --saffron: #f08a1c;
+  --marigold: #ffbf1f;
+  --clay: #a3410d;
+  --gilt: #d89b2a;
+  --serif: 'Sahitya', 'Noto Serif Devanagari', Georgia, serif;
+  --sans: 'Hind', 'Noto Serif Devanagari', system-ui, sans-serif;
+  --ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+
+  min-height: 100svh;
+  overflow-x: clip;
+  background: var(--haldi);
+  color: var(--maroon);
+  font: 400 1.0625rem/1.6 var(--sans);
+  overflow-wrap: anywhere; /* a very long word wraps instead of pushing the page sideways */
+}
+.tpl-toranframes *,
+.tpl-toranframes *::before,
+.tpl-toranframes *::after { box-sizing: border-box; }
+.tpl-toranframes h1,
+.tpl-toranframes h2,
+.tpl-toranframes h3,
+.tpl-toranframes p,
+.tpl-toranframes ol,
+.tpl-toranframes ul { margin: 0; padding: 0; }
+.tpl-toranframes ol,
+.tpl-toranframes ul { list-style: none; }
+.tpl-toranframes h1,
+.tpl-toranframes h2,
+.tpl-toranframes h3 { font-family: var(--serif); font-weight: 700; line-height: 1.15; text-wrap: balance; }
+.tpl-toranframes h2 { font-size: clamp(1.8rem, 7.4vw, 2.5rem); }
+.tpl-toranframes :focus-visible { outline: 3px solid var(--clay); outline-offset: 3px; }
+
+/* A necklace of marigolds laid across the seam between two sections. */
+.tpl-toranframes .tf-mala {
+  position: relative;
+  z-index: 3;
+  height: 22px;
+  margin: -11px 0;
+  background: radial-gradient(circle at 11px 11px, #ffd24a 0 2.6px, var(--saffron) 3.2px 8px, transparent 8.8px) 0 0 / 22px 22px repeat-x;
+  pointer-events: none;
+}
+
+/* ---------- Hero: courtyard, toran, three hanging frames, name board ---------- */
+.tpl-toranframes .tf-hero {
+  --t0: 0.15s; /* when the toran starts to drop; later while the gate is still lifting away */
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 24px;
+  min-height: 100svh;
+  padding: 12px 16px 56px;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 25%, #ffecc4, #f7c98a 75%);
+}
+.tpl-toranframes .tf-hero.via-gate { --t0: 0.75s; }
+.tpl-toranframes .tf-hero::before { /* the beam the toran is tied to */
+  content: '';
+  position: absolute;
+  z-index: 3;
+  inset: 0 0 auto;
+  height: 12px;
+  background: linear-gradient(180deg, #8f3519, #4b160a);
+  box-shadow: 0 2px 0 var(--marigold);
+}
+.tpl-toranframes .tf-courtyard { position: absolute; z-index: -1; inset: 0; overflow: hidden; }
+.tpl-toranframes .tf-courtyard img { position: absolute; inset: 0; width: 100%; height: 100%; filter: blur(2px) saturate(1.05); scale: 1.04; }
+.tpl-toranframes .tf-courtyard::after { /* soft morning light over the photo; the frames and the board carry the content */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(255 240 210 / 0.6), rgb(255 233 190 / 0.18) 45%, rgb(255 222 168 / 0.62));
+}
+
+.tpl-toranframes .tf-stage { position: relative; z-index: 2; width: min(100%, 560px); }
+.tpl-toranframes .tf-toran {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 350 / 44;
+  overflow: visible;
+  animation: tf-drop 0.9s var(--ease) var(--t0) both;
+}
+@keyframes tf-drop { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: none; } }
+
+.tpl-toranframes .tf-frames { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr); margin-top: -1.4%; } /* tucks each string under its flower */
+.tpl-toranframes .tf-hang {
+  --str: 20px; /* string length: the couple's frame hangs lowest */
+  position: relative;
+  padding: var(--str) 4px 0;
+  transform-origin: 50% 0;
+  animation: tf-settle 1.5s var(--ease) var(--t0) both, tf-sway var(--dur, 6s) ease-in-out calc(var(--t0) + 1.5s) infinite;
+}
+.tpl-toranframes .tf-hang--bride { --dur: 5.6s; --kick: 7deg; }
+.tpl-toranframes .tf-hang--couple { --str: 44px; --dur: 6.8s; --kick: -5deg; --amp: 1.3deg; }
+.tpl-toranframes .tf-hang--groom { --dur: 6.1s; --kick: 6deg; --amp: 1.7deg; }
+.tpl-toranframes .tf-hang::before { /* the string */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: var(--str);
+  translate: -50% 0;
+  background: linear-gradient(var(--marigold), #b8741a);
+}
+/* One swing that dies down, then a slow pendulum. rotate is its own property, so nothing here undoes anything else. */
+@keyframes tf-settle {
+  0% { opacity: 0; rotate: var(--kick, 6deg); }
+  25% { opacity: 1; }
+  35% { rotate: calc(var(--kick, 6deg) * -0.55); }
+  65% { rotate: calc(var(--kick, 6deg) * 0.25); }
+  100% { opacity: 1; rotate: 0deg; }
+}
+@keyframes tf-sway {
+  25% { rotate: var(--amp, 1.8deg); }
+  75% { rotate: calc(var(--amp, 1.8deg) * -1); }
+}
+
+.tpl-toranframes .tf-frame {
+  display: block;
+  width: 100%;
+  padding: 4px 4px 6px;
+  border: 3px solid var(--gilt);
+  border-radius: 8px;
+  background: var(--cream);
+  box-shadow: 0 10px 22px rgb(63 19 11 / 0.28);
+  color: var(--maroon);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+.tpl-toranframes .tf-frame__pic { display: block; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 3px; background: linear-gradient(160deg, #f6c98a, #d98a46); }
+.tpl-toranframes .tf-frame__pic img { display: block; width: 100%; height: 100%; }
+.tpl-toranframes .tf-hang--couple .tf-frame { border-radius: 50% 50% 8px 8px / 22% 22% 8px 8px; padding: 8px 8px 8px; }
+.tpl-toranframes .tf-hang--couple .tf-frame__pic { border-radius: 50% 50% 3px 3px / 24% 24% 3px 3px; }
+/* A long name steps down, then breaks at a space or a hyphenation point, never mid-word first; three lines at most
+   (the full name is in the heading and in the button's accessible name). */
+.tpl-toranframes .tf-frame__cap {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  margin: 6px 2px 0;
+  font: 600 0.875rem/1.25 var(--sans);
+  color: var(--maroon);
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+.tpl-toranframes .tf-frame__cap[data-fit='1'] { font-size: 0.8125rem; }
+.tpl-toranframes .tf-frame__cap[data-fit='2'] { font-size: 0.75rem; }
+.tpl-toranframes .tf-frame:focus-visible { outline: 3px solid var(--deep); outline-offset: 3px; box-shadow: 0 0 0 7px var(--cream), 0 10px 22px rgb(63 19 11 / 0.28); }
+
+/* The name board. The gold hairline sits in the board's padding, outside the measured text block. */
+.tpl-toranframes .tf-plate {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 440px);
+  padding: 14px;
+  background: var(--maroon);
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 5px var(--maroon), inset 0 0 0 6.5px rgb(255 191 31 / 0.85), 0 16px 36px rgb(63 19 11 / 0.35);
+  text-align: center;
+}
+.tpl-toranframes .tf-plate__in { display: grid; justify-items: center; gap: 8px; padding: 12px 8px 10px; color: var(--cream); }
+.tpl-toranframes .tf-greet { font-weight: 600; font-size: 0.9375rem; color: var(--marigold); }
+.tpl-toranframes .tf-greet[data-fit='1'] { font-size: 0.875rem; }
+.tpl-toranframes .tf-greet[data-fit='2'] { font-size: 0.8125rem; }
+.tpl-toranframes .tf-hosts { font-size: 0.9375rem; color: #f3dcc0; }
+.tpl-toranframes .tf-names {
+  display: grid;
+  justify-items: center;
+  gap: 0;
+  font-size: clamp(1.9rem, 8.6vw, 3rem);
+  line-height: 1.12;
+  color: var(--cream);
+}
+.tpl-toranframes .tf-names[data-fit='1'] { font-size: clamp(1.7rem, 7.4vw, 2.5rem); }
+.tpl-toranframes .tf-names[data-fit='2'] { font-size: clamp(1.4rem, 6vw, 1.9rem); }
+.tpl-toranframes .tf-names i { font: 400 0.55em/1.3 var(--serif); color: var(--marigold); }
+.tpl-toranframes .tf-tagline { color: var(--cream); }
+.tpl-toranframes .tf-when { margin-top: 4px; font-weight: 600; color: var(--cream); }
+.tpl-toranframes .tf-where { font-size: 0.9375rem; color: #f3dcc0; }
+.tpl-toranframes .tf-hint { margin-top: 4px; font-size: 0.8125rem; color: var(--marigold); }
+
+/* ---------- The day: date, countdown, actions ---------- */
+.tpl-toranframes .tf-day { padding: 64px 16px 64px; background: var(--maroon); color: var(--cream); text-align: center; }
+.tpl-toranframes .tf-day :focus-visible { outline-color: var(--marigold); }
+.tpl-toranframes .tf-day h2 { color: var(--marigold); }
+.tpl-toranframes .tf-day__date { margin-top: 14px; font: 700 clamp(1.5rem, 6.6vw, 2.2rem)/1.2 var(--serif); }
+.tpl-toranframes .tf-day__where { margin-top: 6px; color: #f3dcc0; }
+.tpl-toranframes .tf-count { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 360px; margin: 32px auto 0; }
+.tpl-toranframes .tf-count li { display: grid; justify-items: center; gap: 8px; }
+.tpl-toranframes .tf-count b {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  max-width: 76px;
+  aspect-ratio: 1;
+  border: 3px dotted var(--marigold); /* a ring of beads */
+  border-radius: 50%;
+  font: 700 clamp(1.15rem, 5.4vw, 1.6rem)/1 var(--serif);
+  font-variant-numeric: tabular-nums;
+}
+.tpl-toranframes .tf-count span { font-size: 0.8125rem; color: #f3dcc0; }
+.tpl-toranframes .tf-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 36px; }
+.tpl-toranframes .tf-btn {
+  display: inline-grid;
+  place-items: center;
+  min-height: 52px;
+  padding: 0 26px;
+  border: 2px solid var(--marigold);
+  border-radius: 999px;
+  background: var(--marigold);
+  color: var(--deep);
+  font: 600 1rem/1.2 var(--sans);
+  text-decoration: none;
+  cursor: pointer;
+}
+.tpl-toranframes .tf-btn--ghost { background: none; color: var(--cream); border-color: rgb(255 243 223 / 0.7); }
+
+/* ---------- Our story: a thread with a bead for every year ---------- */
+.tpl-toranframes .tf-story { max-width: 560px; margin: 0 auto; padding: 72px 16px 40px; }
+.tpl-toranframes .tf-thread { display: grid; margin-top: 36px; }
+.tpl-toranframes .tf-thread li { position: relative; display: grid; grid-template-columns: 60px 1fr; gap: 18px; padding-bottom: 30px; }
+.tpl-toranframes .tf-thread li:not(:last-child)::before { /* the thread between two beads */
+  content: '';
+  position: absolute;
+  left: 27px;
+  top: 66px;
+  bottom: 6px;
+  width: 6px;
+  background: radial-gradient(circle, var(--saffron) 1.6px, transparent 2.2px) center top / 6px 10px repeat-y;
+}
+.tpl-toranframes .tf-bead {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--marigold);
+  box-shadow: 0 0 0 4px var(--haldi), 0 0 0 6px var(--saffron);
+  font: 700 0.9375rem/1 var(--serif);
+}
+.tpl-toranframes .tf-thread h3 { font-size: 1.3rem; }
+.tpl-toranframes .tf-thread p { margin-top: 4px; }
+
+/* ---------- Celebrations ---------- */
+.tpl-toranframes .tf-events { max-width: 560px; margin: 0 auto; padding: 32px 16px 80px; }
+.tpl-toranframes .tf-rows { display: grid; margin-top: 28px; }
+.tpl-toranframes .tf-rows li { display: grid; grid-template-columns: minmax(84px, 28%) 1fr; gap: 6px 18px; padding: 18px 0; border-bottom: 2px dotted var(--saffron); }
+.tpl-toranframes .tf-rows li:first-child { border-top: 2px dotted var(--saffron); }
+.tpl-toranframes .tf-rows time { display: grid; gap: 2px; font: 700 1.1rem/1.2 var(--serif); }
+.tpl-toranframes .tf-rows time small { font: 400 0.875rem/1.3 var(--sans); color: var(--clay); }
+.tpl-toranframes .tf-rows h3 { font-size: 1.35rem; }
+.tpl-toranframes .tf-rows p { margin-top: 2px; }
+.tpl-toranframes .tf-rows .tf-dress { font-size: 0.9375rem; color: var(--clay); }
+
+/* ---------- RSVP (shared form, styled for the maroon ground) ---------- */
+.tpl-toranframes .tf-rsvp { padding: 72px 16px 80px; background: var(--maroon); color: var(--cream); text-align: center; }
+.tpl-toranframes .tf-rsvp :focus-visible { outline-color: var(--marigold); }
+.tpl-toranframes .tf-rsvp h2 { color: var(--marigold); }
+.tpl-toranframes .tf-rsvp__by { margin-top: 10px; color: #f3dcc0; }
+.tpl-toranframes .rsvp,
+.tpl-toranframes .rsvp__done { display: grid; gap: 16px; max-width: 380px; margin: 28px auto 0; text-align: left; }
+.tpl-toranframes .rsvp label { display: grid; gap: 6px; }
+.tpl-toranframes .rsvp label span { font-size: 0.875rem; font-weight: 600; color: var(--marigold); }
+.tpl-toranframes .rsvp input,
+.tpl-toranframes .rsvp select,
+.tpl-toranframes .rsvp textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid rgb(255 191 31 / 0.7);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.07);
+  color: var(--cream);
+  font: inherit;
+  font-size: 1rem; /* 16px: iOS does not zoom the page when this is focused */
+}
+.tpl-toranframes .rsvp select option { color: var(--maroon); }
+.tpl-toranframes .rsvp button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--marigold);
+  color: var(--deep);
+  font: 600 1rem var(--sans);
+  cursor: pointer;
+}
+.tpl-toranframes .rsvp__error { color: #ffb4a2; }
+.tpl-toranframes .rsvp__msg { padding: 12px 14px; border-radius: 12px; background: rgb(255 255 255 / 0.09); white-space: pre-wrap; user-select: text; }
+.tpl-toranframes .rsvp__reply button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: 600 1rem var(--sans);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.tpl-toranframes .rsvp__hint { min-height: 1.5em; font-size: 0.9rem; color: var(--marigold); }
+
+/* ---------- Closing ---------- */
+.tpl-toranframes .tf-end { padding: 56px 16px 140px; text-align: center; }
+.tpl-toranframes .tf-end p { font-size: 1rem; }
+.tpl-toranframes .tf-end b { display: block; margin-top: 4px; font: 700 1.6rem/1.25 var(--serif); }
+
+/* ---------- Enlarged portrait (native dialog: focus is trapped, Escape closes) ---------- */
+.tpl-toranframes .tf-viewer {
+  width: min(92vw, 420px);
+  max-height: 94dvh;
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 18px;
+  background: var(--cream);
+  color: var(--maroon);
+  overflow: auto;
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
+  animation: tf-pop 0.35s var(--ease) both;
+}
+.tpl-toranframes .tf-viewer::backdrop { background: rgb(40 12 6 / 0.72); }
+@keyframes tf-pop { from { opacity: 0; transform: translateY(16px) scale(0.97); } to { opacity: 1; transform: none; } }
+.tpl-toranframes .tf-viewer__body { display: grid; justify-items: center; gap: 12px; padding: 12px 16px 18px; }
+.tpl-toranframes .tf-viewer__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
+.tpl-toranframes .tf-viewer__cap { font: 700 1.35rem/1.2 var(--serif); }
+.tpl-toranframes .tf-viewer__x {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--maroon);
+  color: var(--cream);
+  font: 400 1.7rem/1 var(--sans);
+  cursor: pointer;
+}
+.tpl-toranframes .tf-viewer__pic {
+  width: min(100%, calc((100dvh - 190px) * 0.8));
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 4px solid var(--gilt);
+  border-radius: 6px;
+  background: linear-gradient(160deg, #f6c98a, #d98a46);
+}
+.tpl-toranframes .tf-viewer__pic--couple { border-radius: 50% 50% 6px 6px / 22% 22% 6px 6px; }
+.tpl-toranframes .tf-viewer__pic img { display: block; width: 100%; height: 100%; }
+
+@media (min-width: 700px) {
+  .tpl-toranframes .tf-hang { --str: 26px; }
+  .tpl-toranframes .tf-hang--couple { --str: 56px; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tpl-toranframes .tf-hang:hover { animation-play-state: paused; }
+}
+
+/* Reduced motion: the frames simply hang still. */
+@media (prefers-reduced-motion: reduce) {
+  .tpl-toranframes .tf-toran,
+  .tpl-toranframes .tf-hang,
+  .tpl-toranframes .tf-viewer { animation: none; }
+}

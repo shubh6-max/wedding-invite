@@ -460,6 +460,7 @@ export default function SealInvite() {
           <article
             ref={inviteHomeRef}
             className="invite-home"
+            data-lenis-prevent
             style={{ '--invite-image': `url("${BACKGROUND_IMAGE}")` }}
           >
             <div className="invite-home__stack">

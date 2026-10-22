@@ -1,0 +1,239 @@
+/* Now Showing gate: red velvet curtains and a film-leader dial. Only transform and opacity animate.
+   Sequence after the tap (ms): the bill fades 50-350, the digits 3, 2, 1 flash 0-510 (170 each), the curtains part and
+   bunch at the sides 520-1820, the whole gate fades 1700-2050 (useGate ms = 2100). The page is already mounted
+   underneath, so it shows through the widening gap from about 700 ms. */
+.gate-cinemanow.gate {
+  --ink: #0b0b0f;
+  --cream: #f3ead7;
+  --cream-dim: #d4cab5;
+  --amber: #e8b04a;
+  --ease: cubic-bezier(0.7, 0, 0.2, 1);
+
+  color: var(--cream);
+  font: 500 1.1rem/1.4 'Barlow Condensed', 'Noto Serif Devanagari', 'Arial Narrow', sans-serif;
+}
+.gate-cinemanow *,
+.gate-cinemanow *::before,
+.gate-cinemanow *::after { box-sizing: border-box; }
+.gate-cinemanow p,
+.gate-cinemanow h1 { margin: 0; }
+
+/* The dark house behind the curtains is its own layer so it can fade and let the mounted page show through the gap. */
+.gate-cinemanow .gate-cinemanow__house {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 40%, #2b1a14, var(--ink) 72%);
+  transition: opacity 0.6s ease 0.6s;
+}
+
+/* ---- the curtains: pleats from a repeating gradient; each half bunches toward its own edge when it opens ---- */
+.gate-cinemanow .gate-cinemanow__drape {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.5%; /* a hair of overlap so no light shows at the seam */
+  background:
+    linear-gradient(180deg, rgb(0 0 0 / 0.5), transparent 26%, transparent 72%, rgb(0 0 0 / 0.55)),
+    repeating-linear-gradient(90deg, #4c0710 0, #8a1523 15px, #a51e2e 22px, #7a1220 30px, #4c0710 44px);
+  transition: transform 1.3s var(--ease) 0.52s;
+}
+.gate-cinemanow .gate-cinemanow__drape--l { left: 0; transform-origin: 0 50%; box-shadow: 8px 0 28px rgb(0 0 0 / 0.5); }
+.gate-cinemanow .gate-cinemanow__drape--r { right: 0; transform-origin: 100% 50%; box-shadow: -8px 0 28px rgb(0 0 0 / 0.5); }
+
+/* The valance stays put while the curtains travel: a red band with a gold trim and a fringe of gold beads. */
+.gate-cinemanow .gate-cinemanow__valance {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  height: 52px;
+  background: linear-gradient(180deg, #7a1220, #4c0710);
+  border-bottom: 3px solid var(--amber);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.55);
+}
+.gate-cinemanow .gate-cinemanow__valance::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 10px;
+  background: radial-gradient(circle at 10px 4px, var(--amber) 4px, transparent 4.6px) 0 0 / 20px 10px repeat-x;
+}
+
+/* ---- the bill, over the curtains ---- */
+.gate-cinemanow .gate-cinemanow__bill {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  width: min(100%, 420px);
+  padding: 60px 20px 0;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.gate-cinemanow .gate-cinemanow__sign {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px;
+  border: 1px solid rgb(232 176 74 / 0.75);
+  background: rgb(0 0 0 / 0.5); /* keeps the amber at 4.5:1 or better on the brightest pleat */
+  font: 700 0.95rem/1 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+.gate-cinemanow .gate-cinemanow__sign::before,
+.gate-cinemanow .gate-cinemanow__sign::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
+.gate-cinemanow .gate-cinemanow__guest { font-size: 1.1rem; color: var(--cream); }
+.gate-cinemanow .gate-cinemanow__guest[data-fit='1'] { font-size: 1rem; }
+.gate-cinemanow .gate-cinemanow__guest[data-fit='2'] { font-size: 0.9rem; }
+
+/* Film leader: a dial with a crosshair, a sweeping wedge and the digits that flash once the guest taps. */
+.gate-cinemanow .gate-cinemanow__leader {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  border: 2px solid rgb(243 234 215 / 0.85);
+  border-radius: 50%;
+  background: rgb(11 11 15 / 0.82);
+  overflow: hidden;
+}
+.gate-cinemanow .gate-cinemanow__leader::before { /* crosshair */
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.45;
+  background:
+    linear-gradient(var(--cream), var(--cream)) center / 1px 100% no-repeat,
+    linear-gradient(var(--cream), var(--cream)) center / 100% 1px no-repeat;
+}
+.gate-cinemanow .gate-cinemanow__leader::after { /* inner ring */
+  content: '';
+  position: absolute;
+  inset: 13px;
+  border: 1px solid rgb(243 234 215 / 0.55);
+  border-radius: 50%;
+}
+.gate-cinemanow .gate-cinemanow__wipe {
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(from 0deg, transparent 0deg 290deg, rgb(243 234 215 / 0.4) 360deg);
+  animation: cn-sweep 1.6s linear infinite;
+}
+.gate-cinemanow .gate-cinemanow__play {
+  position: absolute;
+  width: 22px;
+  height: 26px;
+  margin-left: 4px;
+  background: var(--cream);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  transition: opacity 0.08s linear;
+}
+.gate-cinemanow .gate-cinemanow__n {
+  position: absolute;
+  z-index: 1;
+  font: 400 3.1rem/1 'Gloock', Georgia, serif;
+  color: var(--cream);
+  opacity: 0;
+}
+
+.gate-cinemanow .gate-cinemanow__names {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0 0.35em;
+  font: 400 clamp(2rem, 10vw, 3rem)/1.12 'Gloock', 'Noto Serif Devanagari', Georgia, serif;
+  color: var(--cream);
+}
+.gate-cinemanow .gate-cinemanow__names[data-fit='1'] { font-size: clamp(1.7rem, 8.4vw, 2.5rem); }
+.gate-cinemanow .gate-cinemanow__names[data-fit='2'] { font-size: clamp(1.4rem, 6.8vw, 2rem); }
+.gate-cinemanow .gate-cinemanow__names i { font-style: normal; font-size: 0.6em; color: var(--amber); }
+.gate-cinemanow .gate-cinemanow__date { margin-top: -4px; font-size: 1.2rem; letter-spacing: 0.04em; color: var(--cream); }
+
+.gate-cinemanow .gate-cinemanow__btn {
+  min-height: 52px;
+  margin-top: 6px;
+  padding: 0 30px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--amber);
+  color: var(--ink);
+  font: 700 1.05rem/1 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 28px rgb(0 0 0 / 0.5);
+  cursor: pointer;
+}
+.gate-cinemanow .gate-cinemanow__btn:focus-visible { outline: 3px solid var(--cream); outline-offset: 4px; }
+
+/* ---- opening ---- */
+.gate-cinemanow.is-opening { animation: cn-gfade 0.35s ease 1.7s forwards; }
+.gate-cinemanow.is-opening .gate-cinemanow__house { opacity: 0; }
+.gate-cinemanow.is-opening .gate-cinemanow__drape--l,
+.gate-cinemanow.is-opening .gate-cinemanow__drape--r { transform: scaleX(0.12); }
+.gate-cinemanow.is-opening .gate-cinemanow__bill > :not(.gate-cinemanow__leader) { opacity: 0; transition: opacity 0.3s ease 0.05s; }
+.gate-cinemanow.is-opening .gate-cinemanow__leader { animation: cn-gfade 0.28s ease 0.52s forwards; }
+.gate-cinemanow.is-opening .gate-cinemanow__play { opacity: 0; }
+.gate-cinemanow.is-opening .gate-cinemanow__n { animation: cn-count 0.17s linear forwards; animation-delay: calc(var(--i) * 0.17s); }
+
+@keyframes cn-sweep { to { transform: rotate(360deg); } }
+@keyframes cn-count { 0%, 99% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes cn-gfade { to { opacity: 0; } }
+
+/* Phone held sideways: no height for a stack, so the dial sits beside the names. */
+@media (max-height: 520px) and (orientation: landscape) {
+  .gate-cinemanow .gate-cinemanow__valance { height: 36px; }
+  .gate-cinemanow .gate-cinemanow__bill {
+    grid-template-columns: auto 1fr;
+    justify-items: stretch;
+    align-items: center;
+    gap: 6px 22px;
+    width: min(100%, 620px);
+    padding-top: 44px;
+  }
+  .gate-cinemanow .gate-cinemanow__leader { grid-row: 1 / span 5; width: 84px; height: 84px; }
+  .gate-cinemanow .gate-cinemanow__bill > :not(.gate-cinemanow__leader) { grid-column: 2; justify-self: center; }
+  .gate-cinemanow .gate-cinemanow__names { font-size: clamp(1.5rem, 5vw, 2.2rem); }
+  .gate-cinemanow .gate-cinemanow__btn { min-height: 48px; margin-top: 2px; }
+}
+
+/* Narrow phones: a little less tracking so the call to action stays on one line. */
+@media (max-width: 340px) {
+  .gate-cinemanow .gate-cinemanow__btn { padding: 0 16px; letter-spacing: 0.08em; }
+}
+
+/* A short portrait window (browser bars up): keep the stack but tighten it so the button stays above the nav pill. */
+@media (max-height: 520px) and (orientation: portrait) {
+  .gate-cinemanow .gate-cinemanow__valance { height: 40px; }
+  .gate-cinemanow .gate-cinemanow__bill { gap: 8px; padding-top: 48px; }
+  .gate-cinemanow .gate-cinemanow__leader { width: 68px; height: 68px; }
+  .gate-cinemanow .gate-cinemanow__n { font-size: 2.2rem; }
+  .gate-cinemanow .gate-cinemanow__btn { min-height: 48px; margin-top: 2px; padding: 0 16px; letter-spacing: 0.08em; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gate-cinemanow:not(.is-opening) .gate-cinemanow__btn:hover { background: #f4c46e; }
+}
+
+/* Reduced motion: no dial, no digits, no travelling curtains; the gate simply fades out (lib/gate.js shortens its timer). */
+@media (prefers-reduced-motion: reduce) {
+  .gate-cinemanow .gate-cinemanow__wipe { animation: none; }
+  .gate-cinemanow.is-opening { animation: cn-gfade 0.25s ease both; }
+  .gate-cinemanow .gate-cinemanow__house,
+  .gate-cinemanow .gate-cinemanow__drape,
+  .gate-cinemanow .gate-cinemanow__bill > * { transition: none; }
+  .gate-cinemanow.is-opening .gate-cinemanow__house { opacity: 1; }
+  .gate-cinemanow.is-opening .gate-cinemanow__drape--l,
+  .gate-cinemanow.is-opening .gate-cinemanow__drape--r { transform: none; }
+  .gate-cinemanow.is-opening .gate-cinemanow__bill > :not(.gate-cinemanow__leader) { opacity: 1; }
+  .gate-cinemanow.is-opening .gate-cinemanow__leader { animation: none; }
+  .gate-cinemanow.is-opening .gate-cinemanow__play { opacity: 1; }
+  .gate-cinemanow.is-opening .gate-cinemanow__n { animation: none; }
+}

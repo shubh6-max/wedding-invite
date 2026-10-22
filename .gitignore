@@ -59,3 +59,9 @@ qa-out/
 
 # Scratch / throwaway scripts
 scratch-*
+
+# Local test photos of real people: never committed (see README, "Photo designs")
+public/bride/
+public/groom/
+public/background/
+public/couple/

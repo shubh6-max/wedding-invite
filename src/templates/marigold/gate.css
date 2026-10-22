@@ -53,7 +53,7 @@
   text-align: center;
   transform: rotate(var(--tilt));
 }
-.gate-marigold .mg-flower { position: absolute; top: -1.7rem; left: -0.9rem; width: 5rem; transform: rotate(-14deg); }
+.gate-marigold .mg-flower { position: absolute; top: -1.7rem; left: -0.5rem; width: 5rem; transform: rotate(-14deg); }
 .gate-marigold .mg-guest { margin: 0; font-size: 1rem; font-weight: 800; overflow-wrap: anywhere; }
 .gate-marigold .mg-names {
   margin: 0;
@@ -61,9 +61,11 @@
   flex-direction: column;
   align-items: center;
   gap: 0.05em;
-  font: 400 min(21cqi, 11svh) / 1.02 'Bagel Fat One', 'Nunito', sans-serif;
+  font: 400 min(21cqi, 11svh) / 1.02 'Bagel Fat One', 'Nunito', 'Noto Serif Devanagari', 'Noto Serif Gujarati', sans-serif;
   overflow-wrap: anywhere;
 }
+.gate-marigold .mg-names[data-fit='1'] { font-size: min(14cqi, 8svh); }
+.gate-marigold .mg-names[data-fit='2'] { font-size: max(1.1rem, min(8.5cqi, 5.2svh)); line-height: 1.15; }
 .gate-marigold .mg-names > span:not(.mg-amp) { padding: 0 0.15em; background: linear-gradient(transparent 62%, var(--pink) 62% 92%, transparent 92%); }
 .gate-marigold .mg-amp {
   display: grid;

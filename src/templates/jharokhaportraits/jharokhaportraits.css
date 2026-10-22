@@ -1,0 +1,397 @@
+/* Jharokha Portraits: a sunbaked haveli wall (the background photo, duotoned terracotta), sandstone window rings
+   and a sill, and verdigris painted shutters that swing open on the three portraits. Everything is scoped under
+   .tpl-jharokhaportraits. The one bold place is the shutters; the rest is flat wall and flat stone. */
+.tpl-jharokhaportraits {
+  --wall: #7a2e1d;
+  --wall-deep: #571e12;
+  --wall-lo: #4d190d;
+  --wall-hi: #b4532f;
+  --stone: #e5c48f;
+  --stone-hi: #f1dcae;
+  --stone-lo: #b88a52;
+  --teal: #1f5f58;
+  --teal-deep: #123f3a;
+  --teal-hi: #2f7d73;
+  --brass: #d9a441;
+  --brass-hi: #f0cb73;
+  --cream: #f6e7c8;
+  --carve: #3a140b;
+  --carve-2: #6a3320;
+  --ring: clamp(5px, 1.8vw, 10px); /* thickness of the stone ring round each window */
+  --ease: cubic-bezier(0.22, 0.9, 0.2, 1);
+  --display: 'Marcellus', 'Noto Serif Devanagari', Georgia, serif;
+  --serif: 'Cormorant Garamond', 'Noto Serif Devanagari', 'Times New Roman', Georgia, serif; /* Times is as narrow as Cormorant, so text wraps alike before the font loads */
+
+  min-height: 100svh;
+  overflow-x: clip;
+  background: var(--wall);
+  color: var(--cream);
+  font: 600 1.15rem/1.55 var(--serif);
+  overflow-wrap: anywhere; /* a very long word wraps instead of pushing the page sideways */
+}
+.tpl-jharokhaportraits *,
+.tpl-jharokhaportraits *::before,
+.tpl-jharokhaportraits *::after { box-sizing: border-box; }
+.tpl-jharokhaportraits h1,
+.tpl-jharokhaportraits h2,
+.tpl-jharokhaportraits h3,
+.tpl-jharokhaportraits p,
+.tpl-jharokhaportraits ol { margin: 0; padding: 0; }
+.tpl-jharokhaportraits ol { list-style: none; }
+.tpl-jharokhaportraits h1,
+.tpl-jharokhaportraits h2,
+.tpl-jharokhaportraits h3 { font-family: var(--display); font-weight: 400; line-height: 1.12; text-wrap: balance; }
+
+/* ---------- Facade (hero) ---------- */
+.tpl-jharokhaportraits .jp-hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 28px;
+  min-height: 100svh;
+  padding: 64px 12px 112px; /* the bottom clears the floating nav pill */
+  overflow: clip; /* open shutters stick out a little; they never widen the page */
+}
+
+/* The wall: the background photo in greys, multiplied onto terracotta (whites become terracotta), then the
+   blacks lifted to a dark oxblood by a `lighten` layer. Both tint layers must paint ABOVE the picture (z-index),
+   or a dark photo stays black. A missing photo leaves the flat terracotta; the eave and a fade to the page
+   colour are drawn on top. */
+.tpl-jharokhaportraits .jp-wall { position: absolute; inset: 0; z-index: -1; isolation: isolate; background: var(--wall-hi); }
+.tpl-jharokhaportraits .jp-wall .jp-photo { filter: grayscale(1) contrast(1.1); mix-blend-mode: multiply; }
+.tpl-jharokhaportraits .jp-wall::before { content: ''; position: absolute; inset: 0; z-index: 1; background: var(--wall-lo); mix-blend-mode: lighten; }
+.tpl-jharokhaportraits .jp-wall::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(180deg, transparent 72%, var(--wall) 100%),
+    radial-gradient(ellipse at 50% 42%, transparent 35%, rgb(30 8 4 / 0.5) 100%),
+    repeating-linear-gradient(0deg, transparent 0 41px, rgb(20 5 2 / 0.12) 41px 42px); /* courses of the wall */
+}
+.tpl-jharokhaportraits .jp-photo { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+
+/* Eave (chhajja): a stone slab with a row of corbels under it. */
+.tpl-jharokhaportraits .jp-eave {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 34px;
+  background:
+    linear-gradient(180deg, var(--stone-hi) 0 4px, var(--stone) 4px 18px, var(--stone-lo) 18px 21px, transparent 21px) 0 0 / 100% 100% no-repeat,
+    repeating-linear-gradient(90deg, var(--stone-lo) 0 11px, transparent 11px 26px) 0 21px / 100% 12px no-repeat;
+  filter: drop-shadow(0 6px 8px rgb(20 5 2 / 0.35));
+}
+
+/* The inscription plaque: opaque sandstone, so its text never sits on the photo itself. */
+.tpl-jharokhaportraits .jp-plaque {
+  display: grid;
+  gap: 8px;
+  width: min(100%, 380px);
+  padding: 22px 18px 24px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--stone-hi), var(--stone));
+  box-shadow: inset 0 0 0 5px var(--stone), inset 0 0 0 6px var(--stone-lo), 0 16px 34px rgb(20 5 2 / 0.4);
+  color: var(--carve);
+  text-align: center;
+}
+.tpl-jharokhaportraits .jp-guest { font-style: italic; color: var(--carve-2); }
+.tpl-jharokhaportraits .jp-hosts { font-size: 1.05rem; font-style: italic; color: var(--carve-2); }
+.tpl-jharokhaportraits .jp-names {
+  display: grid;
+  gap: 0;
+  font: 400 clamp(1.7rem, 8vw, 2.4rem)/1.12 var(--display);
+  color: var(--wall);
+}
+.tpl-jharokhaportraits .jp-names[data-fit='1'] { font-size: clamp(1.45rem, 6.8vw, 2rem); }
+.tpl-jharokhaportraits .jp-names[data-fit='2'] { font-size: clamp(1.2rem, 5.6vw, 1.6rem); }
+.tpl-jharokhaportraits .jp-names i { font: italic 600 0.8em/1.1 var(--serif); color: var(--teal-deep); }
+.tpl-jharokhaportraits .jp-tagline { font-style: italic; color: var(--carve-2); }
+
+/* Three windows cut into the wall: the couple's bay in the middle is wider and taller. */
+.tpl-jharokhaportraits .jp-facade { --gap: clamp(6px, 2vw, 14px); width: min(100%, 600px); }
+.tpl-jharokhaportraits .jp-bays,
+.tpl-jharokhaportraits .jp-sill { display: grid; grid-template-columns: 1fr 1.35fr 1fr; gap: var(--gap); }
+.tpl-jharokhaportraits .jp-bays { align-items: end; }
+
+.tpl-jharokhaportraits .jp-bay { --w: 3; --h: 4.3; --d: 0.18s; position: relative; padding: var(--ring) var(--ring) 0; container-type: inline-size; }
+.tpl-jharokhaportraits .jp-bay--c { --h: 5; --d: 0s; }
+.tpl-jharokhaportraits .jp-bay:last-child { --d: 0.36s; }
+/* The stone ring: the same semicircle as the opening, a ring-width larger. clip-path round with a huge radius
+   is clamped to half the width, so the arch is exact at any size. */
+.tpl-jharokhaportraits .jp-frame {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--stone-lo), var(--stone-hi) 22%, var(--stone) 78%, var(--stone-lo));
+  clip-path: inset(0 round 999px 999px 0 0);
+}
+.tpl-jharokhaportraits .jp-pane { position: relative; aspect-ratio: var(--w) / var(--h); }
+.tpl-jharokhaportraits .jp-glass {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #5c2a1c, #2b0f09); /* the room, if the picture is missing */
+  clip-path: inset(0 round 999px 999px 0 0);
+}
+.tpl-jharokhaportraits .jp-glass::after { /* window light and a dark inner edge, over the photo */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 25%, rgb(255 214 150 / 0.2), transparent 62%);
+  box-shadow: inset 0 0 0 2px rgb(58 20 11 / 0.55), inset 0 -36px 36px -24px rgb(30 8 4 / 0.55);
+  pointer-events: none;
+}
+
+/* Shutters: one real button per window; its two leaves are hinged on the outer edges and swing toward the viewer. */
+.tpl-jharokhaportraits .jp-shutters {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px 999px 0 0;
+  background: none;
+  perspective: 640px;
+  perspective: 450cqw; /* 4.5 window widths, so the swing looks the same at every size; falls back to 640px */
+  perspective-origin: 50% 100%; /* the leaves grow upward, never down onto the sill */
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.tpl-jharokhaportraits .jp-shutters:focus-visible { outline: 3px solid var(--brass-hi); outline-offset: 4px; }
+.tpl-jharokhaportraits .jp-leaf {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 0.22), transparent 14%, transparent 86%, rgb(0 0 0 / 0.18)),
+    repeating-linear-gradient(180deg, var(--teal-hi) 0 1px, var(--teal) 1px 7px, var(--teal-deep) 7px 10px); /* louvres */
+  box-shadow: inset 0 0 0 3px var(--teal-deep), inset 0 0 0 4px rgb(240 203 115 / 0.45);
+  transition: transform 1.05s var(--ease); /* closing and the hover peek have no delay */
+}
+.tpl-jharokhaportraits .jp-leaf::after { /* brass pull */
+  content: '';
+  position: absolute;
+  top: 54%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--brass-hi), var(--brass) 60%, #7a5415);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.55);
+}
+/* Each leaf is a quarter of the arch: its outer top corner takes the full leaf width and half the pane width in height. */
+.tpl-jharokhaportraits .jp-leaf--l { left: 0; transform-origin: 0 50%; border-top-left-radius: 100% calc(50% * var(--w) / var(--h)); }
+.tpl-jharokhaportraits .jp-leaf--r { right: 0; transform-origin: 100% 50%; border-top-right-radius: 100% calc(50% * var(--w) / var(--h)); }
+.tpl-jharokhaportraits .jp-leaf--l::after { right: 9%; }
+.tpl-jharokhaportraits .jp-leaf--r::after { left: 9%; }
+.tpl-jharokhaportraits .jp-shutters[aria-expanded='true'] .jp-leaf { transition-delay: var(--d); } /* opening: centre first, then the sides */
+.tpl-jharokhaportraits .jp-shutters[aria-expanded='true'] .jp-leaf--l { transform: rotateY(-104deg); }
+.tpl-jharokhaportraits .jp-shutters[aria-expanded='true'] .jp-leaf--r { transform: rotateY(104deg); }
+
+/* The sill: a stone ledge across all three windows, carrying their names. */
+.tpl-jharokhaportraits .jp-sill {
+  align-items: start;
+  margin: 0 -6px;
+  padding: 8px 6px 10px;
+  border-top: 2px solid var(--stone-lo);
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(180deg, var(--stone-hi), var(--stone) 45%, var(--stone-lo));
+  box-shadow: 0 12px 26px rgb(20 5 2 / 0.45);
+  color: var(--carve);
+}
+.tpl-jharokhaportraits .jp-sill p { padding: 0 2px; font: 400 0.85rem/1.25 var(--display); text-align: center; hyphens: auto; }
+.tpl-jharokhaportraits .jp-sill p[data-fit='1'] { font-size: 0.8rem; }
+.tpl-jharokhaportraits .jp-sill p[data-fit='2'] { font-size: 0.75rem; }
+
+/* ---------- The day ---------- */
+.tpl-jharokhaportraits .jp-day { display: grid; justify-items: center; gap: 28px; padding: 24px 16px 72px; }
+/* An arch-topped tablet; the thin arch inside is concentric with the cut edge. */
+.tpl-jharokhaportraits .jp-tablet {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  width: min(100%, 360px);
+  padding: clamp(64px, 20vw, 84px) 24px 30px;
+  background: linear-gradient(180deg, var(--stone-hi), var(--stone));
+  color: var(--carve);
+  text-align: center;
+  clip-path: inset(0 round 180px 180px 3px 3px);
+}
+.tpl-jharokhaportraits .jp-tablet::before {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px solid rgb(122 46 29 / 0.4);
+  border-radius: 999px 999px 2px 2px;
+  pointer-events: none;
+}
+.tpl-jharokhaportraits .jp-tablet h2 { font-size: clamp(1.45rem, 6.6vw, 1.85rem); color: var(--wall); }
+.tpl-jharokhaportraits .jp-time { font: 400 1.2rem/1.2 var(--display); color: var(--carve); }
+.tpl-jharokhaportraits .jp-venue { margin-top: 10px; padding-top: 14px; border-top: 1px solid var(--stone-lo); font: 400 1.25rem/1.25 var(--display); color: var(--carve); }
+.tpl-jharokhaportraits .jp-city { font-style: italic; color: var(--carve-2); }
+.tpl-jharokhaportraits .jp-actions { display: grid; gap: 10px; width: 100%; margin-top: 14px; }
+.tpl-jharokhaportraits .jp-btn {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 1.5px solid var(--wall);
+  border-radius: 3px;
+  background: var(--wall);
+  color: var(--cream);
+  font: 400 1rem/1.2 var(--display);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.tpl-jharokhaportraits .jp-btn--ghost { background: transparent; color: var(--wall); }
+.tpl-jharokhaportraits .jp-btn:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+
+/* Countdown: four small arched niches. */
+.tpl-jharokhaportraits .jp-count { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: min(100%, 360px); }
+.tpl-jharokhaportraits .jp-niche {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 16px 2px 10px;
+  border: 1px solid rgb(217 164 65 / 0.75);
+  border-radius: 999px 999px 4px 4px;
+  background: var(--wall-deep);
+}
+.tpl-jharokhaportraits .jp-niche b { font: 400 clamp(1.3rem, 6.4vw, 1.7rem)/1.1 var(--display); font-variant-numeric: tabular-nums; color: var(--cream); }
+.tpl-jharokhaportraits .jp-niche span { font-size: 0.85rem; color: var(--brass-hi); }
+.tpl-jharokhaportraits .jp-today { font: 400 1.4rem/1.2 var(--display); color: var(--brass-hi); text-align: center; }
+
+/* ---------- Events and story ---------- */
+.tpl-jharokhaportraits .jp-events,
+.tpl-jharokhaportraits .jp-story { padding: 24px 20px 72px; }
+.tpl-jharokhaportraits .jp-h2 { margin-bottom: 28px; font-size: clamp(1.9rem, 8.4vw, 2.6rem); text-align: center; color: var(--cream); }
+.tpl-jharokhaportraits .jp-events ol { max-width: 440px; margin: 0 auto; }
+/* One column on a phone (the details get the full width, so they wrap the same with a fallback font or the real one),
+   time beside the details from 480px. */
+.tpl-jharokhaportraits .jp-ev { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px 16px; padding: 18px 0; border-top: 1px solid rgb(217 164 65 / 0.5); }
+.tpl-jharokhaportraits .jp-ev:last-child { border-bottom: 1px solid rgb(217 164 65 / 0.5); }
+.tpl-jharokhaportraits .jp-ev__when { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 12px; color: var(--brass-hi); }
+.tpl-jharokhaportraits .jp-ev__when b { font: 400 1.15rem/1.2 var(--display); }
+.tpl-jharokhaportraits .jp-ev__when span { font-size: 0.9rem; }
+.tpl-jharokhaportraits .jp-ev h3 { font-size: 1.4rem; color: var(--cream); }
+.tpl-jharokhaportraits .jp-ev p { color: var(--cream); }
+@media (min-width: 480px) {
+  .tpl-jharokhaportraits .jp-ev { grid-template-columns: 5.6rem minmax(0, 1fr); }
+  .tpl-jharokhaportraits .jp-ev__when { display: grid; align-content: start; gap: 2px; }
+}
+.tpl-jharokhaportraits .jp-ev__dress { font-style: italic; color: var(--brass-hi); }
+
+.tpl-jharokhaportraits .jp-story ol { display: grid; gap: 22px; max-width: 420px; margin: 0 auto; text-align: center; }
+.tpl-jharokhaportraits .jp-beat + .jp-beat::before { /* a small arch marks the step to the next beat */
+  content: '';
+  display: block;
+  width: 14px;
+  height: 20px;
+  margin: 0 auto 22px;
+  border: 1px solid var(--brass);
+  border-bottom: 0;
+  border-radius: 999px 999px 0 0;
+}
+.tpl-jharokhaportraits .jp-beat b { display: block; font: 400 2.2rem/1.1 var(--display); color: var(--brass-hi); }
+.tpl-jharokhaportraits .jp-beat h3 { margin-top: 6px; font: italic 600 1.4rem/1.2 var(--serif); color: var(--cream); }
+.tpl-jharokhaportraits .jp-beat p { margin-top: 4px; color: var(--cream); }
+
+/* ---------- RSVP (the shared form, styled for the wall) ---------- */
+.tpl-jharokhaportraits .jp-rsvp { padding: 24px 16px 140px; background: linear-gradient(180deg, var(--wall), var(--wall-deep)); text-align: center; }
+.tpl-jharokhaportraits .jp-rsvp__by { margin: -12px 0 8px; font-style: italic; color: var(--brass-hi); }
+.tpl-jharokhaportraits .rsvp,
+.tpl-jharokhaportraits .rsvp__done { display: grid; gap: 16px; max-width: 380px; margin: 20px auto 0; text-align: left; }
+.tpl-jharokhaportraits .rsvp label { display: grid; gap: 6px; }
+.tpl-jharokhaportraits .rsvp label span { font-size: 0.95rem; color: var(--brass-hi); }
+.tpl-jharokhaportraits .rsvp input,
+.tpl-jharokhaportraits .rsvp select,
+.tpl-jharokhaportraits .rsvp textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid rgb(217 164 65 / 0.75);
+  border-radius: 3px;
+  background: rgb(255 255 255 / 0.06);
+  color: var(--cream);
+  font: inherit;
+  font-size: 1rem; /* 16px: iOS does not zoom the page when this is focused */
+}
+.tpl-jharokhaportraits .rsvp select option { color: var(--carve); }
+.tpl-jharokhaportraits .rsvp button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--brass-hi), var(--brass));
+  color: var(--carve);
+  font: 400 1rem/1.2 var(--display);
+  cursor: pointer;
+}
+.tpl-jharokhaportraits .rsvp__error { color: #ffc2b0; }
+.tpl-jharokhaportraits .rsvp__msg { padding: 12px 14px; border-radius: 3px; background: rgb(255 255 255 / 0.08); white-space: pre-wrap; user-select: text; }
+.tpl-jharokhaportraits .rsvp__reply button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: 600 1rem var(--serif);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.tpl-jharokhaportraits .rsvp__hint { min-height: 1.5em; font-size: 0.95rem; color: var(--brass-hi); }
+.tpl-jharokhaportraits .rsvp input:focus-visible,
+.tpl-jharokhaportraits .rsvp select:focus-visible,
+.tpl-jharokhaportraits .rsvp textarea:focus-visible,
+.tpl-jharokhaportraits .rsvp button:focus-visible,
+.tpl-jharokhaportraits .rsvp__reply a:focus-visible { outline: 3px solid var(--brass-hi); outline-offset: 3px; }
+
+/* ---------- Wide screens ---------- */
+@media (min-width: 720px) {
+  .tpl-jharokhaportraits .jp-hero { gap: 36px; padding-top: 80px; }
+  .tpl-jharokhaportraits .jp-plaque { width: min(100%, 440px); }
+  .tpl-jharokhaportraits .jp-names { font-size: 2.7rem; }
+  .tpl-jharokhaportraits .jp-names[data-fit='1'] { font-size: 2.2rem; }
+  .tpl-jharokhaportraits .jp-names[data-fit='2'] { font-size: 1.8rem; }
+  .tpl-jharokhaportraits .jp-actions { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---------- Short screens ---------- */
+/* A small phone held upright (320x568): tighten the stack so the sill clears the nav pill. */
+@media (max-width: 719px) and (max-height: 640px) {
+  .tpl-jharokhaportraits .jp-hero { gap: 18px; padding-top: 50px; }
+  .tpl-jharokhaportraits .jp-plaque { gap: 6px; padding: 16px 16px 18px; }
+}
+/* Plaque beside the windows, so the first screen shows both. A laptop (1366x768) or a phone held SIDEWAYS has too
+   little height to stack the plaque over the facade: the windows would fall below the fold or behind the nav pill.
+   The facade is sized from the height left over (0.672 = centre window height per facade width, 38px = sill) so the
+   sill ends well above the bottom 88px. The phone rule is guarded by orientation: a short PORTRAIT phone (320x460,
+   a small phone with its browser bars showing) keeps the stack, or its windows and plaque would be squeezed. */
+@media (min-width: 900px) and (min-height: 521px) and (max-height: 900px) {
+  .tpl-jharokhaportraits .jp-hero { grid-template-columns: minmax(0, 420px) minmax(0, 600px); justify-content: center; align-items: center; column-gap: 48px; }
+  .tpl-jharokhaportraits .jp-facade { width: min(100%, 600px, calc((100svh - 214px) / 0.672)); }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  /* thin ring and gap keep the side windows (and their buttons) at least 44px wide down to 568x320 */
+  .tpl-jharokhaportraits .jp-hero { --ring: 5px; grid-template-columns: minmax(0, 1fr) auto; justify-content: center; align-items: center; column-gap: 28px; padding: 46px 16px 96px; }
+  .tpl-jharokhaportraits .jp-facade { --gap: 6px; width: min(46vw, calc((100svh - 190px) / 0.672)); }
+  .tpl-jharokhaportraits .jp-plaque { width: min(100%, 340px); justify-self: end; gap: 4px; padding: 14px 14px 16px; }
+  .tpl-jharokhaportraits .jp-names,
+  .tpl-jharokhaportraits .jp-names[data-fit='1'],
+  .tpl-jharokhaportraits .jp-names[data-fit='2'] { font-size: 1.5rem; }
+  .tpl-jharokhaportraits .jp-names[data-fit='2'] { font-size: 1.3rem; }
+}
+
+/* ---------- Hover and reduced motion ---------- */
+@media (hover: hover) and (pointer: fine) {
+  /* A closed shutter opens a crack while the pointer is over it (data-peek, set by the page, is cleared by a click
+     or when the pointer leaves, so a window you just closed does close fully). */
+  .tpl-jharokhaportraits .jp-shutters[data-peek='true'] .jp-leaf--l { transform: rotateY(-9deg); }
+  .tpl-jharokhaportraits .jp-shutters[data-peek='true'] .jp-leaf--r { transform: rotateY(9deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tpl-jharokhaportraits .jp-leaf { transition: none; }
+}

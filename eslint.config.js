@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'qa-out']), // qa-out: git-ignored QA screenshots and scratch builds
   {
     files: ['**/*.{js,jsx}'],
     extends: [

@@ -85,10 +85,12 @@
   display: grid;
   justify-items: center;
   margin: 0;
-  font: 400 clamp(2.2rem, 11vw, 3.6rem) / 1 'Rozha One', 'Times New Roman', serif;
+  font: 400 clamp(2.2rem, 11vw, 3.6rem) / 1 'Rozha One', 'Noto Serif Devanagari', 'Noto Serif Gujarati', 'Times New Roman', serif;
   color: var(--gg-cream);
   overflow-wrap: anywhere;
 }
+.gate-gopuram__names[data-fit='1'] { font-size: clamp(1.7rem, 8vw, 2.6rem); }
+.gate-gopuram__names[data-fit='2'] { font-size: clamp(1.25rem, 5.6vw, 1.9rem); line-height: 1.15; }
 .gate-gopuram__amp { font-size: 0.42em; line-height: 1.1; color: var(--gg-gold); }
 .gate-gopuram__date { margin: 0 0 0.35rem; font-size: 1.15rem; font-weight: 700; color: var(--gg-gold-l); }
 

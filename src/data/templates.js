@@ -1,6 +1,6 @@
 import { lazy } from 'react'
 
-// Registry of the ten designs. Each template lives in src/templates/<id>/ and default-exports
+// Registry of the contemporary designs, then the tradition-specific ones. Each template lives in src/templates/<id>/ and default-exports
 // a component taking `{ invite }` (see data/sample.js). To add one: create the folder, add a row here.
 // `palette` = [background, ink, accent]; `font` / `shape` only drive the gallery thumbnail.
 // `editable: true` opens the design in the Studio ("Customize"). Set it in the commit that finishes the
@@ -14,14 +14,14 @@ const contemporary = [
     Component: lazy(() => import('../templates/rajmahal/Rajmahal.jsx')),
   },
   {
-    id: 'gopuram', name: 'Gopuram', group: 'Traditional',
+    id: 'gopuram', name: 'Gopuram', group: 'Traditional', editable: true,
     blurb: 'South Indian temple tiers, silk green, kolam and diya.',
     signature: 'Temple tower builds tier by tier; light the diya to begin.',
     palette: ['#0f4a3c', '#fbefd5', '#e0a526'], font: "'Rozha One', serif", shape: 'tiers',
     Component: lazy(() => import('../templates/gopuram/Gopuram.jsx')),
   },
   {
-    id: 'marigold', name: 'Marigold Mela', group: 'Playful',
+    id: 'marigold', name: 'Marigold Mela', group: 'Playful', editable: true,
     blurb: 'Haldi-bright, sticker-bold, made for a loud family party.',
     signature: 'Falling petals, bouncy stickers and tilt-on-touch cards.',
     palette: ['#ff8a1f', '#3b0a45', '#ff3d81'], font: "'Bagel Fat One', sans-serif", shape: 'blob',
@@ -75,6 +75,85 @@ const contemporary = [
     signature: 'Split-flap board flips the countdown; tear the stub to RSVP.',
     palette: ['#0f2a4a', '#f4f1e8', '#ffb400'], font: "'Barlow Condensed', sans-serif", shape: 'ticket',
     Component: lazy(() => import('../templates/boardingpass/BoardingPass.jsx')),
+  },
+  {
+    id: 'velvetseal', name: 'Velvet Seal', group: 'Romantic', photos: true,
+    blurb: 'Brown velvet, gold beads and a wax seal that opens like a real envelope.',
+    signature: 'Tap the seal and the letter slides out; scratch the gold foil to reveal the date.',
+    palette: ['#24150e', '#f1e3cb', '#c9a24a'], font: "'Gloock', serif", shape: 'rect',
+    Component: lazy(() => import('../templates/velvetseal/VelvetSeal.jsx')),
+  },
+  // Photo-first designs: each shows the couple's bride, groom, couple and background photos through
+  // components/Photo.jsx (see lib/photos.js; placeholders until a photo is supplied).
+  {
+    id: 'storyreel', name: 'Story Reel', group: 'Modern', photos: true,
+    blurb: 'Your story as full-screen cards, one photo at a time.',
+    signature: 'Tap through the story; the ring around your photo opens it.',
+    palette: ['#0e0e12', '#f5f1ea', '#ff5c7a'], font: "'Instrument Serif', serif", shape: 'rect',
+    Component: lazy(() => import('../templates/storyreel/StoryReel.jsx')),
+  },
+  {
+    id: 'polaroidwall', name: 'Polaroid Wall', group: 'Romantic', photos: true,
+    blurb: 'A wall of taped polaroids that develop as you scroll.',
+    signature: 'Press the shutter and the couple’s polaroid develops.',
+    palette: ['#31241a', '#efe6d8', '#d9674c'], font: "'Kalam', cursive", shape: 'rect', // walnut wall, bright paper on it
+    Component: lazy(() => import('../templates/polaroidwall/PolaroidWall.jsx')),
+  },
+  {
+    id: 'cinemanow', name: 'Now Showing', group: 'Playful', photos: true,
+    blurb: 'A film poster, billing credits and showtimes for the big day.',
+    signature: 'Red curtains part after a 3, 2, 1 countdown.',
+    palette: ['#0b0b0f', '#f3ead7', '#e8b04a'], font: "'Gloock', serif", shape: 'rect',
+    Component: lazy(() => import('../templates/cinemanow/CinemaNow.jsx')),
+  },
+  {
+    id: 'jharokhaportraits', name: 'Jharokha Portraits', group: 'Traditional', photos: true,
+    blurb: 'Three sandstone windows whose shutters open onto the photos.',
+    signature: 'Open the shutters to reveal the bride, the couple and the groom.',
+    palette: ['#7a2e1d', '#f6e7c8', '#d9a441'], font: "'Marcellus', serif", shape: 'arch',
+    Component: lazy(() => import('../templates/jharokhaportraits/JharokhaPortraits.jsx')),
+  },
+  {
+    id: 'duomerge', name: 'Two Become One', group: 'Romantic', photos: true,
+    blurb: 'Two portraits that merge into one as you scroll.',
+    signature: 'Scrolling closes the seam between the two photos.',
+    palette: ['#1f1b24', '#f4efe9', '#b4546a'], font: "'Gloock', serif", shape: 'rect', // the gate and hero are plum
+    Component: lazy(() => import('../templates/duomerge/DuoMerge.jsx')),
+  },
+  {
+    id: 'lockethearts', name: 'Locket', group: 'Romantic', photos: true,
+    blurb: 'A gold locket that opens to the two portraits.',
+    signature: 'Tap the locket and it opens on its hinge.',
+    palette: ['#2b1420', '#f6e3d3', '#d8a35d'], font: "'Pinyon Script', cursive", shape: 'oval',
+    Component: lazy(() => import('../templates/lockethearts/LocketHearts.jsx')),
+  },
+  {
+    id: 'toranframes', name: 'Toran Frames', group: 'Traditional', photos: true,
+    blurb: 'Marigold garlands hang a row of swaying photo frames.',
+    signature: 'Tap a hanging frame to see the photo larger.',
+    palette: ['#fff3df', '#5b1d12', '#f08a1c'], font: "'Sahitya', serif", shape: 'tiers',
+    Component: lazy(() => import('../templates/toranframes/ToranFrames.jsx')),
+  },
+  {
+    id: 'passportduo', name: 'Passport', group: 'Playful', photos: true,
+    blurb: 'Two passport pages and one visa for the same journey.',
+    signature: 'Flip the cover; event stamps land as you scroll.',
+    palette: ['#12324a', '#f1ead9', '#c8a24a'], font: "'DM Serif Display', serif", shape: 'ticket',
+    Component: lazy(() => import('../templates/passportduo/PassportDuo.jsx')),
+  },
+  {
+    id: 'bentoday', name: 'Bento Day', group: 'Modern', photos: true,
+    blurb: 'A bento grid of photo and detail tiles.',
+    signature: 'Tiles slide into place; tap one to expand it.',
+    palette: ['#eceae4', '#16161a', '#ff6a3d'], font: "'Manrope', sans-serif", shape: 'blob',
+    Component: lazy(() => import('../templates/bentoday/BentoDay.jsx')),
+  },
+  {
+    id: 'goldenhour', name: 'Golden Hour', group: 'Romantic', photos: true,
+    blurb: 'A full-bleed photo story that follows the light.',
+    signature: 'Scrolling cross-fades bride, groom and couple under a rising sun.',
+    palette: ['#1a1210', '#fbeed8', '#f0a35e'], font: "'Playfair Display', serif", shape: 'circle',
+    Component: lazy(() => import('../templates/goldenhour/GoldenHour.jsx')),
   },
 ]
 
@@ -187,7 +266,9 @@ const traditional = [
   },
 ]
 
-// `tradition` drives the gallery tabs and which sample data a design receives.
+// `tradition` drives which sample data a design receives (and the Studio's fields). `area` drives the gallery tabs:
+// a design tagged `photos: true` is listed under the "Photo Invites" tab (and not under its tradition's tab);
+// every other design is listed under its tradition.
 // Opening gates (src/templates/<id>/Gate.jsx) and page loaders are discovered by folder, so a design
 // without a Gate simply opens directly. `preload` warms the page chunk while the gate is on screen.
 const gateLoaders = import.meta.glob(['../templates/*/Gate.jsx', '!../templates/_reference/*'])
@@ -196,12 +277,14 @@ const byId = (map, id) => map[Object.keys(map).find((k) => k.includes(`/template
 
 export const templates = [...contemporary.map((t) => ({ tradition: 'contemporary', ...t })), ...traditional].map((t) => {
   const gate = byId(gateLoaders, t.id)
-  return { ...t, Gate: gate ? lazy(gate) : null, preload: byId(pageLoaders, t.id) }
+  return { ...t, area: t.photos ? 'photos' : t.tradition, Gate: gate ? lazy(gate) : null, preload: byId(pageLoaders, t.id) }
 })
 
+// The gallery's filter tabs (the name is historical: one of them, Photo Invites, is not a tradition).
 export const traditions = [
   { id: 'all', label: 'All' },
   { id: 'contemporary', label: 'Contemporary' },
+  { id: 'photos', label: 'Photo Invites' },
   { id: 'hindu', label: 'Hindu' },
   { id: 'marwadi', label: 'Marwadi' },
   { id: 'jain', label: 'Jain' },

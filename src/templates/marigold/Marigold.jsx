@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { useCountdown, useReveal } from '../../lib/hooks.js'
+import { fitStep, graphemes } from '../../lib/fit.js'
 import { downloadIcs } from '../../lib/ics.js'
 import RsvpForm from '../../components/RsvpForm.jsx'
 import './marigold.css'
@@ -60,7 +61,7 @@ const Rangoli = () => (
 function Letters({ text, from }) {
   return (
     <span className="mg-name" aria-hidden="true">
-      {[...text].map((ch, i) => {
+      {graphemes(text).map((ch, i) => {
         const n = from + i
         return ch === ' ' ? <span key={i} className="mg-gap" /> : (
           <span key={i} className={`mg-letter mg-l${n % 4}`} style={{ '--i': n, '--r': `${TILT[n % 8]}deg` }}><b>{ch}</b></span>
@@ -101,10 +102,10 @@ function EventCard({ ev, i }) {
           <svg className="mg-card__bloom" viewBox="0 0 40 40" aria-hidden="true"><use href="#mg-flower" /></svg>
           <h3>{ev.name}</h3>
           <p className="mg-card__when"><b>{ev.day}</b><span>{ev.time}</span></p>
-          <dl>
-            <div><dt>Where</dt><dd>{ev.place}</dd></div>
-            <div><dt>Wear</dt><dd>{ev.dress}</dd></div>
-          </dl>
+          {(ev.place || ev.dress) && <dl>
+            {ev.place && <div><dt>Where</dt><dd>{ev.place}</dd></div>}
+            {ev.dress && <div><dt>Wear</dt><dd>{ev.dress}</dd></div>}
+          </dl>}
         </div>
       </article>
     </li>
@@ -118,13 +119,15 @@ export default function Marigold({ invite }) {
   useReveal(root)
 
   const units = [['days', t.days], ['hours', t.hours], ['mins', t.minutes], ['secs', t.seconds]]
+  // Longer names and lines step down in size (see data-fit in marigold.css) so the sticker letters never leave the screen.
+  const nameFit = Math.max(fitStep(invite.couple.a, [10, 16]), fitStep(invite.couple.b, [10, 16]))
   const pop = (id) => setPops((p) => ({ ...p, [id]: (p[id] || 0) + 1 }))
 
   return (
     <div className="tpl tpl-marigold" ref={root}>
       <Flower />
 
-      <header className="mg-hero">
+      <header className="mg-hero" data-studio-section="hero">
         <div className="mg-petals" aria-hidden="true">
           {PETALS.map((p, i) => (
             <svg key={i} className={`mg-petal mg-p${p.c}`} viewBox="0 0 40 40" style={{ '--x': p.x, '--s': p.s, '--d': p.d, '--dl': p.dl, '--sw': p.sw }}>
@@ -133,12 +136,12 @@ export default function Marigold({ invite }) {
           ))}
         </div>
 
-        <p className="mg-hosts">{invite.hosts}</p>
+        {invite.hosts && <p className="mg-hosts" data-fit={fitStep(invite.hosts, [60, 100])}>{invite.hosts}</p>}
         <div className="mg-names">
-          <h1 aria-label={`${invite.couple.a} and ${invite.couple.b}`}>
+          <h1 data-fit={nameFit} aria-label={`${invite.couple.a} and ${invite.couple.b}`}>
             <Letters text={invite.couple.a} from={0} />
             <span className="mg-amp" aria-hidden="true">&amp;</span>
-            <Letters text={invite.couple.b} from={invite.couple.a.length + 1} />
+            <Letters text={invite.couple.b} from={graphemes(invite.couple.a).length + 1} />
           </h1>
           {STICKERS.map((s) => (
             <button key={s.id} type="button" className={`mg-sticker mg-s-${s.pos}`} aria-label={s.label} onClick={() => pop(s.id)}>
@@ -153,14 +156,14 @@ export default function Marigold({ invite }) {
             </button>
           ))}
         </div>
-        <p className="mg-tagline">{invite.tagline}</p>
+        {invite.tagline && <p className="mg-tagline" data-fit={fitStep(invite.tagline, [50, 80])}>{invite.tagline}</p>}
         <p className="mg-when"><b>{invite.dateLabel}</b> at {invite.timeLabel}</p>
-        <div className="mg-actions">
+        <div className="mg-actions" data-studio-section="venue">
           <button type="button" className="mg-btn" onClick={() => downloadIcs(invite)}>Add to calendar</button>
-          <a className="mg-btn mg-btn--alt" href={invite.mapUrl} target="_blank" rel="noreferrer">
+          {invite.mapUrl && <a className="mg-btn mg-btn--alt" href={invite.mapUrl} target="_blank" rel="noreferrer">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.500 7 12 7 12z" fill="#ff3d81" stroke="currentColor" strokeWidth="2" /><circle cx="12" cy="10" r="2.5" fill="currentColor" /></svg>
-            {invite.venue}, {invite.city}
-          </a>
+            {invite.venue}{invite.city && `, ${invite.city}`}
+          </a>}
         </div>
       </header>
 
@@ -171,42 +174,42 @@ export default function Marigold({ invite }) {
         <div className="mg-clock" role="timer" aria-label="Time until the wedding">
           {units.map(([label, v], i) => (
             <div key={label} className={`mg-tick mg-t${i}`}>
-              <strong>{t.pad(v)}</strong>
+              <strong className={label === 'days' && v > 9999 ? 'is-long' : undefined}>{t.pad(v)}</strong>
               <span>{label}</span>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="mg-events" aria-labelledby="mg-h-events">
+      <section className="mg-events" aria-labelledby="mg-h-events" data-studio-section="events">
         <h2 id="mg-h-events">The celebrations</h2>
         <ul className="mg-cards">
-          {invite.events.map((ev, i) => <EventCard key={ev.id} ev={ev} i={i} />)}
+          {invite.events.map((ev, i) => <EventCard key={ev.id || i} ev={ev} i={i} />)}
         </ul>
       </section>
 
       <Rangoli />
 
-      <section className="mg-story" aria-labelledby="mg-h-story">
+      <section className="mg-story" aria-labelledby="mg-h-story" data-studio-section="story">
         <h2 id="mg-h-story">How we got here</h2>
         <ol className="mg-strip">
           {invite.story.map((s, i) => (
-            <li key={s.year} className="mg-panel" data-reveal style={{ '--i': i }}>
+            <li key={i} className="mg-panel" data-reveal style={{ '--i': i }}>
               <svg className="mg-panel__art" viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true">{STORY_ART[i % 3]}</svg>
-              <span className="mg-panel__year">{s.year}</span>
-              <h3 className="mg-bubble">{s.title}</h3>
-              <p className="mg-caption">{s.text}</p>
+              {s.year && <span className="mg-panel__year">{s.year}</span>}
+              {s.title && <h3 className="mg-bubble">{s.title}</h3>}
+              {s.text && <p className="mg-caption">{s.text}</p>}
             </li>
           ))}
         </ol>
       </section>
 
-      <section className="mg-rsvp" aria-labelledby="mg-h-rsvp">
+      <section className="mg-rsvp" aria-labelledby="mg-h-rsvp" data-studio-section="replies">
         <h2 id="mg-h-rsvp">Say you&rsquo;re coming</h2>
         <div className="mg-rsvp__card">
           <RsvpForm />
         </div>
-        <p className="mg-reply">Please reply by {invite.rsvpBy}.</p>
+        {invite.rsvpBy && <p className="mg-reply">Please reply by {invite.rsvpBy}.</p>}
       </section>
     </div>
   )

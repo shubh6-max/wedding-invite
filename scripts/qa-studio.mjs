@@ -7,7 +7,7 @@
 //   hostile    broken, oversized and malicious links and messages never run code or show another sample;
 //              a same-origin message IS applied (control) while foreign or malformed ones are not
 //   storage    blocked or full storage: the Studio still works and says so
-//   gallery    Customize or "Editing soon" on every card; the floating bar fits 320px; the guest bar keeps ?d=
+//   gallery    Customize on editable cards and one note for the rest; the floating bar fits 320px; the guest bar keeps ?d=
 //   mobile     two tabs, preview fills the screen, tab bar steps aside while typing
 //   focus      the preview's gate never keeps keyboard focus; reduced motion stops the lay-down
 //   proof      editable-proof fixtures on one design (default rajmahal), guest path, several viewports, then live edits
@@ -50,6 +50,8 @@ const first = (e) => String(e?.message ?? e).split('\n')[0]
 // fields it prints, and the selectors of its countdown, hero text box and story item. Add a row to prove another design.
 const PROOF = {
   rajmahal: { tradition: 'contemporary', keys: RENDERED_KEYS, cells: '.rj-cell b', room: '.rj-room', plaque: '.rj-plaque' },
+  gopuram: { tradition: 'contemporary', keys: RENDERED_KEYS, cells: '.count__cell b', room: '.hero__text', plaque: '.leaf', done: '.count__done' },
+  marigold: { tradition: 'contemporary', keys: RENDERED_KEYS, cells: '.mg-tick strong', room: null, plaque: '.mg-panel' },
 }
 
 // Every sample couple, host line and place in src/data: none of it may appear where the link's own data (or an error) belongs.
@@ -262,7 +264,7 @@ async function share() {
       await guest.page.goto(`${url}&open=1`)
       await guest.page.waitForSelector('.tpl h1', { timeout: 8000 })
       const body = await guest.page.locator('body').innerText()
-      for (const w of ['Meera', 'Arjun']) if (!body.includes(w)) fail('share', `${id}: guest page misses ${w}`)
+      for (const w of ['Meera', 'Arjun']) if (!has(body, w)) fail('share', `${id}: guest page misses ${w}`)
       if (!(await guest.page.title()).includes('Meera & Arjun')) fail('share', `${id}: guest page title is "${await guest.page.title()}"`)
       if (await guest.page.locator('.pill__home').count()) fail('share', `${id}: guest sees the gallery navigation`)
       if (guest.page.problems.length) fail('share', `${id}: guest ${guest.page.problems[0]}`)
@@ -275,7 +277,7 @@ async function share() {
       extra.push(old.ctx)
       await old.page.goto(plainLink)
       await old.page.waitForSelector('.tpl h1', { timeout: 8000 })
-      if (!(await old.page.locator('body').innerText()).includes('Meera')) fail('share', `${id}: plain link fails without CompressionStream`)
+      if (!has(await old.page.locator('body').innerText(), 'Meera')) fail('share', `${id}: plain link fails without CompressionStream`)
       if (q.get('d').startsWith('z.')) {
         await old.page.goto(`${base}/#/t/${id}?d=${q.get('d')}&open=1&n=2`)
         await old.page.waitForSelector('.problem', { timeout: 5000 }).catch(() => fail('share', `${id}: compressed link on an old browser shows no explanation`))
@@ -477,10 +479,24 @@ async function gallery() {
     await page.waitForSelector('.card')
     const cards = await page.locator('.card').count()
     if (cards !== 25) fail('gallery', `${cards} cards, expected 25`)
-    const bare = await page.evaluate(() => [...document.querySelectorAll('.card')].filter((c) => !c.querySelector('.card__actions .btn, .card__actions .card__soon')).length)
-    if (bare) fail('gallery', `${bare} cards show neither Customize nor "Editing soon"`)
-    const small = await page.evaluate(() => [...document.querySelectorAll('.card__actions a')].filter((a) => a.getBoundingClientRect().height < 44).length)
-    if (small) fail('gallery', `${small} card actions under 44px high`)
+    // Customize shows only on editable designs, as a link to their Studio; the rest are explained once by a note.
+    const buttons = await page.evaluate(() => [...document.querySelectorAll('.card__actions .btn')].map((a) => a.getAttribute('href')))
+    if (!buttons.length) fail('gallery', 'no card offers Customize (expected at least the proof design)')
+    if (buttons.some((h) => !/^#\/studio\/[\w-]+$/.test(h || ''))) fail('gallery', `a Customize link does not open the Studio: ${buttons.join(', ')}`)
+    if (!buttons.includes(`#/studio/${proofDesign}`)) fail('gallery', `${proofDesign} has no Customize link`)
+    const notes = await page.locator('.designs__note').count()
+    if (notes !== 1) fail('gallery', `${notes} notes about editing, expected exactly one`)
+    const soon = await page.evaluate(() => (document.body.innerText.match(/Editing soon/gi) || []).length)
+    if (soon) fail('gallery', `"Editing soon" repeated ${soon} times; say it once in the note`)
+    // One tab stop per design; the hero fan is decoration and must stay out of keyboard and screen-reader order.
+    const fanOpen = await page.evaluate(() => { const f = document.querySelector('.fan'); return !f || f.getAttribute('aria-hidden') !== 'true' || [...f.querySelectorAll('a')].some((a) => a.tabIndex >= 0) })
+    if (fanOpen) fail('gallery', 'the hero fan is reachable by keyboard or screen reader')
+    const eager = await page.evaluate(() => [...document.querySelectorAll('.card img')].filter((i) => i.loading !== 'lazy').length)
+    if (eager) fail('gallery', `${eager} tile images are not lazy-loaded`)
+    const heads = await page.evaluate(() => document.querySelectorAll('.card h3.card__name').length)
+    if (heads !== 25) fail('gallery', `${heads} design names are headings, expected 25`)
+    const small = await page.evaluate(() => [...document.querySelectorAll('.card__actions a, .hero__actions a, .hero__actions button, .chip')].filter((a) => a.getBoundingClientRect().height < 44).length)
+    if (small) fail('gallery', `${small} gallery controls under 44px high`)
     if ((await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)) > 0) fail('gallery', 'the gallery scrolls sideways')
   } catch (e) {
     fail('gallery', first(e))
@@ -601,7 +617,16 @@ async function proof() {
         await page.locator('.gate [data-gate-primary]').first().waitFor({ timeout: 8000 })
         const gateOver = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)
         if (gateOver > 0) fail('proof', `${tag}: gate scrolls sideways by ${gateOver}px`)
-        const gateClip = await page.evaluate(() => [...document.querySelectorAll('.gate *')].filter((e) => { const r = e.getBoundingClientRect(); return r.width && (r.right > innerWidth + 1 || r.left < -1) }).length)
+        // An element inside a clipping ancestor that itself fits the screen (a backdrop with overflow: hidden) is not off screen.
+        const gateClip = await page.evaluate(() => [...document.querySelectorAll('.gate *')].filter((e) => {
+          const r = e.getBoundingClientRect()
+          if (!r.width || !(r.right > innerWidth + 1 || r.left < -1)) return false
+          for (let p = e.parentElement; p && !p.classList.contains('gate'); p = p.parentElement) {
+            const q = p.getBoundingClientRect()
+            if (getComputedStyle(p).overflowX !== 'visible' && q.left >= -1 && q.right <= innerWidth + 1) return false
+          }
+          return true
+        }).length)
         if (gateClip) fail('proof', `${tag}: ${gateClip} gate elements leave the screen sideways`)
         // Every line of text in the closed gate must stay on screen and clear of its button (line boxes, not element boxes).
         const gate = await page.evaluate(() => {
@@ -638,7 +663,7 @@ async function proof() {
         await sleep(2300) // the hero's own entrance
         const r = await page.evaluate(({ sel }) => {
           const body = document.body.innerText
-          const room = document.querySelector(sel.room)
+          const room = sel.room ? document.querySelector(sel.room) : null // a design with no fixed hero box has nothing to overflow
           const small = [...document.querySelectorAll('.tpl *')].filter((e) => [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim().length > 1) && e.getBoundingClientRect().width && parseFloat(getComputedStyle(e).fontSize) < 12).length
           const empty = [...document.querySelectorAll('.tpl p, .tpl dd, .tpl h2, .tpl h3, .tpl a')].filter((e) => !e.children.length && !e.textContent.trim()).length
           const cells = [...document.querySelectorAll(sel.cells)].map((e) => e.textContent.trim())
@@ -646,6 +671,7 @@ async function proof() {
             over: document.documentElement.scrollWidth - innerWidth,
             roomOver: room ? room.scrollHeight - room.clientHeight : 0,
             small, empty, junk: /\b(undefined|NaN|null)\b|\[object/.test(body), body, cells,
+            done: !!(sel.done && document.querySelector(sel.done)),
             cellOver: [...document.querySelectorAll(sel.cells)].filter((e) => e.parentElement && e.parentElement.scrollWidth > e.parentElement.clientWidth + 1).length,
           }
         }, { sel: design })
@@ -655,7 +681,7 @@ async function proof() {
         if (r.empty) fail('proof', `${tag}: ${r.empty} empty elements left on the page`)
         if (r.junk) fail('proof', `${tag}: the page prints undefined, NaN, null or [object]`)
         // The countdown must exist and show numbers: an empty cell is not zero.
-        if (!r.cells.length) fail('proof', `${tag}: no countdown cells found (${design.cells})`)
+        if (!r.cells.length && c.zeroCountdown && r.done) { /* the design's own "the date has passed" message stands in for zeros */ } else if (!r.cells.length) fail('proof', `${tag}: no countdown cells found (${design.cells})`)
         else if (!r.cells.every((x) => /^\d+$/.test(x))) fail('proof', `${tag}: countdown shows "${r.cells.join(' ')}", not numbers`)
         else if (c.zeroCountdown && !r.cells.every((x) => /^0+$/.test(x))) fail('proof', `${tag}: past date does not show a zero countdown`)
         if (r.cellOver) fail('proof', `${tag}: countdown digits overflow`)
@@ -689,7 +715,8 @@ async function proof() {
     if (!(days > 20000)) fail('proof', `countdown shows ${days} days after the date moved to 2090`)
     await type(page, 'date', '2020-01-01')
     await sleep(700)
-    if ((await firstCell()) !== 0) fail('proof', 'countdown did not fall to zero for a past date')
+    const passed = design.done ? await frame.locator(design.done).count() : 0
+    if (!passed && (await firstCell()) !== 0) fail('proof', 'countdown did not fall to zero for a past date')
     // A story item that has already revealed itself must stay visible when its text is edited
     // (keys built from the text would remount it without the .in class).
     const plaque = frame.locator(design.plaque).first()

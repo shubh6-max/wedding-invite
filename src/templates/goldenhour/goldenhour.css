@@ -1,0 +1,304 @@
+/* Golden Hour: one sticky, full-bleed photo stage; chapters of text scroll over it and the stage cross-fades to the
+   photo of the chapter on screen. Dark ground, warm light. Everything scoped under .tpl-goldenhour. */
+.tpl-goldenhour {
+  --night: #1a1210;
+  --cream: #fbeed8;
+  --muted: rgb(251 238 216 / 0.8);
+  --sun: #f0a35e;
+  --haze: #ffd9a0;
+  --line: rgb(240 163 94 / 0.34);
+  --ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+  --rail: 48px; /* a stop is a tap target: 48px */
+  --stop: calc(6px + var(--rail) / 2); /* centre of the first stop in the rail */
+  --mr: calc(var(--rail) + 14px); /* the rail's column, kept free of text */
+  --serif: 'Playfair Display', 'Noto Serif Devanagari', Georgia, serif;
+
+  min-height: 100svh;
+  overflow-x: clip;
+  background: var(--night);
+  color: var(--cream);
+  font: 400 1.0625rem/1.6 'Hanken Grotesk', 'Noto Serif Devanagari', system-ui, sans-serif;
+  overflow-wrap: anywhere; /* a very long word wraps instead of pushing the page sideways */
+}
+.tpl-goldenhour *,
+.tpl-goldenhour *::before,
+.tpl-goldenhour *::after { box-sizing: border-box; }
+.tpl-goldenhour h1,
+.tpl-goldenhour h2,
+.tpl-goldenhour h3,
+.tpl-goldenhour p,
+.tpl-goldenhour ol { margin: 0; padding: 0; }
+.tpl-goldenhour ol { list-style: none; }
+.tpl-goldenhour h1,
+.tpl-goldenhour h2,
+.tpl-goldenhour h3 { font-family: var(--serif); font-weight: 400; line-height: 1.1; text-wrap: balance; }
+
+/* ---------- The story: stage, chapters and rail share one grid cell ---------- */
+.tpl-goldenhour .gh-story { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); }
+.tpl-goldenhour .gh-story > * { grid-area: 1 / 1; }
+
+/* The stage stays put while the chapters scroll. It is as tall as the largest viewport, so a phone's collapsing
+   address bar never uncovers the page behind it. Its size never depends on a picture. */
+.tpl-goldenhour .gh-stage {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  z-index: 0;
+  height: 100vh;
+  height: 100lvh;
+  overflow: hidden;
+  background: var(--night);
+}
+.tpl-goldenhour .gh-stage::after { /* a soft vignette so the light feels like it falls from above */
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 120% 90% at 50% 25%, transparent 45%, rgb(26 18 16 / 0.5) 100%);
+}
+.tpl-goldenhour .gh-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(165deg, #43271f, #1a1210);
+  transition: opacity 1.2s ease;
+}
+.tpl-goldenhour .gh-layer.is-on { opacity: 1; }
+.tpl-goldenhour .gh-layer::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: var(--grade); }
+/* The grade is the warm light of the hour: each picture gets its own, pre-dawn to golden. */
+.tpl-goldenhour .gh-layer--background { --grade: linear-gradient(180deg, rgb(48 28 66 / 0.5) 0%, rgb(240 163 94 / 0.22) 55%, rgb(199 91 52 / 0.34) 100%); --ox: 50%; --dx: -2%; --dy: -1.5%; }
+.tpl-goldenhour .gh-layer--bride { --grade: linear-gradient(180deg, rgb(255 190 150 / 0.22), rgb(180 70 70 / 0.28)); --ox: 35%; --dx: 2%; --dy: -1%; }
+.tpl-goldenhour .gh-layer--groom { --grade: linear-gradient(180deg, rgb(255 200 120 / 0.2), rgb(150 70 40 / 0.3)); --ox: 65%; --dx: -2%; --dy: -1%; }
+.tpl-goldenhour .gh-layer--couple {
+  --grade: radial-gradient(circle at 78% 16%, rgb(255 214 150 / 0.6), transparent 52%), linear-gradient(180deg, rgb(240 163 94 / 0.22), rgb(120 50 30 / 0.3));
+  --ox: 50%;
+  --dx: 1.5%;
+  --dy: -2%;
+}
+/* The slow pan (Ken Burns). It idles on the pictures that are not showing. */
+.tpl-goldenhour .gh-kb { position: absolute; inset: 0; transform-origin: var(--ox, 50%) 38%; animation: gh-pan 30s ease-in-out infinite alternate; }
+.tpl-goldenhour .gh-layer:not(.is-on) .gh-kb { animation-play-state: paused; }
+.tpl-goldenhour .gh-kb img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+@keyframes gh-pan { from { transform: scale(1.02); } to { transform: scale(1.14) translate3d(var(--dx, -2%), var(--dy, -1.5%), 0); } }
+
+/* ---------- Chapters ---------- */
+.tpl-goldenhour .gh-chapters { position: relative; z-index: 1; }
+.tpl-goldenhour .gh-ch { display: flex; align-items: flex-end; min-height: 100vh; min-height: 100svh; }
+/* The scrim is a pool of night behind the text: it fades in above it (--rise tall), stays solid through it and the
+   96px the nav pill covers, then fades out (below, and at the right on wide screens, so the photo is left clear). The
+   text box sits entirely inside the solid part, whatever the screen: the right padding plus the rail's column
+   (--mr) is always at least the right fade (--fade), so its contrast does not depend on the picture.
+   A caption that is not the one on stage fades out (.gh-ch--off), so it is never read over the wrong photo. */
+.tpl-goldenhour .gh-ch__scrim {
+  --fade: clamp(64px, 18vw, 300px);
+  --pad: max(20px, 6vw);
+  --rise: 120px;
+  position: relative;
+  isolation: isolate;
+  width: min(100%, calc(var(--pad) + 34rem + 8px + var(--fade))); /* ends just past the text, then the fade */
+  padding: var(--rise) max(20px, calc(var(--fade) + 8px - var(--mr))) 96px var(--pad);
+  transition: opacity 0.5s ease;
+}
+.tpl-goldenhour .gh-ch--off .gh-ch__scrim { opacity: 0; }
+.tpl-goldenhour .gh-ch__scrim::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    rgb(26 18 16 / 0) 0,
+    rgb(26 18 16 / 0.12) calc(var(--rise) * 0.25),
+    rgb(26 18 16 / 0.36) calc(var(--rise) * 0.5),
+    rgb(26 18 16 / 0.66) calc(var(--rise) * 0.75),
+    rgb(26 18 16 / 0.86) var(--rise),
+    rgb(26 18 16 / 0.86) calc(100% - 96px),
+    rgb(26 18 16 / 0.5) calc(100% - 64px),
+    rgb(26 18 16 / 0.16) calc(100% - 32px),
+    rgb(26 18 16 / 0) 100%
+  );
+  mask-image: linear-gradient(90deg, #000 calc(100% - var(--fade)), rgb(0 0 0 / 0.5) calc(100% - var(--fade) * 0.45), transparent);
+}
+.tpl-goldenhour .gh-ch__text { max-width: 34rem; margin-right: var(--mr); } /* leaves the rail's column free */
+.tpl-goldenhour .gh-ch__text > * + * { margin-top: 10px; }
+.tpl-goldenhour .gh-ch--open .gh-ch__scrim { animation: gh-rise 1s var(--ease) 0.2s backwards; }
+.tpl-goldenhour .gh-ch--open.via-gate .gh-ch__scrim { animation-delay: 0.9s; } /* the gate is still dissolving */
+@keyframes gh-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+.tpl-goldenhour .gh-guest { font: italic 400 1.2rem/1.3 var(--serif); color: var(--sun); }
+.tpl-goldenhour .gh-guest[data-fit='1'] { font-size: 1.05rem; }
+.tpl-goldenhour .gh-guest[data-fit='2'] { font-size: 0.95rem; }
+.tpl-goldenhour .gh-hosts { font-weight: 600; font-size: 0.9375rem; color: var(--muted); }
+.tpl-goldenhour .gh-names {
+  --k: 1.9; /* how many characters of the longest name fit across the text width, in ems; fitStep nudges it */
+  font-size: clamp(1.7rem, calc(min(100vw - 98px, 34rem) / var(--chars, 12) * var(--k)), 4.4rem);
+  line-height: 1.08;
+}
+.tpl-goldenhour .gh-names[data-fit='1'] { --k: 1.8; }
+.tpl-goldenhour .gh-names[data-fit='2'] { --k: 1.7; }
+.tpl-goldenhour .gh-names span { display: block; }
+.tpl-goldenhour .gh-names i { color: var(--sun); }
+.tpl-goldenhour .gh-tagline { font: italic 400 1.25rem/1.3 var(--serif); }
+.tpl-goldenhour .gh-cue { margin-top: 18px; font-size: 0.9375rem; color: var(--muted); }
+.tpl-goldenhour .gh-cue::after { content: ''; display: block; width: 1px; height: 28px; margin-top: 8px; background: linear-gradient(var(--sun), transparent); }
+.tpl-goldenhour .gh-role { font-weight: 600; font-size: 0.9375rem; color: var(--sun); }
+.tpl-goldenhour .gh-year { font: italic 400 1.3rem/1.2 var(--serif); color: var(--sun); }
+.tpl-goldenhour .gh-title { font-size: clamp(1.9rem, 8.4vw, 2.9rem); }
+.tpl-goldenhour .gh-text { max-width: 36ch; color: var(--muted); text-wrap: pretty; }
+
+/* ---------- The sun's path: one stop per chapter; the sun sits on the chapter on screen ---------- */
+.tpl-goldenhour .gh-rail { position: sticky; top: 0; align-self: start; z-index: 2; height: 100svh; pointer-events: none; }
+.tpl-goldenhour .gh-rail__list {
+  position: absolute;
+  right: 8px;
+  top: calc((100svh - 88px) / 2); /* centred above the nav pill */
+  width: calc(var(--rail) + 2px);
+  padding: 6px 0;
+  transform: translateY(-50%);
+  border: 1px solid rgb(251 238 216 / 0.18);
+  border-radius: 999px;
+  background: rgb(26 18 16 / 0.55);
+  pointer-events: auto;
+}
+.tpl-goldenhour .gh-rail__list::before { content: ''; position: absolute; left: 50%; top: var(--stop); bottom: var(--stop); width: 1px; background: rgb(251 238 216 / 0.28); }
+.tpl-goldenhour .gh-rail__list button { position: relative; display: block; width: var(--rail); height: var(--rail); padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; }
+.tpl-goldenhour .gh-rail__list button::before { content: ''; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: rgb(251 238 216 / 0.75); }
+.tpl-goldenhour .gh-rail__list button:focus-visible { outline: 2px solid var(--cream); outline-offset: -4px; }
+.tpl-goldenhour .gh-rail__sun {
+  position: absolute;
+  left: 50%;
+  top: var(--stop);
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #fff3d6, var(--haze) 40%, var(--sun));
+  box-shadow: 0 0 14px 4px rgb(240 163 94 / 0.6);
+  transform: translateY(calc(var(--at, 0) * var(--rail)));
+  transition: transform 0.7s var(--ease);
+  pointer-events: none;
+  z-index: 2; /* over the stop it sits on */
+}
+.tpl-goldenhour .gh-rail__list li { position: relative; z-index: 1; }
+
+/* ---------- The day: countdown, place, actions ---------- */
+.tpl-goldenhour .gh-day {
+  padding: 96px 20px 24px;
+  background: radial-gradient(ellipse 90% 480px at 50% 0, #4b2a19 0%, rgb(26 18 16 / 0) 100%), var(--night);
+  text-align: center;
+}
+.tpl-goldenhour .gh-h2 { font-size: clamp(2rem, 9vw, 3rem); }
+.tpl-goldenhour .gh-clock { display: grid; grid-template-columns: repeat(4, 1fr); max-width: 30rem; margin: 32px auto 0; }
+.tpl-goldenhour .gh-clock div { position: relative; display: grid; gap: 2px; }
+.tpl-goldenhour .gh-clock div + div::before { content: ':'; position: absolute; left: 0; top: 0; transform: translateX(-50%); font: 400 clamp(2rem, 11vw, 3.4rem)/1.1 var(--serif); color: var(--sun); }
+.tpl-goldenhour .gh-clock b { font: 400 clamp(2rem, 11vw, 3.4rem)/1.1 var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+.tpl-goldenhour .gh-clock span { font-size: 0.875rem; color: var(--muted); }
+.tpl-goldenhour .gh-clock__done { margin-top: 28px; font: italic 400 1.5rem/1.3 var(--serif); color: var(--sun); }
+.tpl-goldenhour .gh-place { margin-top: 44px; }
+.tpl-goldenhour .gh-place h3 { font-size: clamp(1.5rem, 6.4vw, 2rem); }
+.tpl-goldenhour .gh-place p { margin-top: 4px; color: var(--muted); }
+.tpl-goldenhour .gh-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 28px; }
+.tpl-goldenhour .gh-btn {
+  display: inline-grid;
+  place-items: center;
+  min-height: 52px;
+  padding: 0 26px;
+  border: 1.5px solid var(--sun);
+  border-radius: 999px;
+  background: none;
+  color: var(--cream);
+  font: 600 1rem 'Hanken Grotesk', system-ui, sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+}
+.tpl-goldenhour .gh-btn--fill { background: var(--sun); color: var(--night); }
+
+/* ---------- Schedule ---------- */
+.tpl-goldenhour .gh-plan-sec { padding: 72px 20px 24px; }
+.tpl-goldenhour .gh-plan-sec .gh-h2 { text-align: center; }
+.tpl-goldenhour .gh-plan { max-width: 34rem; margin: 32px auto 0; }
+.tpl-goldenhour .gh-plan li { display: grid; grid-template-columns: minmax(84px, 28%) 1fr; gap: 16px; padding: 22px 0; border-top: 1px solid var(--line); }
+.tpl-goldenhour .gh-plan li:last-child { border-bottom: 1px solid var(--line); }
+.tpl-goldenhour .gh-plan__when { display: grid; align-content: start; gap: 2px; }
+.tpl-goldenhour .gh-plan__when b { font: italic 400 1.35rem/1.2 var(--serif); color: var(--sun); }
+.tpl-goldenhour .gh-plan__when span { font-size: 0.875rem; color: var(--muted); }
+.tpl-goldenhour .gh-plan h3 { font-size: 1.55rem; }
+.tpl-goldenhour .gh-plan li p { margin-top: 4px; color: var(--muted); }
+
+/* ---------- RSVP (shared form, styled for the dark ground) ---------- */
+.tpl-goldenhour .gh-rsvp { padding: 72px 20px 140px; text-align: center; }
+.tpl-goldenhour .gh-rsvp__by { margin-top: 10px; color: var(--muted); }
+.tpl-goldenhour .rsvp,
+.tpl-goldenhour .rsvp__done { display: grid; gap: 16px; max-width: 380px; margin: 28px auto 0; text-align: left; }
+.tpl-goldenhour .rsvp label { display: grid; gap: 6px; }
+.tpl-goldenhour .rsvp label span { font-size: 0.875rem; font-weight: 600; color: var(--sun); }
+.tpl-goldenhour .rsvp input,
+.tpl-goldenhour .rsvp select,
+.tpl-goldenhour .rsvp textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid rgb(240 163 94 / 0.55);
+  border-radius: 12px;
+  background: rgb(251 238 216 / 0.06);
+  color: var(--cream);
+  font: inherit;
+  font-size: 1rem; /* 16px: iOS does not zoom the page when this is focused */
+}
+.tpl-goldenhour .rsvp select option { color: #1a1210; }
+.tpl-goldenhour .rsvp button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sun);
+  color: var(--night);
+  font: 700 1rem 'Hanken Grotesk', system-ui, sans-serif;
+  cursor: pointer;
+}
+.tpl-goldenhour .rsvp__error { color: #ffb4a2; }
+.tpl-goldenhour .rsvp__msg { padding: 12px 14px; border-radius: 12px; background: rgb(251 238 216 / 0.08); white-space: pre-wrap; user-select: text; }
+.tpl-goldenhour .rsvp__reply button {
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: 600 1rem 'Hanken Grotesk', system-ui, sans-serif;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.tpl-goldenhour .rsvp__hint { min-height: 1.5em; font-size: 0.9rem; color: var(--haze); }
+
+.tpl-goldenhour .gh-btn:focus-visible,
+.tpl-goldenhour .rsvp input:focus-visible,
+.tpl-goldenhour .rsvp select:focus-visible,
+.tpl-goldenhour .rsvp textarea:focus-visible,
+.tpl-goldenhour .rsvp button:focus-visible { outline: 3px solid var(--haze); outline-offset: 3px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .tpl-goldenhour .gh-btn:hover { background: var(--haze); border-color: var(--haze); color: var(--night); }
+  .tpl-goldenhour .gh-rail__list button:hover::before { background: var(--haze); }
+}
+
+/* A short screen (phone held sideways, or a small phone with its browser bars showing): no room for the rail's
+   column of stops, so the text may use it and the pool's fades shrink to match (the text still sits wholly inside
+   the solid part). Plain scrolling still moves the chapters. */
+@media (max-height: 560px) {
+  .tpl-goldenhour { --mr: 0px; }
+  .tpl-goldenhour .gh-rail { display: none; }
+  .tpl-goldenhour .gh-ch__scrim { --fade: 40px; --rise: 72px; }
+  .tpl-goldenhour .gh-names { font-size: clamp(1.5rem, min(calc(min(100vw - 98px, 34rem) / var(--chars, 12) * var(--k)), 11svh), 4.4rem); }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  .tpl-goldenhour .gh-cue { display: none; }
+}
+
+/* Reduced motion: no pan, no cross-fade, no entrance. The stage shows one still picture per chapter. */
+@media (prefers-reduced-motion: reduce) {
+  .tpl-goldenhour .gh-layer { transition: none; }
+  .tpl-goldenhour .gh-kb { animation: none; transform: scale(1.04); }
+  .tpl-goldenhour .gh-ch--open .gh-ch__scrim { animation: none; }
+  .tpl-goldenhour .gh-rail__sun,
+  .tpl-goldenhour .gh-ch__scrim { transition: none; }
+}

@@ -1,0 +1,179 @@
+/* Passport gate: a navy leather cover with gold embossing on a dark desk. Tap it and the cover swings open on its
+   spine (3D), showing the first page; the book drifts toward you and the gate fades onto the invitation.
+   Sequence (ms): cover swings 0-1050, book drifts 500-1800, gate fades 1500-2200 (useGate ms = 2250, a little slack).
+   Only transform and opacity animate. Sizes hang off --cw (the cover's width) so the cover scales as one piece. */
+.gate-passportduo.gate {
+  --gold: #c8a24a;
+  --gold-hi: #e6cc84;
+  --paper: #f3edde;
+  --ink: #14283a;
+  --serif: 'DM Serif Display', 'Noto Serif Devanagari', Georgia, serif;
+  --ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+  --cw: min(84vw, calc((100vh - 132px) * 5 / 7), 380px); /* dvh below, where the browser knows it */
+
+  background: radial-gradient(ellipse at 50% 38%, #174563, #08202f 78%);
+  color: var(--gold-hi);
+  font: 400 1rem/1.3 'Archivo', system-ui, sans-serif;
+}
+@supports (height: 100dvh) {
+  .gate-passportduo.gate { --cw: min(84vw, calc((100dvh - 132px) * 5 / 7), 380px); }
+}
+.gate-passportduo *,
+.gate-passportduo *::before,
+.gate-passportduo *::after { box-sizing: border-box; }
+.gate-passportduo p { margin: 0; }
+
+.gate-passportduo .gate-passportduo__book {
+  position: relative;
+  width: var(--cw);
+  aspect-ratio: 5 / 7;
+  perspective: 1500px;
+  transition: transform 1.3s var(--ease) 0.5s;
+}
+
+/* ---- the first page, waiting under the cover (hidden until the tap so nothing shows through) ---- */
+.gate-passportduo .gate-passportduo__inner {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  display: grid;
+  grid-template-columns: 42% 1fr;
+  align-content: start;
+  gap: 5% 8%;
+  padding: 9% 8%;
+  border-radius: 3px 10px 10px 3px;
+  background:
+    repeating-radial-gradient(circle at 0% 0%, transparent 0 7px, rgb(29 74 150 / 0.08) 7px 8px),
+    repeating-radial-gradient(circle at 100% 100%, transparent 0 9px, rgb(31 96 68 / 0.08) 9px 10px),
+    var(--paper);
+  box-shadow: inset 14px 0 18px -10px rgb(0 0 0 / 0.35), 0 26px 50px rgb(0 0 0 / 0.5);
+}
+.gate-passportduo.is-opening .gate-passportduo__inner { visibility: visible; }
+.gate-passportduo .gate-passportduo__ph { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: #c8c3b2; box-shadow: inset 0 0 0 1px rgb(20 40 58 / 0.35); }
+.gate-passportduo .gate-passportduo__ph img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.gate-passportduo .gate-passportduo__bars { display: grid; align-content: start; gap: calc(var(--cw) * 0.045); padding-top: 4%; }
+.gate-passportduo .gate-passportduo__bar { display: block; height: calc(var(--cw) * 0.022); border-radius: 3px; background: rgb(20 40 58 / 0.2); }
+.gate-passportduo .gate-passportduo__bar:nth-child(2) { width: 72%; }
+.gate-passportduo .gate-passportduo__bar:nth-child(3) { width: 88%; }
+.gate-passportduo .gate-passportduo__bar:nth-child(4) { width: 55%; }
+.gate-passportduo .gate-passportduo__bars--wide { grid-column: 1 / -1; padding-top: 0; }
+
+/* ---- the cover: a front face (the button) and a lining, one slab that swings on its left edge ---- */
+.gate-passportduo .gate-passportduo__cover {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 50%;
+  transform-style: preserve-3d;
+  transition: transform 1.05s cubic-bezier(0.55, 0.05, 0.25, 1);
+}
+.gate-passportduo .gate-passportduo__lining,
+.gate-passportduo .gate-passportduo__front {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px 12px 12px 3px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.gate-passportduo .gate-passportduo__lining {
+  transform: rotateY(180deg);
+  background: radial-gradient(circle at 70% 25%, #1b4a6c, #0e2b41 75%);
+  box-shadow: inset -12px 0 16px -10px rgb(0 0 0 / 0.6);
+}
+.gate-passportduo .gate-passportduo__lining::before { content: ''; position: absolute; inset: 5%; border: 1px solid rgb(200 162 74 / 0.45); border-radius: 2px 8px 8px 2px; }
+
+.gate-passportduo .gate-passportduo__front {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--cw) * 0.03);
+  padding: 11% 8% 9%;
+  overflow: hidden;
+  border: 0;
+  background:
+    radial-gradient(circle, rgb(255 255 255 / 0.05) 0.8px, transparent 1.2px) 0 0 / 4px 4px,
+    radial-gradient(circle at 30% 18%, #1c4c70, #0f2d44 72%);
+  box-shadow: inset 10px 0 12px -8px rgb(0 0 0 / 0.6), inset 0 0 0 1px rgb(255 255 255 / 0.07), 0 26px 50px rgb(0 0 0 / 0.55);
+  color: var(--gold-hi);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+.gate-passportduo .gate-passportduo__front:focus-visible { outline: 3px solid var(--gold-hi); outline-offset: 5px; }
+.gate-passportduo .gate-passportduo__front::before { /* the blind-stamped frame */
+  content: '';
+  position: absolute;
+  inset: 4.5%;
+  border: 1px solid rgb(200 162 74 / 0.7);
+  border-radius: 2px 9px 9px 2px;
+  pointer-events: none;
+}
+.gate-passportduo .gate-passportduo__front::after { /* a glint of foil that sweeps across now and then */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgb(255 240 190 / 0.16) 50%, transparent 60%);
+  transform: translateX(-120%);
+  animation: pp-glint 4.5s ease-in-out 1s infinite;
+  pointer-events: none;
+}
+.gate-passportduo .gate-passportduo__front > span,
+.gate-passportduo .gate-passportduo__front > svg { position: relative; z-index: 1; }
+
+/* Foil lettering: flat gold with a light edge below and a dark edge above, so it reads as pressed into the leather. */
+.gate-passportduo .gate-passportduo__title,
+.gate-passportduo .gate-passportduo__names,
+.gate-passportduo .gate-passportduo__date,
+.gate-passportduo .gate-passportduo__guest { color: #dcbb5e; text-shadow: 0 1px 0 rgb(255 245 205 / 0.4), 0 -1px 0 rgb(0 0 0 / 0.55); }
+.gate-passportduo .gate-passportduo__title { display: grid; gap: 2px; }
+.gate-passportduo .gate-passportduo__title small { font-size: max(12px, calc(var(--cw) * 0.052)); font-weight: 600; letter-spacing: 0.14em; }
+.gate-passportduo .gate-passportduo__title b { font: 400 max(20px, calc(var(--cw) * 0.12))/1.05 var(--serif); }
+.gate-passportduo .gate-passportduo__crest { width: calc(var(--cw) * 0.27); height: auto; fill: none; stroke: #dcbb5e; stroke-width: 1.4; filter: drop-shadow(0 1px 0 rgb(255 245 205 / 0.35)); }
+.gate-passportduo .gate-passportduo__mid { display: grid; justify-items: center; gap: calc(var(--cw) * 0.03); min-width: 0; max-width: 100%; }
+.gate-passportduo .gate-passportduo__names { font: 400 max(16px, calc(var(--cw) * 0.1))/1.12 var(--serif); text-wrap: balance; overflow-wrap: anywhere; }
+.gate-passportduo .gate-passportduo__names[data-fit='1'] { font-size: max(15px, calc(var(--cw) * 0.085)); }
+.gate-passportduo .gate-passportduo__names[data-fit='2'] { font-size: max(14px, calc(var(--cw) * 0.07)); }
+.gate-passportduo .gate-passportduo__names i { font-size: 0.8em; font-style: italic; }
+.gate-passportduo .gate-passportduo__date,
+.gate-passportduo .gate-passportduo__guest { font-size: max(12px, calc(var(--cw) * 0.05)); font-weight: 600; text-wrap: balance; overflow-wrap: anywhere; }
+.gate-passportduo .gate-passportduo__guest { font-style: italic; }
+.gate-passportduo .gate-passportduo__cta {
+  padding: 0.65em 1.4em;
+  border: 1px solid rgb(220 187 94 / 0.85);
+  border-radius: 999px;
+  background: rgb(10 33 50 / 0.5);
+  font-size: max(13px, calc(var(--cw) * 0.058));
+  font-weight: 600;
+  color: var(--gold-hi);
+  animation: pp-nudge 2.4s ease-in-out infinite;
+}
+@keyframes pp-glint { 0%, 55% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+@keyframes pp-nudge { 50% { transform: scale(1.05); } }
+@keyframes pp-gfade { to { opacity: 0; } }
+
+/* ---- opening ---- */
+.gate-passportduo.is-opening { animation: pp-gfade 0.7s ease 1.5s forwards; }
+.gate-passportduo.is-opening .gate-passportduo__cover { transform: rotateY(-168deg); }
+.gate-passportduo.is-opening .gate-passportduo__book { transform: scale(1.12); }
+.gate-passportduo.is-opening .gate-passportduo__cta,
+.gate-passportduo.is-opening .gate-passportduo__front::after { animation: none; }
+
+/* Phone held sideways: the cover keeps its shape but gives up the crest. */
+@media (max-height: 520px) {
+  .gate-passportduo .gate-passportduo__crest { display: none; }
+  .gate-passportduo .gate-passportduo__front { padding: 9% 7% 7%; }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .gate-passportduo:not(.is-opening) .gate-passportduo__cover:hover { transform: rotateY(-9deg); }
+}
+
+/* Reduced motion: the cover stays shut and the gate simply fades (lib/gate.js also shortens its timer). */
+@media (prefers-reduced-motion: reduce) {
+  .gate-passportduo .gate-passportduo__front::after,
+  .gate-passportduo .gate-passportduo__cta { animation: none; }
+  .gate-passportduo.is-opening { animation: pp-gfade 0.25s ease both; }
+  .gate-passportduo.is-opening .gate-passportduo__cover,
+  .gate-passportduo.is-opening .gate-passportduo__book { transform: none; transition: none; }
+  .gate-passportduo.is-opening .gate-passportduo__inner { visibility: hidden; }
+}

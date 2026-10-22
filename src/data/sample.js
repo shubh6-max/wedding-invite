@@ -24,4 +24,14 @@ export const sample = {
     { id: 'wedding', name: 'Wedding', day: '13 Feb 2027', time: '5:30 PM', place: 'Saffron Court Gardens', dress: 'Traditional' },
     { id: 'reception', name: 'Reception', day: '13 Feb 2027', time: '9:00 PM', place: 'The Lake Pavilion', dress: 'Cocktail' },
   ],
+  // Pictures for the photo-first designs (components/Photo.jsx). These are local test photos in git-ignored folders
+  // (public/bride, groom, couple, background); where a file is missing the design shows its illustrated placeholder.
+  photos: {
+    bride: '/bride/bride.jpg',
+    groom: '/groom/groom.jpg',
+    couple: '/couple/couple.jpg',
+    background: '/background/background.jpg',
+  },
+  // Where the faces are in each picture (x% y%), so a frame of any shape keeps them in view (lib/photos.js resolveFocus).
+  photoFocus: { bride: '48% 41%', groom: '54% 36%', couple: '46% 28%', background: '47% 36%' },
 }

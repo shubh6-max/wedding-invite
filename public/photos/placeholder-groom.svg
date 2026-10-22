@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 800" width="640" height="800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#efe3d0"/>
+      <stop offset="0.55" stop-color="#cdb59a"/>
+      <stop offset="1" stop-color="#6f7f94"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.38" r="0.5">
+      <stop offset="0" stop-color="#fff6ea" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#fff6ea" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7d5a52"/>
+      <stop offset="1" stop-color="#553a38"/>
+    </linearGradient>
+    <linearGradient id="suit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b4658"/>
+      <stop offset="1" stop-color="#232b3a"/>
+    </linearGradient>
+    <linearGradient id="hair" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2d211f"/>
+      <stop offset="1" stop-color="#1c1413"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6"/></filter>
+  </defs>
+  <rect width="640" height="800" fill="url(#bg)"/>
+  <rect width="640" height="800" fill="url(#glow)"/>
+  <g fill="#fff3e2" filter="url(#soft)">
+    <circle cx="560" cy="140" r="44" opacity="0.3"/>
+    <circle cx="80" cy="120" r="30" opacity="0.3"/>
+    <circle cx="50" cy="330" r="50" opacity="0.2"/>
+    <circle cx="590" cy="440" r="34" opacity="0.22"/>
+  </g>
+  <path d="M30 800C30 660 150 590 320 590S610 660 610 800Z" fill="url(#suit)"/>
+  <path d="M283 470h74l10 130-47 56-47-56Z" fill="url(#skin)"/>
+  <path d="M258 598L320 706 382 598 340 590 320 640 300 590Z" fill="#ece0cf" fill-opacity="0.9"/>
+  <path d="M236 598L320 720 404 598" fill="none" stroke="#8c97a8" stroke-opacity="0.55" stroke-width="3"/>
+  <ellipse cx="320" cy="362" rx="92" ry="110" fill="url(#skin)"/>
+  <path d="M228 350C222 250 274 224 322 224c50 0 100 26 92 126-12-44-40-64-92-64-52 0-82 20-94 64Z" fill="url(#hair)" transform="translate(0 0)"/>
+</svg>

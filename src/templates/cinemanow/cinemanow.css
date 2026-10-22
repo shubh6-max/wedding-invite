@@ -1,0 +1,307 @@
+/* Now Showing: a widescreen title scene, the poster, billing credits, showtimes and a box office. Scoped under .tpl-cinemanow. */
+.tpl-cinemanow {
+  --ink: #0b0b0f;
+  --ink-2: #15131a;
+  --cream: #f3ead7;
+  --cream-dim: #cfc6b2;
+  --amber: #e8b04a;
+  --display: 'Gloock', 'Noto Serif Devanagari', Georgia, serif;
+  --credit: 'Barlow Condensed', 'Noto Serif Devanagari', 'Arial Narrow', sans-serif;
+  --ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+
+  min-height: 100svh;
+  overflow-x: clip;
+  background: var(--ink);
+  color: var(--cream);
+  font: 500 1.15rem/1.5 var(--credit);
+  overflow-wrap: anywhere; /* a very long word wraps instead of pushing the page sideways */
+}
+.tpl-cinemanow *,
+.tpl-cinemanow *::before,
+.tpl-cinemanow *::after { box-sizing: border-box; }
+.tpl-cinemanow h1,
+.tpl-cinemanow h2,
+.tpl-cinemanow h3,
+.tpl-cinemanow p,
+.tpl-cinemanow ol,
+.tpl-cinemanow figure { margin: 0; padding: 0; }
+.tpl-cinemanow ol { list-style: none; }
+.tpl-cinemanow h1,
+.tpl-cinemanow h2,
+.tpl-cinemanow h3 { font-family: var(--display); font-weight: 400; line-height: 1.1; text-wrap: balance; }
+.tpl-cinemanow h2 { font-size: clamp(2rem, 9vw, 3rem); }
+/* Photos fill whatever aspect-ratio box holds them; the box, never the picture, sets the size. */
+.tpl-cinemanow .cn-fill { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+
+/* ---------- Title scene: widescreen bars, the backdrop panning slowly, the names on a scrim ---------- */
+.tpl-cinemanow .cn-hero { display: flex; flex-direction: column; min-height: 100svh; background: #000; }
+.tpl-cinemanow .cn-bar {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 8px;
+  min-height: clamp(48px, 8svh, 72px);
+  padding: 12px 16px;
+  background: #000;
+  font: 700 0.95rem/1 var(--credit);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--amber);
+}
+/* The countdown sits above the bottom 88px of the first screen, where the gallery nav pill floats. */
+.tpl-cinemanow .cn-bar--clock { padding-bottom: calc(100px + env(safe-area-inset-bottom)); color: var(--cream-dim); }
+
+.tpl-cinemanow .cn-stage {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  overflow: hidden;
+  isolation: isolate;
+  background: radial-gradient(ellipse at 50% 25%, #3b2a2e, #15101a 75%);
+}
+.tpl-cinemanow .cn-stage::after { /* lens vignette */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 40%, transparent 55%, rgb(0 0 0 / 0.45));
+  pointer-events: none;
+}
+/* The backdrop is wider than the screen and drifts sideways: transform only, one slow loop back and forth. */
+.tpl-cinemanow .cn-pan { position: absolute; inset: 0 -9%; animation: cn-pan 54s ease-in-out infinite alternate; will-change: transform; }
+@keyframes cn-pan { from { transform: translateX(-7%); } to { transform: translateX(7%); } }
+
+/* The scrim belongs to the title block and fades in over its first --fade (shorter on short screens, so the
+   countdown still clears the nav pill), so the text always sits on the solid part however many lines the names take. */
+.tpl-cinemanow .cn-title {
+  --fade: clamp(64px, 16svh, 150px);
+
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: var(--fade) max(20px, calc(50% - 360px)) 30px;
+  background: linear-gradient(180deg, transparent 0, rgb(11 11 15 / 0.9) var(--fade));
+  text-align: center;
+}
+.tpl-cinemanow .cn-hosts { font: 700 0.95rem/1.3 var(--credit); letter-spacing: 0.2em; text-transform: uppercase; color: var(--cream); }
+.tpl-cinemanow .cn-names {
+  display: grid;
+  gap: 2px;
+  font-size: clamp(2.4rem, 12.5vw, 5rem);
+  line-height: 1.02;
+  color: var(--cream);
+}
+.tpl-cinemanow .cn-names[data-fit='1'] { font-size: clamp(2rem, 10vw, 4rem); }
+.tpl-cinemanow .cn-names[data-fit='2'] { font-size: clamp(1.6rem, 7.6vw, 3rem); }
+.tpl-cinemanow .cn-names i { font: 700 max(0.3em, 14px)/1.3 var(--credit); /* never under 12px, whatever step the names fit at */ letter-spacing: 0.3em; text-transform: uppercase; color: var(--amber); }
+.tpl-cinemanow .cn-tagline { font-size: 1.3rem; color: var(--cream); }
+.tpl-cinemanow .cn-when { font-size: 1.15rem; color: var(--cream); }
+
+.tpl-cinemanow .cn-clock { display: flex; justify-content: center; gap: clamp(14px, 5vw, 30px); }
+.tpl-cinemanow .cn-clock span { display: grid; justify-items: center; gap: 4px; min-width: 44px; }
+.tpl-cinemanow .cn-clock b { font: 400 clamp(1.5rem, 6vw, 2rem)/1 var(--display); letter-spacing: 0; color: var(--cream); }
+.tpl-cinemanow .cn-clock small { font: 500 0.85rem/1 var(--credit); letter-spacing: 0.1em; text-transform: none; }
+.tpl-cinemanow .cn-clock--live { font: 400 1.4rem/1 var(--display); letter-spacing: 0; text-transform: none; color: var(--cream); }
+
+/* ---------- Poster: the couple photo in a marquee frame of bulbs, the opening date on its lower third ---------- */
+.tpl-cinemanow .cn-poster-sec { display: grid; justify-items: center; padding: 72px 20px 56px; }
+.tpl-cinemanow .cn-poster {
+  width: min(100%, 340px);
+  padding: 16px;
+  background: radial-gradient(circle, var(--amber) 0 3px, transparent 3.6px) center / 22px 22px round #1c130a;
+  box-shadow: 0 0 60px rgb(232 176 74 / 0.16), 0 24px 50px rgb(0 0 0 / 0.55);
+}
+.tpl-cinemanow .cn-poster__art { position: relative; aspect-ratio: 2 / 3; overflow: hidden; background: linear-gradient(160deg, #3a2a34, #1a1420); }
+.tpl-cinemanow .cn-poster__text {
+  position: absolute;
+  inset: auto 0 0;
+  display: grid;
+  gap: 4px;
+  padding: 80px 14px 18px;
+  background: linear-gradient(180deg, transparent 0, rgb(11 11 15 / 0.92) 80px);
+  text-align: center;
+}
+.tpl-cinemanow .cn-poster__open { font: 700 0.95rem/1.2 var(--credit); letter-spacing: 0.28em; text-transform: uppercase; color: var(--amber); }
+.tpl-cinemanow .cn-poster__date { font: 400 1.7rem/1.1 var(--display); text-wrap: balance; color: var(--cream); }
+.tpl-cinemanow .cn-poster__meta { font-size: 1.1rem; line-height: 1.3; color: var(--cream); }
+
+/* ---------- Starring: both portraits on one strip of 35mm film ---------- */
+.tpl-cinemanow .cn-cast { padding: 64px 16px 72px; background: var(--ink-2); text-align: center; }
+.tpl-cinemanow .cn-reel {
+  --hole: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='14'%3E%3Crect x='6' y='3' width='10' height='8' rx='2' fill='%2315131a'/%3E%3C/svg%3E");
+
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 440px;
+  margin: 28px auto 0;
+  padding: 34px 12px 30px;
+  background: #2b2722;
+  text-align: center;
+}
+.tpl-cinemanow .cn-reel::before,
+.tpl-cinemanow .cn-reel::after { content: ''; position: absolute; left: 0; right: 0; height: 14px; background: var(--hole) 0 0 / 22px 14px repeat-x; }
+.tpl-cinemanow .cn-reel::before { top: 10px; }
+.tpl-cinemanow .cn-reel::after { bottom: 8px; }
+.tpl-cinemanow .cn-frame__img { position: relative; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 2px; background: linear-gradient(160deg, #4a3d3a, #231d28); }
+.tpl-cinemanow .cn-frame figcaption { display: grid; gap: 2px; padding-top: 12px; }
+.tpl-cinemanow .cn-frame b { font: 400 1.2rem/1.15 var(--display); color: var(--cream); }
+.tpl-cinemanow .cn-frame b[data-fit='1'] { font-size: 1.05rem; }
+.tpl-cinemanow .cn-frame b[data-fit='2'] { font-size: 0.95rem; }
+.tpl-cinemanow .cn-frame span { font-size: 1.05rem; color: var(--amber); }
+
+/* ---------- The story so far ---------- */
+.tpl-cinemanow .cn-story { padding: 72px 20px 64px; text-align: center; }
+.tpl-cinemanow .cn-plot { display: grid; max-width: 520px; margin: 28px auto 0; text-align: left; }
+.tpl-cinemanow .cn-plot li {
+  display: grid;
+  grid-template-columns: clamp(64px, 22%, 92px) 1fr;
+  gap: 4px 16px;
+  padding: 18px 0;
+  border-top: 1px solid rgb(243 234 215 / 0.18);
+}
+.tpl-cinemanow .cn-plot__year { font: 400 1.7rem/1.1 var(--display); color: var(--amber); }
+.tpl-cinemanow .cn-plot h3 { font-size: 1.35rem; color: var(--cream); }
+.tpl-cinemanow .cn-plot p { margin-top: 4px; color: var(--cream-dim); }
+
+/* ---------- Showtimes: ticket stubs, the time on the tear-off end ---------- */
+.tpl-cinemanow .cn-shows { padding: 72px 16px 72px; background: var(--ink-2); text-align: center; }
+.tpl-cinemanow .cn-tickets { display: grid; gap: 18px; max-width: 520px; margin: 28px auto 0; text-align: left; }
+.tpl-cinemanow .cn-ticket {
+  --stub: 112px;
+
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr var(--stub);
+  border-radius: 6px;
+  background: var(--cream);
+  color: var(--ink);
+}
+.tpl-cinemanow .cn-ticket::before,
+.tpl-cinemanow .cn-ticket::after { /* the two punched notches either end of the perforation */
+  content: '';
+  position: absolute;
+  right: calc(var(--stub) - 9px);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--ink-2);
+}
+.tpl-cinemanow .cn-ticket::before { top: -9px; }
+.tpl-cinemanow .cn-ticket::after { bottom: -9px; }
+.tpl-cinemanow .cn-ticket__main { display: grid; align-content: center; gap: 4px; padding: 16px 14px 16px 18px; }
+.tpl-cinemanow .cn-ticket h3 { font-size: 1.5rem; color: var(--ink); }
+.tpl-cinemanow .cn-ticket__main p { font-size: 1.1rem; line-height: 1.3; color: #2c261c; }
+.tpl-cinemanow .cn-ticket__stub {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border-radius: 0 6px 6px 0;
+  background: repeating-linear-gradient(180deg, rgb(11 11 15 / 0.55) 0 6px, transparent 6px 12px) 0 0 / 2px 100% no-repeat, var(--amber);
+  text-align: center;
+}
+.tpl-cinemanow .cn-ticket__stub b { font: 700 1.55rem/1 var(--credit); color: var(--ink); }
+.tpl-cinemanow .cn-ticket__stub span { font-size: 1.05rem; line-height: 1.2; color: var(--ink); }
+
+/* Tickets slide in from the right the first time they scroll into view; translate is its own property. */
+.tpl-cinemanow [data-reveal] { opacity: 0; translate: 28px 0; transition: opacity 0.7s var(--ease), translate 0.7s var(--ease); transition-delay: calc(var(--i, 0) * 80ms); }
+.tpl-cinemanow [data-reveal].in { opacity: 1; translate: 0 0; }
+
+/* ---------- Venue and actions ---------- */
+.tpl-cinemanow .cn-where { display: grid; justify-items: center; gap: 6px; padding: 72px 20px 64px; text-align: center; }
+.tpl-cinemanow .cn-where__lead { font: 700 0.95rem/1.2 var(--credit); letter-spacing: 0.26em; text-transform: uppercase; color: var(--amber); }
+.tpl-cinemanow .cn-where__city { font-size: 1.2rem; color: var(--cream-dim); }
+.tpl-cinemanow .cn-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 22px; }
+.tpl-cinemanow .cn-btn {
+  display: inline-grid;
+  place-items: center;
+  min-height: 52px;
+  padding: 0 26px;
+  border: 1px solid var(--amber);
+  border-radius: 4px;
+  background: var(--amber);
+  color: var(--ink);
+  font: 700 1.05rem/1 var(--credit);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+.tpl-cinemanow .cn-btn--ghost { background: transparent; color: var(--cream); }
+
+/* ---------- Book your seat: back behind the curtains ---------- */
+.tpl-cinemanow .cn-rsvp {
+  padding: 88px 16px 150px;
+  background:
+    linear-gradient(180deg, rgb(0 0 0 / 0.55), transparent 180px),
+    repeating-linear-gradient(90deg, #4a0b12 0, #5e0e19 16px, #6e1220 24px, #55101a 32px, #4a0b12 44px);
+  text-align: center;
+}
+.tpl-cinemanow .cn-rsvp__note { margin-top: 10px; font-size: 1.2rem; color: var(--cream); }
+.tpl-cinemanow .rsvp,
+.tpl-cinemanow .rsvp__done { display: grid; gap: 16px; max-width: 380px; margin: 28px auto 0; text-align: left; }
+.tpl-cinemanow .rsvp label { display: grid; gap: 6px; }
+.tpl-cinemanow .rsvp label span { font: 700 0.9rem/1.2 var(--credit); letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber); }
+.tpl-cinemanow .rsvp input,
+.tpl-cinemanow .rsvp select,
+.tpl-cinemanow .rsvp textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid rgb(232 176 74 / 0.65);
+  border-radius: 4px;
+  background: rgb(0 0 0 / 0.32);
+  color: var(--cream);
+  font: inherit;
+  font-size: 1.1rem; /* over 16px: iOS does not zoom the page when a field is focused */
+}
+.tpl-cinemanow .rsvp select option { color: var(--ink); }
+.tpl-cinemanow .rsvp button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--amber);
+  color: var(--ink);
+  font: 700 1.05rem/1 var(--credit);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.tpl-cinemanow .rsvp__error { color: #ffc2b0; }
+.tpl-cinemanow .rsvp__msg { padding: 12px 14px; border-radius: 4px; background: rgb(0 0 0 / 0.3); white-space: pre-wrap; user-select: text; }
+.tpl-cinemanow .rsvp__reply button {
+  min-height: 44px;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: 700 1rem/1 var(--credit);
+  letter-spacing: 0.04em;
+  text-transform: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.tpl-cinemanow .rsvp__hint { min-height: 1.5em; font-size: 1rem; color: var(--cream); }
+
+.tpl-cinemanow .cn-btn:focus-visible,
+.tpl-cinemanow .rsvp input:focus-visible,
+.tpl-cinemanow .rsvp select:focus-visible,
+.tpl-cinemanow .rsvp textarea:focus-visible,
+.tpl-cinemanow .rsvp button:focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .tpl-cinemanow .cn-btn:hover { background: #f4c46e; border-color: #f4c46e; }
+  .tpl-cinemanow .cn-btn--ghost:hover { background: rgb(232 176 74 / 0.16); border-color: var(--amber); }
+}
+
+/* Reduced motion: the backdrop holds still and the tickets are simply there. */
+@media (prefers-reduced-motion: reduce) {
+  .tpl-cinemanow .cn-pan { animation: none; transform: none; }
+  .tpl-cinemanow [data-reveal] { opacity: 1; translate: 0 0; transition: none; }
+}

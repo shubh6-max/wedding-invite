@@ -16,7 +16,8 @@
   min-height: 100svh;
   overflow-x: clip;
   color: var(--cream);
-  font: 1.0625rem/1.6 'Karla', system-ui, sans-serif;
+  font: 1.0625rem/1.6 'Karla', 'Noto Serif Devanagari', 'Noto Serif Gujarati', system-ui, sans-serif;
+  overflow-wrap: anywhere; /* a very long word wraps instead of pushing the page sideways */
   background-color: var(--green);
   background-image:
     repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 7px),
@@ -25,7 +26,7 @@
 .tpl-gopuram *, .tpl-gopuram *::before, .tpl-gopuram *::after { box-sizing: border-box; }
 .tpl-gopuram h1, .tpl-gopuram h2, .tpl-gopuram h3, .tpl-gopuram p, .tpl-gopuram dl, .tpl-gopuram dd, .tpl-gopuram ol { margin: 0; padding: 0; }
 .tpl-gopuram ol { list-style: none; }
-.tpl-gopuram h1, .tpl-gopuram h2, .tpl-gopuram h3 { font-family: 'Rozha One', 'Times New Roman', serif; font-weight: 400; line-height: 1.12; }
+.tpl-gopuram h1, .tpl-gopuram h2, .tpl-gopuram h3 { font-family: 'Rozha One', 'Noto Serif Devanagari', 'Noto Serif Gujarati', 'Times New Roman', serif; font-weight: 400; line-height: 1.12; }
 .tpl-gopuram h2 { font-size: clamp(1.6rem, 5.4vw, 2.5rem); color: var(--gold-l); text-align: center; text-wrap: balance; }
 .tpl-gopuram .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .tpl-gopuram a:focus-visible, .tpl-gopuram button:focus-visible, .tpl-gopuram input:focus-visible,
@@ -74,12 +75,23 @@
 .tpl-gopuram .hero__tag { font-size: 1.15rem; }
 .tpl-gopuram .hero__when { margin-top: 0.75rem; font-size: 1.3rem; font-weight: 700; color: var(--gold-l); }
 .tpl-gopuram .hero__where { max-width: 30ch; }
+/* Longer text steps down so the column never overflows (data-fit is set from the grapheme count; nothing goes under 12px). */
+.tpl-gopuram .hero h1[data-fit='1'] { font-size: clamp(2.4rem, 11vw, 4.6rem); }
+.tpl-gopuram .hero h1[data-fit='2'] { font-size: clamp(1.7rem, 7.5vw, 3rem); line-height: 1.15; }
+.tpl-gopuram .hero__hosts[data-fit='1'] { font-size: 0.95rem; }
+.tpl-gopuram .hero__hosts[data-fit='2'] { font-size: 0.8rem; line-height: 1.3; }
+.tpl-gopuram .hero__tag[data-fit='1'] { font-size: 1rem; }
+.tpl-gopuram .hero__tag[data-fit='2'] { font-size: 0.85rem; line-height: 1.3; }
+.tpl-gopuram .hero__where[data-fit='1'] { font-size: 0.95rem; }
+.tpl-gopuram .hero__where[data-fit='2'] { font-size: 0.85rem; line-height: 1.3; }
+.tpl-gopuram .hero__hosts, .tpl-gopuram .hero__tag, .tpl-gopuram .hero__where { text-wrap: balance; }
 
 /* ---------- countdown ---------- */
 .tpl-gopuram .count { padding: 3.5rem 1rem 1rem; display: grid; gap: 1.5rem; justify-items: center; }
 .tpl-gopuram .count__row { display: grid; grid-template-columns: repeat(4, minmax(0, 92px)); gap: 0.6rem; width: 100%; justify-content: center; }
 .tpl-gopuram .count__cell { display: grid; justify-items: center; align-content: end; padding: 1.1rem 0.25rem 0.6rem; border: 2px solid var(--gold); border-bottom-width: 4px; border-radius: 999px 999px 4px 4px; background: rgba(0, 0, 0, 0.18); }
 .tpl-gopuram .count__cell b { font: 400 clamp(1.5rem, 7vw, 2.3rem)/1.1 'Rozha One', serif; font-variant-numeric: tabular-nums; color: var(--cream); }
+.tpl-gopuram .count__cell b.is-long { font-size: clamp(1rem, 5vw, 1.9rem); } /* five-digit day counts (a date far in the future) */
 .tpl-gopuram .count__cell span { font-size: 0.78rem; color: var(--gold-l); }
 .tpl-gopuram .count__done { font-size: 1.3rem; color: var(--gold-l); }
 
@@ -151,6 +163,8 @@
   .tpl-gopuram .hero__stage { width: 100%; }
   .tpl-gopuram .hero__text { justify-items: start; max-width: 40rem; }
   .tpl-gopuram .hero h1 { justify-items: start; font-size: clamp(4.5rem, 8vw, 8rem); }
+  .tpl-gopuram .hero h1[data-fit='1'] { font-size: clamp(3.2rem, 5.5vw, 5.5rem); }
+  .tpl-gopuram .hero h1[data-fit='2'] { font-size: clamp(2.2rem, 4vw, 3.8rem); }
   .tpl-gopuram .ribbon::before { left: calc(50% - 10px); }
   .tpl-gopuram .ribbon li { width: calc(50% - 3rem); padding-left: 0; }
   .tpl-gopuram .ribbon li:nth-child(odd) { margin-right: auto; text-align: right; }

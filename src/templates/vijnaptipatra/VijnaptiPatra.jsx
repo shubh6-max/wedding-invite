@@ -196,8 +196,7 @@ export default function VijnaptiPatra({ invite }) {
                 <RsvpForm
                   labels={{
                     note: 'A message for the families',
-                    submit: 'Send reply',
-                    yes: `${jai}. Your reply has reached the families, and we look forward to seeing you.`,
+                    yes: `${jai}. We look forward to seeing you.`,
                     no: `${jai}. Thank you for letting us know. You will be in our thoughts.`,
                   }}
                 />

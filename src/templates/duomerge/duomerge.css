@@ -1,0 +1,323 @@
+/* Two Become One. A tall hero track with a pinned stage; scroll position (written to --p by DuoMerge.jsx, never a
+   timer) zips the seam shut and then opens the couple photo outward from it. Everything is scoped under .tpl-duomerge.
+   Geometry is in percent of the canvas: the seam runs from (56%, top) to (44%, bottom); the open zipper is a wedge
+   17% to each side of the seam at the top and a point at the bottom, like the gate's. */
+.tpl-duomerge {
+  --plum: #1f1b24;
+  --ink: #1f1b24;
+  --ink-2: #4a4350;
+  --cream: #f6f0ea;
+  --rose: #8f3349;
+  --rose-hi: #f0a5b8;
+  --gold: #c9a24a;
+  --gold-hi: #e6cb88;
+  --gold-lo: #a8832f;
+  --sheet: 244 238 240; /* the pale scrim every band sits on, as an rgb triplet */
+  --serif: 'Gloock', 'Noto Serif Devanagari', Georgia, serif;
+
+  min-height: 100svh;
+  overflow-x: clip;
+  background: var(--plum);
+  color: var(--ink);
+  font: 400 1.0625rem/1.65 'Josefin Sans', 'Hind', system-ui, sans-serif;
+  overflow-wrap: anywhere; /* a very long word wraps instead of pushing the page sideways */
+}
+.tpl-duomerge *,
+.tpl-duomerge *::before,
+.tpl-duomerge *::after { box-sizing: border-box; }
+.tpl-duomerge h1,
+.tpl-duomerge h2,
+.tpl-duomerge h3,
+.tpl-duomerge p,
+.tpl-duomerge ul { margin: 0; padding: 0; }
+.tpl-duomerge ul { list-style: none; }
+.tpl-duomerge h1,
+.tpl-duomerge h2,
+.tpl-duomerge h3 { font-family: var(--serif); font-weight: 400; line-height: 1.12; text-wrap: balance; }
+
+/* ---------- Hero: the pinned stage ---------- */
+.tpl-duomerge .dm-hero { position: relative; height: calc(100vh + 130vh); height: calc(100svh + 130svh); background: var(--plum); }
+.tpl-duomerge .dm-stage {
+  --p: 0; /* merge progress 0..1, set from scroll */
+  --s: calc(1 - clamp(0, var(--p) / 0.42, 1)); /* how open the zipper still is: 1 open, 0 shut */
+  --m: clamp(0, (var(--p) - 0.34) / 0.6, 1); /* how much of the canvas the couple photo has taken */
+  --w: calc(var(--m) * 62%); /* half-width of the couple band around the seam */
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: radial-gradient(ellipse at 50% 38%, #2c2433, var(--plum) 72%);
+}
+.tpl-duomerge .dm-canvas { position: absolute; inset: 0; width: min(100%, 920px); margin-inline: auto; }
+
+.tpl-duomerge .dm-half,
+.tpl-duomerge .dm-couple { position: absolute; inset: 0; }
+.tpl-duomerge .dm-half { z-index: 1; }
+.tpl-duomerge .dm-half--a { clip-path: polygon(0 0, 56% 0, 44% 100%, 0 100%); }
+.tpl-duomerge .dm-half--b { clip-path: polygon(56% 0, 100% 0, 100% 100%, 44% 100%); }
+/* A frame is sized by its box, never by the picture; its own colour shows if the photo is missing. */
+.tpl-duomerge .dm-frame { position: absolute; top: 0; bottom: 0; width: 72%; overflow: hidden; }
+.tpl-duomerge .dm-half--a .dm-frame { left: -10%; background: #c8a1ae; }
+.tpl-duomerge .dm-half--b .dm-frame { right: -10%; background: #9d98b5; }
+.tpl-duomerge .dm-frame img,
+.tpl-duomerge .dm-couple img { display: block; width: 100%; height: 100%; }
+
+/* The closed zipper runs the whole seam; the wedge hides it where the zipper is still open. */
+.tpl-duomerge .dm-seam {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  clip-path: polygon(calc(56% - 2px) 0, calc(56% + 2px) 0, calc(44% + 2px) 100%, calc(44% - 2px) 100%);
+  background: repeating-linear-gradient(180deg, var(--gold-hi) 0 4px, var(--gold) 4px 7px, #8a6a22 7px 8px);
+}
+.tpl-duomerge .dm-wedge {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 56% 0; /* scaling about the top of the seam keeps the wedge's point on the seam */
+  transform: scale(var(--s));
+}
+.tpl-duomerge .dm-wedge polygon { fill: #1a161e; }
+.tpl-duomerge .dm-wedge polyline {
+  fill: none;
+  stroke: var(--gold-hi);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+/* The couple photo opens outward from the seam: a diagonal band that widens until it covers the canvas. */
+.tpl-duomerge .dm-couple {
+  z-index: 4;
+  background: #d6b7bf;
+  clip-path: polygon(calc(56% - var(--w)) 0, calc(56% + var(--w)) 0, calc(44% + var(--w)) 100%, calc(44% - var(--w)) 100%);
+}
+.tpl-duomerge .dm-pull {
+  position: absolute;
+  z-index: 5;
+  left: calc(56% - 12% * var(--s)); /* rides the seam from the bottom to the top as it zips */
+  top: calc(100% * var(--s));
+  width: 22px;
+  height: 36px;
+  translate: -50% -50%;
+  border-radius: 11px 11px 13px 13px;
+  background: linear-gradient(180deg, var(--gold-hi), var(--gold) 55%, #9a7a2e);
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.5);
+  opacity: clamp(0, calc(var(--s) * 10), 1);
+  pointer-events: none;
+}
+.tpl-duomerge .dm-pull::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 9px;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  border-radius: 50%;
+  background: #1a161e;
+}
+
+/* The names stay pinned the whole way: a woven label sewn across the seam, on its own scrim. */
+.tpl-duomerge .dm-label {
+  position: absolute;
+  z-index: 6;
+  inset-inline: 0;
+  bottom: 108px; /* clear of the gallery nav pill */
+  width: min(88%, 400px);
+  margin-inline: auto;
+  padding: 12px; /* the stitch sits in this margin; the marked text block inside stays clear of it */
+  text-align: center;
+  color: var(--cream);
+  background: rgb(26 21 32 / 0.9);
+  outline: 1px dashed rgb(230 203 136 / 0.75);
+  outline-offset: -6px;
+}
+.tpl-duomerge .dm-label__in { padding: 12px 8px 10px; }
+.tpl-duomerge .dm-for { font-size: 0.9375rem; font-weight: 600; letter-spacing: 0.04em; color: var(--gold-hi); }
+.tpl-duomerge .dm-for[data-fit='1'] { font-size: 0.875rem; }
+.tpl-duomerge .dm-for[data-fit='2'] { font-size: 0.8125rem; }
+.tpl-duomerge .dm-hosts { font-size: 0.875rem; letter-spacing: 0.03em; color: #cdc3d2; }
+.tpl-duomerge .dm-label h1 {
+  display: grid;
+  justify-items: center;
+  margin: 8px 0 6px;
+  font-size: clamp(1.7rem, 8vw, 2.35rem);
+  color: var(--cream);
+}
+.tpl-duomerge .dm-label h1[data-fit='1'] { font-size: clamp(1.45rem, 6.8vw, 1.95rem); }
+.tpl-duomerge .dm-label h1[data-fit='2'] { font-size: clamp(1.2rem, 5.6vw, 1.6rem); }
+.tpl-duomerge .dm-label h1 i { font-style: normal; font-size: 0.6em; line-height: 1.25; color: var(--rose-hi); }
+.tpl-duomerge .dm-tagline { font-size: 0.9375rem; color: #cdc3d2; }
+.tpl-duomerge .dm-label time { display: block; margin-top: 2px; font-size: 0.9375rem; font-weight: 600; letter-spacing: 0.03em; color: var(--gold-hi); }
+
+/* ---------- Later sections: pale bands over a blurred, pinned ground ---------- */
+/* The top edge slants the way the seam does. */
+.tpl-duomerge .dm-later { position: relative; clip-path: polygon(0 40px, 100% 0, 100% 100%, 0 100%); }
+.tpl-duomerge .dm-ground {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: 100vh;
+  height: 100svh;
+  margin-bottom: -100vh;
+  margin-bottom: -100svh;
+  overflow: hidden;
+  background: #d8cbd2;
+}
+.tpl-duomerge .dm-ground__pic { position: absolute; inset: -6%; background: #cdbcc6; filter: blur(16px) saturate(0.85); }
+.tpl-duomerge .dm-ground__pic img { display: block; width: 100%; height: 100%; }
+.tpl-duomerge .dm-ground::after { content: ''; position: absolute; inset: 0; background: rgb(var(--sheet) / 0.5); }
+
+/* Every band is marked data-over-photo: the ground behind it is a photo, so each carries its own scrim. */
+.tpl-duomerge .dm-band { position: relative; z-index: 1; width: min(100%, 640px); margin-inline: auto; background: rgb(var(--sheet) / 0.9); color: var(--ink); }
+.tpl-duomerge .dm-band__in { padding: 56px 24px 52px; }
+.tpl-duomerge .dm-band h2 { margin-bottom: 22px; font-size: clamp(1.9rem, 8.5vw, 2.5rem); color: var(--ink); }
+/* The stitched gap between bands shows the ground. */
+.tpl-duomerge .dm-gap { position: relative; z-index: 1; height: 88px; }
+.tpl-duomerge .dm-gap--lead { height: 120px; }
+.tpl-duomerge .dm-gap::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 12px;
+  bottom: 12px;
+  width: 2px;
+  margin-left: -1px;
+  background: repeating-linear-gradient(180deg, var(--gold-lo) 0 6px, transparent 6px 12px);
+}
+.tpl-duomerge .dm-gap--end { height: 56px; }
+
+/* Story */
+.tpl-duomerge .dm-story li {
+  display: grid;
+  grid-template-columns: 4.25rem minmax(0, 1fr);
+  gap: 0 16px;
+  padding: 18px 0;
+  border-top: 1px dashed rgb(31 27 36 / 0.4);
+}
+.tpl-duomerge .dm-story b { font: 400 1.5rem/1.25 var(--serif); color: var(--rose); }
+.tpl-duomerge .dm-story h3 { margin-bottom: 4px; font-size: 1.2rem; line-height: 1.25; }
+.tpl-duomerge .dm-story p { color: var(--ink-2); }
+
+/* When and where */
+.tpl-duomerge .dm-date { display: block; font: 400 clamp(1.5rem, 7vw, 2rem)/1.2 var(--serif); }
+.tpl-duomerge .dm-where { margin-top: 8px; color: var(--ink-2); }
+.tpl-duomerge .dm-where b { display: block; font-weight: 600; color: var(--ink); }
+.tpl-duomerge .dm-count { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 28px 0; }
+.tpl-duomerge .dm-count > span { display: grid; justify-items: center; padding: 10px 2px 8px; border: 1px dashed rgb(31 27 36 / 0.45); }
+.tpl-duomerge .dm-count b { font: 400 clamp(1.5rem, 7vw, 2rem)/1.15 var(--serif); }
+.tpl-duomerge .dm-count small { font-size: 0.8125rem; color: var(--ink-2); }
+.tpl-duomerge .dm-today { margin: 28px 0; font: 400 1.5rem/1.3 var(--serif); color: var(--rose); }
+.tpl-duomerge .dm-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.tpl-duomerge .dm-btn {
+  display: inline-grid;
+  place-items: center;
+  min-height: 48px;
+  padding: 0 22px;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ink);
+  font: 600 1rem 'Josefin Sans', 'Hind', system-ui, sans-serif;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  cursor: pointer;
+}
+.tpl-duomerge .dm-btn--solid { background: var(--gold); }
+
+/* Events */
+.tpl-duomerge .dm-events li {
+  display: grid;
+  grid-template-columns: 5.25rem minmax(0, 1fr);
+  gap: 0 16px;
+  padding: 16px 0;
+  border-top: 1px dashed rgb(31 27 36 / 0.4);
+}
+.tpl-duomerge .dm-ev__when { display: grid; align-content: start; }
+.tpl-duomerge .dm-ev__when b { font-weight: 600; }
+.tpl-duomerge .dm-ev__when span { font-size: 0.875rem; color: var(--ink-2); }
+.tpl-duomerge .dm-events h3 { font-size: 1.3rem; }
+.tpl-duomerge .dm-events p { color: var(--ink-2); }
+
+/* RSVP (shared form, styled for the pale band) */
+.tpl-duomerge .dm-rsvp .dm-band__in { padding-bottom: 140px; } /* the nav pill sits at the bottom */
+.tpl-duomerge .dm-rsvp__by { margin: -8px 0 20px; color: var(--ink-2); }
+.tpl-duomerge .rsvp,
+.tpl-duomerge .rsvp__done { display: grid; gap: 16px; text-align: left; }
+.tpl-duomerge .rsvp label { display: grid; gap: 6px; }
+.tpl-duomerge .rsvp label span { font-size: 0.875rem; font-weight: 600; letter-spacing: 0.03em; color: var(--ink-2); }
+.tpl-duomerge .rsvp input,
+.tpl-duomerge .rsvp select,
+.tpl-duomerge .rsvp textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid rgb(31 27 36 / 0.5);
+  border-radius: 2px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem; /* 16px: iOS does not zoom the page when this is focused */
+}
+.tpl-duomerge .rsvp textarea { min-height: 96px; resize: none; } /* the browser's grey resize grip is not a colour the band can promise contrast for */
+.tpl-duomerge .rsvp button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--gold);
+  color: var(--ink);
+  font: 600 1rem 'Josefin Sans', 'Hind', system-ui, sans-serif;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+.tpl-duomerge .rsvp__error { color: #8a1f2d; }
+.tpl-duomerge .rsvp__msg { padding: 12px 14px; border: 1px dashed rgb(31 27 36 / 0.45); background: #fff; white-space: pre-wrap; user-select: text; }
+.tpl-duomerge .rsvp__reply button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--rose);
+  font: 600 1rem 'Josefin Sans', 'Hind', system-ui, sans-serif;
+  letter-spacing: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.tpl-duomerge .rsvp__reply a { color: var(--rose); }
+.tpl-duomerge .rsvp__hint { min-height: 1.5em; font-size: 0.9375rem; color: var(--ink-2); }
+
+.tpl-duomerge .dm-btn:focus-visible,
+.tpl-duomerge .rsvp input:focus-visible,
+.tpl-duomerge .rsvp select:focus-visible,
+.tpl-duomerge .rsvp textarea:focus-visible,
+.tpl-duomerge .rsvp button:focus-visible,
+.tpl-duomerge .rsvp__reply a:focus-visible { outline: 3px solid var(--rose); outline-offset: 3px; }
+
+/* Phone held sideways: no room for a stacked label under the faces, so it becomes a short, wide strip: one line of
+   names, then the tagline and date side by side. */
+@media (max-height: 520px) {
+  .tpl-duomerge .dm-label { bottom: 96px; width: min(84%, 580px); padding: 8px; outline-offset: -4px; }
+  .tpl-duomerge .dm-label__in { padding: 6px 8px 4px; }
+  .tpl-duomerge .dm-label h1 { display: block; margin: 2px 0; font-size: clamp(1.3rem, 3.6vw, 1.8rem); }
+  .tpl-duomerge .dm-label h1 span { display: inline; }
+  .tpl-duomerge .dm-label h1 i { display: inline; font-size: 0.7em; } /* the spaces in the markup now separate the three parts */
+  .tpl-duomerge .dm-tagline,
+  .tpl-duomerge .dm-label time { display: inline; margin-inline: 0.5em; }
+}
+
+/* Reduced motion: no scroll-linked merge. The hero is one plain screen showing the finished couple photo. */
+@media (prefers-reduced-motion: reduce) {
+  .tpl-duomerge .dm-hero { height: auto; }
+  .tpl-duomerge .dm-stage { position: relative; }
+  .tpl-duomerge .dm-half,
+  .tpl-duomerge .dm-seam,
+  .tpl-duomerge .dm-wedge,
+  .tpl-duomerge .dm-pull { display: none; }
+  .tpl-duomerge .dm-couple { clip-path: none; }
+}

@@ -1,0 +1,237 @@
+/* Jharokha Portraits gate: the haveli wall with its three windows shuttered. Tap the brass button (or any shutter):
+   the centre shutters swing open first, then the two side ones, showing the portraits, and the gate fades onto
+   the page, whose own windows are already open. Only transform and opacity animate. Sequence (ms): centre
+   leaves 0-1050, left 180-1230, right 360-1410, button and guest line fade 0-300, the whole gate fades 1550-2150
+   (useGate ms = 2200). */
+.gate-jharokhaportraits.gate {
+  --wall: #7a2e1d;
+  --wall-deep: #571e12;
+  --wall-lo: #4d190d;
+  --wall-hi: #b4532f;
+  --stone: #e5c48f;
+  --stone-hi: #f1dcae;
+  --stone-lo: #b88a52;
+  --teal: #1f5f58;
+  --teal-deep: #123f3a;
+  --teal-hi: #2f7d73;
+  --brass: #d9a441;
+  --brass-hi: #f0cb73;
+  --cream: #f6e7c8;
+  --carve: #3a140b;
+  --carve-2: #6a3320;
+  --ring: clamp(5px, 1.8vw, 9px);
+  --ease: cubic-bezier(0.22, 0.9, 0.2, 1);
+
+  background: var(--wall-hi);
+  color: var(--cream);
+  font: 600 1.05rem/1.4 'Cormorant Garamond', 'Noto Serif Devanagari', Georgia, serif;
+}
+.gate-jharokhaportraits *,
+.gate-jharokhaportraits *::before,
+.gate-jharokhaportraits *::after { box-sizing: border-box; }
+.gate-jharokhaportraits p { margin: 0; }
+
+/* The wall: the background photo in greys multiplied onto terracotta, blacks lifted to oxblood (same as the page).
+   Both tint layers need a z-index to paint above the picture. */
+.gate-jharokhaportraits .gate-jharokhaportraits__wall { position: absolute; inset: 0; isolation: isolate; background: var(--wall-hi); }
+.gate-jharokhaportraits .gate-jharokhaportraits__wall .gate-jharokhaportraits__photo { filter: grayscale(1) contrast(1.1); mix-blend-mode: multiply; }
+.gate-jharokhaportraits .gate-jharokhaportraits__wall::before { content: ''; position: absolute; inset: 0; z-index: 1; background: var(--wall-lo); mix-blend-mode: lighten; }
+.gate-jharokhaportraits .gate-jharokhaportraits__wall::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    radial-gradient(ellipse at 50% 45%, transparent 35%, rgb(30 8 4 / 0.5) 100%),
+    repeating-linear-gradient(0deg, transparent 0 41px, rgb(20 5 2 / 0.12) 41px 42px);
+}
+.gate-jharokhaportraits .gate-jharokhaportraits__photo { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+
+.gate-jharokhaportraits .gate-jharokhaportraits__eave {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 34px;
+  background:
+    linear-gradient(180deg, var(--stone-hi) 0 4px, var(--stone) 4px 18px, var(--stone-lo) 18px 21px, transparent 21px) 0 0 / 100% 100% no-repeat,
+    repeating-linear-gradient(90deg, var(--stone-lo) 0 11px, transparent 11px 26px) 0 21px / 100% 12px no-repeat;
+  filter: drop-shadow(0 6px 8px rgb(20 5 2 / 0.35));
+}
+
+/* ---- the stage: guest line, names plate, windows, button ---- */
+.gate-jharokhaportraits .gate-jharokhaportraits__stage {
+  position: relative;
+  display: grid;
+  grid-template-areas: 'guest' 'plate' 'facade' 'btn';
+  justify-items: center;
+  row-gap: clamp(8px, 1.8dvh, 14px);
+  width: min(100%, 560px);
+  margin-top: 30px; /* clear of the eave */
+  padding: 0 12px;
+}
+.gate-jharokhaportraits .gate-jharokhaportraits__guest {
+  grid-area: guest;
+  max-width: 100%;
+  padding: 5px 16px;
+  border: 1px solid rgb(217 164 65 / 0.8);
+  border-radius: 3px; /* square corners: a pill's cut-away corners would show the wall behind the text */
+  background: var(--wall-deep);
+  color: var(--brass-hi);
+  font-size: 1rem;
+  font-style: italic;
+  text-align: center;
+  overflow-wrap: anywhere;
+  transition: opacity 0.3s ease;
+}
+.gate-jharokhaportraits .gate-jharokhaportraits__guest[data-fit='1'] { font-size: 0.95rem; }
+.gate-jharokhaportraits .gate-jharokhaportraits__guest[data-fit='2'] { font-size: 0.9rem; }
+
+.gate-jharokhaportraits .gate-jharokhaportraits__plate {
+  grid-area: plate;
+  display: grid;
+  gap: 2px;
+  width: min(100%, 360px);
+  padding: 14px 14px 16px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--stone-hi), var(--stone));
+  box-shadow: inset 0 0 0 4px var(--stone), inset 0 0 0 5px var(--stone-lo), 0 14px 30px rgb(20 5 2 / 0.4);
+  color: var(--carve);
+  text-align: center;
+}
+.gate-jharokhaportraits .gate-jharokhaportraits__names {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 0.35em;
+  font: 400 clamp(1.5rem, 7.2vw, 2rem)/1.15 'Marcellus', 'Noto Serif Devanagari', Georgia, serif;
+  color: var(--wall);
+  overflow-wrap: anywhere;
+}
+.gate-jharokhaportraits .gate-jharokhaportraits__names[data-fit='1'] { font-size: clamp(1.3rem, 6.2vw, 1.75rem); }
+.gate-jharokhaportraits .gate-jharokhaportraits__names[data-fit='2'] { font-size: clamp(1.15rem, 5.2vw, 1.45rem); }
+.gate-jharokhaportraits .gate-jharokhaportraits__names i { font: italic 600 0.85em/1.2 'Cormorant Garamond', Georgia, serif; color: var(--teal-deep); }
+.gate-jharokhaportraits .gate-jharokhaportraits__date { font-size: 1.05rem; color: var(--carve-2); }
+
+/* ---- the windows ---- */
+.gate-jharokhaportraits .gate-jharokhaportraits__facade {
+  grid-area: facade;
+  --gap: clamp(6px, 2vw, 12px);
+  width: min(100%, 520px, calc((100dvh - 340px) / 0.672));
+  cursor: pointer;
+}
+.gate-jharokhaportraits .gate-jharokhaportraits__row { display: grid; grid-template-columns: 1fr 1.35fr 1fr; gap: var(--gap); align-items: end; }
+.gate-jharokhaportraits .gate-jharokhaportraits__bay { --w: 3; --h: 4.3; --d: 0.18s; position: relative; padding: var(--ring) var(--ring) 0; container-type: inline-size; }
+.gate-jharokhaportraits .gate-jharokhaportraits__bay--c { --h: 5; --d: 0s; }
+.gate-jharokhaportraits .gate-jharokhaportraits__bay:last-child { --d: 0.36s; }
+.gate-jharokhaportraits .gate-jharokhaportraits__ring {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--stone-lo), var(--stone-hi) 22%, var(--stone) 78%, var(--stone-lo));
+  clip-path: inset(0 round 999px 999px 0 0); /* a huge radius is clamped to half the width: an exact semicircle */
+}
+.gate-jharokhaportraits .gate-jharokhaportraits__pane {
+  position: relative;
+  aspect-ratio: var(--w) / var(--h);
+  perspective: 640px;
+  perspective: 450cqw; /* 4.5 window widths: the same swing at every size */
+  perspective-origin: 50% 100%;
+}
+.gate-jharokhaportraits .gate-jharokhaportraits__glass {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #5c2a1c, #2b0f09);
+  clip-path: inset(0 round 999px 999px 0 0);
+}
+.gate-jharokhaportraits .gate-jharokhaportraits__glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 25%, rgb(255 214 150 / 0.2), transparent 62%);
+  box-shadow: inset 0 0 0 2px rgb(58 20 11 / 0.55), inset 0 -36px 36px -24px rgb(30 8 4 / 0.55);
+}
+.gate-jharokhaportraits .gate-jharokhaportraits__leaf {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 0.22), transparent 14%, transparent 86%, rgb(0 0 0 / 0.18)),
+    repeating-linear-gradient(180deg, var(--teal-hi) 0 1px, var(--teal) 1px 7px, var(--teal-deep) 7px 10px);
+  box-shadow: inset 0 0 0 3px var(--teal-deep), inset 0 0 0 4px rgb(240 203 115 / 0.45);
+  transition: transform 1.05s var(--ease); /* the stagger belongs to opening only; the hover peek has no delay */
+}
+.gate-jharokhaportraits .gate-jharokhaportraits__leaf::after { /* brass pull */
+  content: '';
+  position: absolute;
+  top: 54%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--brass-hi), var(--brass) 60%, #7a5415);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.55);
+}
+.gate-jharokhaportraits .gate-jharokhaportraits__leaf--l { left: 0; transform-origin: 0 50%; border-top-left-radius: 100% calc(50% * var(--w) / var(--h)); }
+.gate-jharokhaportraits .gate-jharokhaportraits__leaf--r { right: 0; transform-origin: 100% 50%; border-top-right-radius: 100% calc(50% * var(--w) / var(--h)); }
+.gate-jharokhaportraits .gate-jharokhaportraits__leaf--l::after { right: 9%; }
+.gate-jharokhaportraits .gate-jharokhaportraits__leaf--r::after { left: 9%; }
+.gate-jharokhaportraits .gate-jharokhaportraits__sill {
+  display: block;
+  height: 16px;
+  margin: 0 -6px;
+  border-top: 2px solid var(--stone-lo);
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(180deg, var(--stone-hi), var(--stone) 50%, var(--stone-lo));
+  box-shadow: 0 12px 26px rgb(20 5 2 / 0.45);
+}
+
+/* ---- the button ---- */
+.gate-jharokhaportraits .gate-jharokhaportraits__btn {
+  grid-area: btn;
+  min-height: 52px;
+  padding: 0 30px;
+  border: 0;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--brass-hi), var(--brass));
+  box-shadow: 0 8px 18px rgb(20 5 2 / 0.45);
+  color: var(--carve);
+  font: 400 1.1rem/1.2 'Marcellus', Georgia, serif;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+.gate-jharokhaportraits .gate-jharokhaportraits__btn:focus-visible { outline: 3px solid var(--cream); outline-offset: 4px; }
+
+/* ---- opening ---- */
+.gate-jharokhaportraits.is-opening { animation: jp-fade 0.6s ease 1.55s forwards; }
+@keyframes jp-fade { to { opacity: 0; } }
+.gate-jharokhaportraits.is-opening .gate-jharokhaportraits__guest,
+.gate-jharokhaportraits.is-opening .gate-jharokhaportraits__btn { opacity: 0; }
+.gate-jharokhaportraits.is-opening .gate-jharokhaportraits__leaf { transition-delay: var(--d); }
+.gate-jharokhaportraits.is-opening .gate-jharokhaportraits__leaf--l { transform: rotateY(-104deg); }
+.gate-jharokhaportraits.is-opening .gate-jharokhaportraits__leaf--r { transform: rotateY(104deg); }
+
+/* Phone held sideways: no room to stack, so the text sits left and the windows right. Guarded by orientation: a short
+   PORTRAIT phone (320x460 with its browser bars showing) keeps the stack. */
+@media (max-height: 520px) and (orientation: landscape) {
+  .gate-jharokhaportraits .gate-jharokhaportraits__stage {
+    grid-template-areas: 'guest facade' 'plate facade' 'btn facade';
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 28px;
+    row-gap: 10px;
+    width: min(100%, 780px);
+    margin-top: 28px;
+  }
+  .gate-jharokhaportraits .gate-jharokhaportraits__facade { width: min(46vw, calc((100dvh - 190px) / 0.672)); }
+  .gate-jharokhaportraits .gate-jharokhaportraits__plate { padding: 10px 12px 12px; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gate-jharokhaportraits:not(.is-opening) .gate-jharokhaportraits__facade:hover .gate-jharokhaportraits__leaf--l { transform: rotateY(-9deg); }
+  .gate-jharokhaportraits:not(.is-opening) .gate-jharokhaportraits__facade:hover .gate-jharokhaportraits__leaf--r { transform: rotateY(9deg); }
+}
+
+/* Reduced motion: no swing; the shutters are simply open and the gate fades out (lib/gate.js also shortens its timer). */
+@media (prefers-reduced-motion: reduce) {
+  .gate-jharokhaportraits .gate-jharokhaportraits__leaf { transition: none; }
+  .gate-jharokhaportraits.is-opening { animation: jp-fade 0.25s ease both; }
+}

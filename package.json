@@ -13,6 +13,7 @@
     "qa:studio": "node scripts/qa-studio.mjs"
   },
   "dependencies": {
+    "lenis": "^1.3.27",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"
   },
