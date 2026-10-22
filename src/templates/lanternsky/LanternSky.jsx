@@ -75,15 +75,42 @@ function useTilt(ref) {
         stage.removeEventListener('pointerleave', leave)
       })
     } else if (typeof DeviceOrientationEvent !== 'undefined') {
+      // visit with ?tiltdebug to see the raw sensor on screen (or "no events" when the host/device blocks them)
+      const debug = /tiltdebug/.test(window.location.search) && document.createElement('div')
+      if (debug) {
+        debug.style.cssText =
+          'position:fixed;left:8px;bottom:8px;z-index:99;font:12px monospace;color:#fff;background:rgb(0 0 0/.65);padding:4px 8px;border-radius:6px;pointer-events:none'
+        debug.textContent = 'tilt: waiting for sensor…'
+        document.body.appendChild(debug)
+        offs.push(() => debug.remove())
+      }
       let base = null
+      let got = false
       const turn = (e) => {
         if (e.beta == null || e.gamma == null) return
+        got = true
+        if (debug) debug.textContent = `tilt β ${e.beta.toFixed(1)} γ ${e.gamma.toFixed(1)}`
         if (!base) base = { b: e.beta, g: e.gamma }
-        // ponytail: fixed first-reading baseline; re-baseline on orientationchange if it bothers anyone
         const clamp = (v) => Math.max(-8, Math.min(8, v))
         apply(clamp((base.b - e.beta) * 0.35), clamp((e.gamma - base.g) * 0.35))
       }
-      const listen = () => window.addEventListener('deviceorientation', turn)
+      // rotating the phone swaps the sensor axes: start level from the new grip
+      const reb = () => { base = null }
+      window.addEventListener('orientationchange', reb)
+      offs.push(() => window.removeEventListener('orientationchange', reb))
+      const listen = () => {
+        window.addEventListener('deviceorientation', turn)
+        offs.push(() => window.removeEventListener('deviceorientation', turn))
+        // Androids without a gyroscope never fire the relative event; fall back to the absolute one
+        const t = setTimeout(() => {
+          if (!got) {
+            window.removeEventListener('deviceorientation', turn)
+            window.addEventListener('deviceorientationabsolute', turn)
+            offs.push(() => window.removeEventListener('deviceorientationabsolute', turn))
+          }
+        }, 700)
+        offs.push(() => clearTimeout(t))
+      }
       if (typeof DeviceOrientationEvent.requestPermission === 'function') {
         // iOS only hands out motion data after a user-gesture permission: ask on the first tap
         const ask = () => {
@@ -96,7 +123,6 @@ function useTilt(ref) {
       } else {
         listen()
       }
-      offs.push(() => window.removeEventListener('deviceorientation', turn))
     }
 
     return () => offs.forEach((f) => f())
