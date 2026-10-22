@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Photo from '../../components/Photo.jsx'
 import RsvpForm from '../../components/RsvpForm.jsx'
 import { guestName } from '../../lib/guest.js'
@@ -59,6 +59,17 @@ export default function ShaadiChat({ invite, viaGate }) {
   const full = invite.full || couple
   useReveal(rootRef, [story.length, events.length])
 
+  // The header condenses once the thread scrolls: the two avatar photos fade out, so no photo box ever
+  // sits over text passing beneath the sticky header (their square img rects would otherwise intersect
+  // every line that scrolls under them, even though the opaque header hides it).
+  useEffect(() => {
+    const el = rootRef.current
+    const onScroll = () => el && el.classList.toggle('sch-scrolled', window.scrollY > 8)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   // the quick-reply chips scroll the thread down to the real form
   const goRsvp = () => {
     const calm = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -81,7 +92,9 @@ export default function ShaadiChat({ invite, viaGate }) {
               <span className="sch-ava sch-ava--head"><Photo slot="bride" alt="" eager /></span>
               <span className="sch-ava sch-ava--head"><Photo slot="groom" alt="" eager /></span>
             </span>
-            <div className="sch-who">
+            {/* over-photo: the thread's photos scroll under the sticky header; the plate behind these
+                names is the fully opaque header bar (var(--head)), paper text on it is ~11.8:1 */}
+            <div className="sch-who" data-over-photo>
               <h1 className="sch-title">{couple.a} &amp; {couple.b}</h1>
               <p className="sch-sub">typing their vows…</p>
             </div>

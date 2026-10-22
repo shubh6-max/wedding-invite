@@ -1,12 +1,12 @@
-/* Lantern Sky: a painted dusk sky of rising paper lanterns over a golden chhatri; the page then descends
-   into a lamplit courtyard, a teal stationery INVITE, cream arch event cards, and a night-sky countdown.
-   Everything scoped under .tpl-lanternsky; keyframes lsk-*; only transform and opacity animate. */
+/* Lantern Sky: a hand-painted dusk sky of rising paper lanterns over a golden chhatri; the page then
+   descends into a lamplit courtyard, a teal stationery INVITE, tall cream event cards and a night-sky
+   countdown. Everything scoped under .tpl-lanternsky; keyframes lsk-*; only transform and opacity animate. */
 .tpl-lanternsky {
-  --night: #16304f;
+  --night: #14305e;
   --sky: #2a5fa3;
-  --sky-mid: #4f86c0;
-  --sky-hi: #8fc0e4;
-  --dusk: #f0a952;
+  --sky-mid: #4b8ec4;
+  --sky-hi: #9ccbe8;
+  --dusk: #f2b268;
   --ember: #d8702f;
   --gold: #eab052;
   --gold-deep: #a9731f;
@@ -20,6 +20,9 @@
   --script: 'Pinyon Script', cursive;
   --ui: 'Karla', system-ui, sans-serif;
   --ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+  /* painted-canvas grain, reused by the sky and the stationery sections */
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='t'><feTurbulence type='fractalNoise' baseFrequency='0.012 0.05' numOctaves='3'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.6 0'/></filter><rect width='260' height='260' filter='url(%23t)'/></svg>");
+  --streaks: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='160'><filter id='s'><feTurbulence type='turbulence' baseFrequency='0.004 0.09' numOctaves='2'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.45 0'/></filter><rect width='320' height='160' filter='url(%23s)'/></svg>");
 
   background: var(--teal);
   color: var(--ink);
@@ -42,106 +45,134 @@
 .tpl-lanternsky .lsk-h2--light { color: var(--ivory); }
 .tpl-lanternsky .lsk-script { font: 400 clamp(1.5rem, 5.6vw, 2.1rem)/1.25 var(--script); }
 
-/* ================= hero: the lantern sky ================= */
+/* ================= hero: the painted lantern sky ================= */
 .tpl-lanternsky .lsk-hero {
   position: relative;
   min-height: 100svh;
   overflow: hidden;
   display: grid;
-  grid-template-rows: 1fr auto auto;
+  grid-template-rows: 1fr auto;
   justify-items: center;
-  background: linear-gradient(180deg, var(--night), var(--sky) 30%, var(--sky-mid) 56%, var(--sky-hi) 72%, var(--dusk) 87%, var(--ember));
+  background: linear-gradient(
+    180deg,
+    var(--night),
+    #1d4a86 18%,
+    var(--sky) 36%,
+    #3d79b6 52%,
+    var(--sky-mid) 66%,
+    var(--sky-hi) 78%,
+    var(--dusk) 89%,
+    var(--ember)
+  );
 }
-/* painted-canvas texture over the gradient */
+/* thick-paint texture: canvas grain plus horizontal stroke streaks */
 .tpl-lanternsky .lsk-hero::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='t'><feTurbulence type='fractalNoise' baseFrequency='0.012 0.05' numOctaves='3'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.6 0'/></filter><rect width='260' height='260' filter='url(%23t)'/></svg>");
+  background-image: var(--streaks), var(--grain);
   mix-blend-mode: overlay;
-  opacity: 0.35;
+  opacity: 0.5;
   pointer-events: none;
 }
-/* the warm glow where the sky meets the pavilion */
+/* the warm haze where the sky meets the pavilion */
 .tpl-lanternsky .lsk-hero::after {
   content: '';
   position: absolute;
   inset: auto 0 0 0;
-  height: 42vh;
-  background: radial-gradient(58% 90% at 50% 100%, rgb(255 196 107 / 0.55), rgb(255 196 107 / 0) 72%);
+  height: 46vh;
+  background: radial-gradient(60% 92% at 50% 100%, rgb(255 198 110 / 0.6), rgb(255 198 110 / 0) 74%);
   pointer-events: none;
 }
+.tpl-lanternsky .lsk-swirls { position: absolute; inset: 0 0 auto 0; width: 100%; height: 100%; pointer-events: none; }
+
+/* the hero is a shallow 3D stage: names and pavilion sit on different planes and lean with the pointer */
+.tpl-lanternsky .lsk-hero { perspective: 1100px; }
+.tpl-lanternsky .lsk-scene {
+  z-index: 2;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
+  width: 100%;
+  min-height: 100svh;
+  transform-style: preserve-3d;
+  transition: transform 0.35s ease-out;
+  will-change: transform;
+}
+.tpl-lanternsky .lsk-head { transform: translateZ(56px); }
+.tpl-lanternsky .lsk-pavilion { transform: translateZ(28px); }
 
 .tpl-lanternsky .lsk-head {
   z-index: 2;
   display: grid;
   justify-items: center;
   align-content: center;
-  gap: clamp(10px, 2.4vh, 18px);
-  padding: clamp(64px, 12vh, 110px) 20px 8px;
+  gap: clamp(12px, 2.6vh, 20px);
+  padding: clamp(64px, 11vh, 104px) 20px 8px;
   text-align: center;
 }
-.tpl-lanternsky .lsk-guest { font: italic 500 clamp(1rem, 3vw, 1.2rem)/1.3 var(--serif); color: var(--ivory); text-shadow: 0 1px 14px rgb(20 40 80 / 0.6); }
+.tpl-lanternsky .lsk-guest { font: italic 500 clamp(1rem, 3vw, 1.2rem)/1.3 var(--serif); color: var(--ivory); text-shadow: 0 1px 14px rgb(16 36 72 / 0.6); }
 .tpl-lanternsky .lsk-names {
   display: grid;
   justify-items: center;
-  gap: clamp(4px, 1.2vh, 10px);
+  gap: clamp(6px, 1.6vh, 14px);
   color: #fff;
-  font: 600 clamp(2.1rem, 9vw, 3.6rem)/1.04 var(--serif);
-  letter-spacing: 0.14em;
-  text-indent: 0.14em;
+  font: 600 clamp(2.3rem, 10vw, 4rem)/1.02 var(--serif);
+  letter-spacing: 0.16em;
+  text-indent: 0.16em;
   text-transform: uppercase;
-  text-shadow: 0 2px 28px rgb(16 36 72 / 0.55);
+  text-shadow: 0 2px 30px rgb(12 30 64 / 0.6), 0 0 22px rgb(255 214 140 / 0.3);
   text-wrap: balance;
 }
 .tpl-lanternsky .lsk-names__weds {
-  font: 400 clamp(0.8rem, 2.6vw, 1rem)/1.2 var(--caps);
-  letter-spacing: 0.56em;
-  text-indent: 0.56em;
+  font: 400 clamp(0.8rem, 2.6vw, 1.05rem)/1.2 var(--caps);
+  letter-spacing: 0.62em;
+  text-indent: 0.62em;
   opacity: 0.94;
 }
-.tpl-lanternsky .lsk-herodate { font: 500 clamp(0.8125rem, 2.4vw, 0.9375rem)/1.4 var(--ui); letter-spacing: 0.22em; text-indent: 0.22em; text-transform: uppercase; color: var(--ivory); text-shadow: 0 1px 12px rgb(20 40 80 / 0.6); }
 .tpl-lanternsky.via-gate .lsk-head { animation: lsk-in 1.3s var(--ease) 0.15s both; }
 
-/* the chhatri: SVG frame over the clipped couple photo; window % matches the arch in the 320x420 drawing */
+/* the chhatri: SVG frame over the clipped couple photo; window % matches the arch in the 320x440 drawing */
 .tpl-lanternsky .lsk-pavilion {
   position: relative;
   z-index: 2;
-  width: min(72vw, 320px);
-  aspect-ratio: 320 / 420;
-  margin-top: clamp(6px, 3vh, 30px);
-  filter: drop-shadow(0 16px 34px rgb(20 30 60 / 0.4));
+  width: min(76vw, 332px);
+  aspect-ratio: 320 / 440;
+  margin-top: clamp(4px, 2vh, 22px);
+  filter: drop-shadow(0 16px 36px rgb(16 26 56 / 0.42));
 }
 .tpl-lanternsky .lsk-pavilion::before {
   content: '';
   position: absolute;
-  inset: -14% -30%;
-  background: radial-gradient(50% 50% at 50% 56%, rgb(255 206 120 / 0.5), rgb(255 206 120 / 0) 70%);
+  inset: -12% -34%;
+  background: radial-gradient(50% 52% at 50% 58%, rgb(255 206 120 / 0.55), rgb(255 206 120 / 0) 72%);
 }
 .tpl-lanternsky .lsk-pavilion__photo {
   position: absolute;
-  left: 35.5%;
-  right: 35.5%;
-  top: 51.5%;
-  bottom: 15%;
+  left: 35.6%;
+  right: 35.6%;
+  top: 50.5%;
+  bottom: 16.8%;
   overflow: hidden;
-  border-radius: 50% 50% 0 0 / 44% 44% 0 0;
+  border-radius: 50% 50% 0 0 / 46% 46% 0 0;
   background: var(--night);
 }
 .tpl-lanternsky .lsk-pavilion__photo img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .tpl-lanternsky .lsk-pavilion__art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
 .tpl-lanternsky .lsk-scrollhint {
-  z-index: 2;
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 3;
   display: grid;
   justify-items: center;
   gap: 6px;
-  padding: 10px 0 calc(16px + env(safe-area-inset-bottom));
+  padding: 10px 0 calc(14px + env(safe-area-inset-bottom));
   font: 600 0.75rem/1 var(--ui);
   letter-spacing: 0.3em;
   text-indent: 0.3em;
   text-transform: uppercase;
-  color: rgb(255 248 230 / 0.95);
+  color: rgb(72 36 8 / 0.9);
 }
 .tpl-lanternsky .lsk-scrollhint__chev {
   width: 10px;
@@ -152,21 +183,27 @@
   animation: lsk-bob 1.8s ease-in-out infinite;
 }
 
-/* ---- the drifting lanterns ---- */
-.tpl-lanternsky .lsk-field { position: absolute; inset: 0; pointer-events: none; }
+/* ---- the drifting lanterns: a true 3D field, three planes deep ---- */
+.tpl-lanternsky .lsk-field { position: absolute; inset: 0; pointer-events: none; perspective: 1000px; }
 .tpl-lanternsky .lsk-lantern {
   position: absolute;
   left: var(--x);
-  bottom: -18vh;
-  width: calc(46px * var(--s));
+  bottom: -20vh;
+  width: calc(58px * var(--s));
+  transform: translateZ(var(--z, 0px));
+  will-change: transform;
+}
+.tpl-lanternsky .lsk-riser {
+  display: block;
   animation: lsk-rise var(--d) linear infinite;
   animation-delay: var(--delay);
   will-change: transform;
 }
 .tpl-lanternsky .lsk-lantern svg { display: block; width: 100%; height: auto; overflow: visible; animation: lsk-sway calc(var(--d) / 4) ease-in-out infinite alternate; }
 .tpl-lanternsky .lsk-lantern .lsk-flame { animation: lsk-flicker 2.4s ease-in-out infinite; }
-.tpl-lanternsky .lsk-lantern--far { opacity: 0.55; filter: blur(0.6px); }
-@keyframes lsk-rise { to { transform: translateY(-136vh); } }
+.tpl-lanternsky .lsk-lantern--far { --z: -240px; opacity: 0.55; filter: blur(0.8px); }
+.tpl-lanternsky .lsk-lantern--near { --z: 170px; z-index: 3; opacity: 0.96; filter: blur(1.1px); }
+@keyframes lsk-rise { to { transform: translateY(-140vh); } }
 @keyframes lsk-sway { from { transform: translateX(-6%) rotate(-2.5deg); } to { transform: translateX(6%) rotate(2.5deg); } }
 @keyframes lsk-flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
 @keyframes lsk-bob { 0%, 100% { transform: rotate(45deg) translate(0, 0); } 50% { transform: rotate(45deg) translate(4px, 4px); } }
@@ -176,16 +213,26 @@
 .tpl-lanternsky .lsk-blessing {
   position: relative;
   overflow: hidden;
-  padding: clamp(40px, 8vh, 72px) 20px clamp(56px, 10vh, 96px);
+  padding: clamp(36px, 7vh, 64px) 20px clamp(56px, 10vh, 96px);
   display: grid;
   justify-items: center;
   gap: clamp(20px, 5vh, 44px);
   text-align: center;
-  background: linear-gradient(180deg, var(--ember), #b05a28 34%, #6e4a3a 68%, var(--teal-deep));
+  background: linear-gradient(180deg, var(--ember), #ad5423 30%, #7a4a35 62%, #44544c 86%, var(--teal));
   color: var(--ivory);
 }
-.tpl-lanternsky .lsk-courtyard { width: min(92vw, 520px); height: auto; display: block; opacity: 0.95; }
-.tpl-lanternsky .lsk-blessing__text { display: grid; gap: 12px; max-width: 34rem; }
+.tpl-lanternsky .lsk-blessing::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  mix-blend-mode: overlay;
+  opacity: 0.3;
+  pointer-events: none;
+}
+.tpl-lanternsky .lsk-blessing .lsk-lantern { opacity: 0.7; }
+.tpl-lanternsky .lsk-courtyard { position: relative; width: min(96vw, 560px); height: auto; display: block; }
+.tpl-lanternsky .lsk-blessing__text { position: relative; display: grid; gap: 12px; max-width: 34rem; }
 .tpl-lanternsky .lsk-blessing .lsk-script { color: #ffd98a; }
 .tpl-lanternsky .lsk-hosts { font: 600 clamp(1.3rem, 5vw, 1.8rem)/1.3 var(--serif); letter-spacing: 0.04em; text-wrap: balance; }
 .tpl-lanternsky .lsk-fine { font: italic 400 clamp(0.95rem, 2.8vw, 1.1rem)/1.5 var(--serif); opacity: 0.92; }
@@ -193,17 +240,40 @@
 /* ================= INVITE ================= */
 .tpl-lanternsky .lsk-invite {
   position: relative;
+  overflow: hidden;
   padding: clamp(56px, 10vh, 100px) 20px clamp(36px, 7vh, 64px);
   display: grid;
   justify-items: center;
   gap: clamp(14px, 3vh, 24px);
   text-align: center;
-  background:
-    radial-gradient(120% 60% at 50% 0%, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0) 60%),
-    var(--teal);
+  background: radial-gradient(120% 60% at 50% 0%, rgb(255 255 255 / 0.08), rgb(255 255 255 / 0) 60%), var(--teal);
   color: var(--ivory);
 }
+/* paper grain and a faint dome watermark behind the stationery */
+.tpl-lanternsky .lsk-invite::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.tpl-lanternsky .lsk-invite::after {
+  content: '';
+  position: absolute;
+  top: clamp(24px, 5vh, 56px);
+  left: 50%;
+  width: min(84vw, 420px);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border: 1.5px solid rgb(253 243 221 / 0.1);
+  border-bottom: 0;
+  border-radius: 50% 50% 0 0 / 62% 62% 0 0;
+  pointer-events: none;
+}
 .tpl-lanternsky .lsk-invitehead {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
@@ -217,13 +287,14 @@
 .tpl-lanternsky .lsk-invitehead::before,
 .tpl-lanternsky .lsk-invitehead::after { content: ''; height: 1px; background: linear-gradient(90deg, rgb(253 243 221 / 0), var(--gold)); }
 .tpl-lanternsky .lsk-invitehead::after { background: linear-gradient(90deg, var(--gold), rgb(253 243 221 / 0)); }
-.tpl-lanternsky .lsk-invite__line { max-width: 30rem; font: italic 500 clamp(1rem, 3vw, 1.2rem)/1.5 var(--serif); opacity: 0.94; }
-.tpl-lanternsky .lsk-invite__names { font: 600 clamp(1.9rem, 8vw, 2.9rem)/1.15 var(--serif); text-wrap: balance; }
+.tpl-lanternsky .lsk-invite__line { position: relative; max-width: 30rem; font: italic 500 clamp(1rem, 3vw, 1.2rem)/1.5 var(--serif); opacity: 0.94; }
+.tpl-lanternsky .lsk-invite__names { position: relative; font: 600 clamp(1.9rem, 8vw, 2.9rem)/1.15 var(--serif); text-wrap: balance; }
 .tpl-lanternsky .lsk-amp { font: 400 0.8em var(--script); color: var(--gold); }
-.tpl-lanternsky .lsk-invite__tag { color: #ffd98a; }
-.tpl-lanternsky .lsk-invite__cue { font: 600 0.8125rem/1.4 var(--ui); letter-spacing: 0.26em; text-indent: 0.26em; text-transform: uppercase; opacity: 0.88; }
+.tpl-lanternsky .lsk-invite__tag { position: relative; color: #ffd98a; }
+.tpl-lanternsky .lsk-flourish { position: relative; width: min(44vw, 170px); height: auto; }
+.tpl-lanternsky .lsk-invite__cue { position: relative; font: 600 0.8125rem/1.4 var(--ui); letter-spacing: 0.26em; text-indent: 0.26em; text-transform: uppercase; opacity: 0.88; }
 
-.tpl-lanternsky .lsk-pair { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(18px, 6vw, 48px); margin: clamp(8px, 2vh, 18px) 0; }
+.tpl-lanternsky .lsk-pair { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(18px, 6vw, 48px); margin: clamp(8px, 2vh, 18px) 0; }
 .tpl-lanternsky .lsk-frame { display: grid; gap: 10px; justify-items: center; }
 .tpl-lanternsky .lsk-frame__box {
   position: relative;
@@ -239,33 +310,46 @@
 .tpl-lanternsky .lsk-frame__box img { width: 100%; height: 100%; display: block; border-radius: 50% 50% 0 0 / 36% 36% 0 0; }
 .tpl-lanternsky .lsk-frame__name { font: 600 clamp(1.05rem, 3.4vw, 1.3rem)/1.2 var(--serif); letter-spacing: 0.08em; }
 
-/* ================= the events ================= */
-.tpl-lanternsky .lsk-events { padding: clamp(10px, 2vh, 20px) 20px clamp(64px, 11vh, 110px); background: var(--teal); }
-.tpl-lanternsky .lsk-cards { display: grid; gap: clamp(22px, 5vh, 40px); justify-items: center; }
+/* ================= the events: tall cream pills ================= */
+.tpl-lanternsky .lsk-events {
+  position: relative;
+  padding: clamp(10px, 2vh, 20px) 20px clamp(64px, 11vh, 110px);
+  background: var(--teal);
+}
+.tpl-lanternsky .lsk-events::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.tpl-lanternsky .lsk-cards { position: relative; display: grid; gap: clamp(24px, 5vh, 44px); justify-items: center; }
 .tpl-lanternsky .lsk-card {
   position: relative;
-  width: min(100%, 24rem);
-  padding: clamp(36px, 7vw, 52px) clamp(28px, 7vw, 48px);
+  width: min(100%, 23rem);
+  padding: clamp(48px, 11vw, 66px) clamp(30px, 8vw, 52px);
   display: grid;
   gap: 8px;
   text-align: center;
   background: linear-gradient(180deg, #fbf3e1, var(--cream));
   color: var(--ink);
-  border-radius: clamp(64px, 16vw, 92px);
-  box-shadow: 0 16px 34px rgb(20 40 36 / 0.28), inset 0 0 0 1px rgb(169 115 31 / 0.35);
+  border-radius: 999px;
+  box-shadow: 0 18px 38px rgb(18 38 34 / 0.32), inset 0 0 0 1px rgb(169 115 31 / 0.35);
 }
 .tpl-lanternsky .lsk-card::before {
   content: '';
   position: absolute;
-  inset: 9px;
+  inset: 10px;
   border: 1px solid rgb(169 115 31 / 0.4);
   border-radius: inherit;
   pointer-events: none;
 }
-.tpl-lanternsky .lsk-card__posy { position: absolute; width: clamp(54px, 14vw, 76px); height: auto; pointer-events: none; }
-.tpl-lanternsky .lsk-card__posy--tr { top: 8px; right: 14px; }
-.tpl-lanternsky .lsk-card__posy--bl { bottom: 8px; left: 14px; transform: scaleX(-1); }
-.tpl-lanternsky .lsk-card__name { font: 600 clamp(1.4rem, 6vw, 1.9rem)/1.15 var(--serif); letter-spacing: 0.22em; text-indent: 0.22em; text-transform: uppercase; color: #7c4a0e; }
+.tpl-lanternsky .lsk-card__posy { position: absolute; width: clamp(60px, 16vw, 84px); height: auto; pointer-events: none; }
+.tpl-lanternsky .lsk-card__posy--tr { top: 18px; right: 26px; }
+.tpl-lanternsky .lsk-card__posy--bl { bottom: 18px; left: 26px; transform: scaleX(-1); }
+.tpl-lanternsky .lsk-card__name { font: 600 clamp(1.4rem, 6vw, 1.9rem)/1.15 var(--serif); letter-spacing: 0.24em; text-indent: 0.24em; text-transform: uppercase; color: #7c4a0e; }
 .tpl-lanternsky .lsk-card__when { font: 500 clamp(0.9rem, 2.8vw, 1rem)/1.4 var(--ui); letter-spacing: 0.06em; }
 .tpl-lanternsky .lsk-card__place { font: italic 500 clamp(1rem, 3vw, 1.15rem)/1.4 var(--serif); }
 .tpl-lanternsky .lsk-card__dress { font: 500 0.875rem/1.4 var(--ui); color: #4e5a53; }
@@ -275,7 +359,7 @@
   place-items: center;
   min-height: 44px;
   padding: 0 14px;
-  margin: -8px 0 -10px;
+  margin: -8px 0 -12px;
   font: 700 0.8125rem/1.2 var(--ui);
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -291,7 +375,16 @@
   padding: clamp(64px, 11vh, 110px) 20px;
   display: grid;
   justify-items: center;
-  background: linear-gradient(180deg, var(--teal-deep), var(--night) 46%, #0e2038);
+  background: linear-gradient(180deg, var(--teal-deep), var(--night) 46%, #0d1f3c);
+}
+.tpl-lanternsky .lsk-day::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  mix-blend-mode: overlay;
+  opacity: 0.3;
+  pointer-events: none;
 }
 .tpl-lanternsky .lsk-day .lsk-lantern { opacity: 0.5; }
 .tpl-lanternsky .lsk-day__in { position: relative; z-index: 1; display: grid; justify-items: center; gap: clamp(16px, 3.4vh, 28px); text-align: center; color: var(--ivory); }
@@ -304,7 +397,7 @@
   background: linear-gradient(180deg, #ffd98a, #e8973a 78%, #c97a2c);
   color: #58300a;
   border-radius: 16px 16px 20px 20px;
-  box-shadow: 0 0 26px rgb(255 190 100 / 0.4);
+  box-shadow: 0 0 28px rgb(255 190 100 / 0.45);
 }
 .tpl-lanternsky .lsk-count__cell::before { content: ''; justify-self: center; width: 42%; height: 5px; border-radius: 3px; background: #8a4f16; }
 .tpl-lanternsky .lsk-count__cell b { font: 600 clamp(1.5rem, 6.4vw, 2rem)/1.1 var(--caps); }
@@ -312,6 +405,7 @@
 .tpl-lanternsky .lsk-done { font: italic 500 clamp(1.2rem, 4vw, 1.5rem)/1.4 var(--serif); color: var(--ivory); }
 .tpl-lanternsky .lsk-venue { display: grid; gap: 2px; font: 500 clamp(1.05rem, 3.2vw, 1.25rem)/1.4 var(--serif); }
 .tpl-lanternsky .lsk-venue span { font: 400 0.9em var(--serif); opacity: 0.85; }
+.tpl-lanternsky .lsk-when { font: 500 0.875rem/1.4 var(--ui); letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.9; }
 .tpl-lanternsky .lsk-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 .tpl-lanternsky .lsk-btn {
   display: inline-grid;
@@ -334,7 +428,7 @@
 }
 
 /* ================= RSVP ================= */
-.tpl-lanternsky .lsk-rsvp { padding: 0 20px clamp(72px, 12vh, 120px); background: #0e2038; display: grid; justify-items: center; }
+.tpl-lanternsky .lsk-rsvp { padding: 0 20px clamp(72px, 12vh, 120px); background: #0d1f3c; display: grid; justify-items: center; }
 .tpl-lanternsky .lsk-rsvp__card {
   width: min(100%, 26rem);
   padding: clamp(28px, 6vw, 44px);
@@ -376,15 +470,16 @@
 
 /* ================= small screens / reduced motion ================= */
 @media (max-height: 560px) and (orientation: landscape) {
-  .tpl-lanternsky .lsk-hero { grid-template-rows: auto auto auto; }
   .tpl-lanternsky .lsk-head { padding-top: 40px; }
-  .tpl-lanternsky .lsk-pavilion { width: min(34vh, 220px); }
+  .tpl-lanternsky .lsk-pavilion { width: min(36vh, 220px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tpl-lanternsky .lsk-lantern { animation: none; bottom: auto; top: var(--rest); }
+  .tpl-lanternsky .lsk-lantern { bottom: auto; top: var(--rest); }
+  .tpl-lanternsky .lsk-riser,
   .tpl-lanternsky .lsk-lantern svg,
   .tpl-lanternsky .lsk-lantern .lsk-flame { animation: none; }
+  .tpl-lanternsky .lsk-scene { transition: none; transform: none; }
   .tpl-lanternsky .lsk-scrollhint__chev { animation: none; }
   .tpl-lanternsky.via-gate .lsk-head { animation: none; }
   .tpl-lanternsky [data-reveal] { opacity: 1; transform: none; transition: none; }

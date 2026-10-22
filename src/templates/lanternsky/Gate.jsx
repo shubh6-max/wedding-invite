@@ -24,6 +24,12 @@ export default function Gate({ invite, onOpen, onDone }) {
       <div className="lskg-sky" aria-hidden="true">
         <Photo slot="background" eager />
       </div>
+      {/* faraway lanterns already adrift behind the one still to be lit */}
+      <div className="lskg-drift" aria-hidden="true">
+        {[[12, 0.7, 26, -9], [26, 0.5, 34, -22], [70, 0.6, 30, -4], [86, 0.45, 38, -17], [52, 0.4, 42, -28]].map(([x, s, d, delay], i) => (
+          <span key={i} style={{ '--x': `${x}%`, '--s': s, '--d': `${d}s`, '--delay': `${delay}s`, '--rest': `${(i * 23) % 70}%` }} />
+        ))}
+      </div>
 
       <div className="lskg-in">
         <div className="lskg-text">

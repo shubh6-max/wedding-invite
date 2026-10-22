@@ -32,7 +32,11 @@
 .tpl-nowplaying ol { list-style: none; }
 
 /* ---- ambient light: the background photo blurred into a glow, then darkened to the chrome ---- */
-.tpl-nowplaying .npl-ambient { position: absolute; inset: 0; overflow: hidden; }
+/* A top band, not the whole page: by ~500px the scrim is solid chrome anyway, and keeping the img's layout
+   rect out of the tracklist and everything below is what lets that text stay unmarked (qa-photos.mjs measures
+   the img's getBoundingClientRect, clipping or not). The img's 1.25 scale makes its rect 562px tall; the first
+   unmarked text (the tracklist heading) never starts above ~600px at any checked viewport. */
+.tpl-nowplaying .npl-ambient { position: absolute; inset: 0 0 auto; height: 500px; overflow: hidden; }
 .tpl-nowplaying .npl-ambient img {
   position: absolute;
   inset: 0;
@@ -45,8 +49,8 @@
   content: '';
   position: absolute;
   inset: 0;
-  /* the scrim every data-over-photo block relies on: solid enough everywhere, fully solid below the player */
-  background: linear-gradient(180deg, rgb(11 11 15 / 0.82) 0, rgb(11 11 15 / 0.88) 520px, var(--chrome) 960px);
+  /* the scrim every data-over-photo block relies on: solid enough everywhere, fully solid by the band's cut */
+  background: linear-gradient(180deg, rgb(11 11 15 / 0.82) 0, rgb(11 11 15 / 0.88) 55%, var(--chrome) 100%);
 }
 
 /* ---- the screen: one phone-width column of chrome ---- */

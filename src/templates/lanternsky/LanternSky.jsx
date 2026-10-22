@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import Photo from '../../components/Photo.jsx'
 import RsvpForm from '../../components/RsvpForm.jsx'
 import { guestName } from '../../lib/guest.js'
@@ -6,22 +6,65 @@ import { useCountdown, useReveal } from '../../lib/hooks.js'
 import { downloadIcs } from '../../lib/ics.js'
 import './lanternsky.css'
 
-// Lantern Sky: a dusk sky full of rising paper lanterns over a golden chhatri pavilion, the couple framed
-// inside its arch (the lantern-festival invite trend, researched Oct 2026). Scrolling descends from the sky
-// into a lamplit courtyard of blessings, a teal stationery INVITE, and cream arch cards for the events.
-// All artwork is inline SVG drawn here; photos come through the shared <Photo> slots.
+// Lantern Sky: a hand-painted dusk sky full of rising paper lanterns over a golden chhatri pavilion, the
+// couple framed inside its arch (the lantern-festival invite trend, researched Oct 2026). Scrolling descends
+// into a lamplit courtyard of blessings, a teal stationery INVITE, and tall cream event cards.
+// All artwork is original inline SVG drawn here; photos come through the shared <Photo> slots.
 
-// The drifting lanterns: [left %, scale, rise duration s, delay s]. Negative delays start them mid-flight
-// so the sky is already alive on load. `--rest` (from the index) parks each one under reduced motion.
+// The drifting lanterns: [left %, scale, rise duration s, delay s]. Negative delays start them mid-flight so
+// the sky is already alive on load. Scales under 0.55 read as far (dim, soft); 1.1+ as close (soft-focus
+// foreground, kept to the edges so the names stay clear). `--rest` parks each one under reduced motion.
 const DRIFT = [
-  [4, 0.5, 34, -8], [12, 0.78, 26, -20], [21, 0.46, 38, -2], [29, 0.64, 30, -14],
-  [37, 0.42, 40, -26], [47, 0.7, 27, -6], [55, 0.5, 36, -18], [63, 0.84, 24, -11],
-  [71, 0.58, 32, -24], [79, 0.74, 28, -4], [87, 0.52, 35, -16], [93, 0.68, 29, -22],
-  [8, 1.04, 22, -13], [44, 1.14, 21, -9], [76, 1.08, 23, -19], [59, 0.98, 25, -1],
+  [2, 0.5, 40, -4], [7, 1.35, 23, -15], [11, 0.6, 34, -26], [16, 0.8, 29, -9],
+  [21, 0.48, 42, -31], [26, 0.95, 26, -18], [31, 0.58, 37, -2], [36, 0.72, 31, -22],
+  [41, 0.52, 44, -12], [46, 0.85, 27, -35], [51, 0.46, 46, -7], [56, 0.68, 33, -27],
+  [61, 0.9, 25, -16], [66, 0.55, 39, -5], [71, 0.78, 30, -24], [76, 0.5, 43, -13],
+  [81, 1.0, 24, -29], [86, 0.62, 35, -8], [90, 1.45, 22, -19], [94, 0.58, 38, -28],
+  [13, 1.18, 24, -2], [33, 1.05, 22, -33], [49, 1.0, 25, -21], [68, 1.08, 23, -11],
+  [84, 1.3, 22, -25], [58, 0.45, 48, -37], [4, 0.75, 32, -20], [24, 0.65, 36, -14],
+  [44, 0.6, 41, -30], [63, 0.5, 45, -23], [78, 0.68, 34, -3], [96, 0.72, 31, -10],
+]
+const BLESS_DRIFT = [
+  [6, 0.6, 36, -10], [18, 0.8, 30, -24], [34, 0.5, 40, -6], [52, 0.7, 32, -18],
+  [68, 0.55, 38, -28], [82, 0.85, 28, -12], [92, 0.6, 34, -22], [42, 0.95, 26, -2],
 ]
 const DAY_DRIFT = [
-  [8, 0.5, 38, -12], [24, 0.42, 44, -30], [50, 0.56, 36, -5], [68, 0.44, 42, -22], [84, 0.52, 40, -16], [38, 0.38, 46, -34],
+  [8, 0.6, 38, -12], [24, 0.5, 44, -30], [50, 0.66, 36, -5], [68, 0.52, 42, -22], [84, 0.62, 40, -16],
+  [38, 0.46, 46, -34], [14, 0.85, 30, -8], [60, 0.75, 33, -26], [92, 0.55, 41, -19], [30, 0.7, 35, -3],
 ]
+
+// Pointer tilt for the hero's 3D scene: the sky, names and pavilion lean a few degrees toward the
+// cursor (fine pointers only; reduced motion and touch leave the scene still).
+function useTilt(ref) {
+  useEffect(() => {
+    const el = ref.current
+    if (!el || typeof window === 'undefined') return undefined
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined
+    if (!window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) return undefined
+    const stage = el.parentElement
+    let raf = 0
+    const move = (e) => {
+      const r = stage.getBoundingClientRect()
+      const x = (e.clientX - r.left) / r.width - 0.5
+      const y = (e.clientY - r.top) / r.height - 0.5
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => {
+        el.style.transform = `rotateX(${(-y * 4).toFixed(2)}deg) rotateY(${(x * 5).toFixed(2)}deg)`
+      })
+    }
+    const leave = () => {
+      cancelAnimationFrame(raf)
+      el.style.transform = ''
+    }
+    stage.addEventListener('pointermove', move)
+    stage.addEventListener('pointerleave', leave)
+    return () => {
+      stage.removeEventListener('pointermove', move)
+      stage.removeEventListener('pointerleave', leave)
+      cancelAnimationFrame(raf)
+    }
+  }, [ref])
+}
 
 // Shared paint: gradients and the lattice pattern every SVG below refers to (ids are lsk- prefixed; one copy).
 function Defs() {
@@ -29,32 +72,37 @@ function Defs() {
     <svg className="lsk-defs" aria-hidden="true" focusable="false">
       <defs>
         <linearGradient id="lsk-paper" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#ffdf9e" />
-          <stop offset="0.55" stopColor="#f3a93f" />
+          <stop offset="0" stopColor="#ffe3a6" />
+          <stop offset="0.5" stopColor="#f6ad42" />
           <stop offset="1" stopColor="#d8702f" />
         </linearGradient>
         <radialGradient id="lsk-core">
-          <stop offset="0" stopColor="#fff8da" />
-          <stop offset="0.6" stopColor="#ffd98a" stopOpacity="0.55" />
+          <stop offset="0" stopColor="#fffbe4" />
+          <stop offset="0.55" stopColor="#ffd98a" stopOpacity="0.6" />
           <stop offset="1" stopColor="#ffd98a" stopOpacity="0" />
         </radialGradient>
         <radialGradient id="lsk-halo">
-          <stop offset="0" stopColor="#ffc46b" stopOpacity="0.5" />
+          <stop offset="0" stopColor="#ffc46b" stopOpacity="0.55" />
+          <stop offset="0.5" stopColor="#ffb75c" stopOpacity="0.22" />
           <stop offset="1" stopColor="#ffc46b" stopOpacity="0" />
         </radialGradient>
         <linearGradient id="lsk-gold" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#f3c968" />
+          <stop offset="0" stopColor="#f6cf6f" />
           <stop offset="1" stopColor="#c98a2b" />
         </linearGradient>
-        <linearGradient id="lsk-dome" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#f9dc93" />
-          <stop offset="0.6" stopColor="#e8a93c" />
-          <stop offset="1" stopColor="#b97f24" />
+        <linearGradient id="lsk-dome" x1="0.15" y1="0" x2="0.85" y2="1">
+          <stop offset="0" stopColor="#fbe2a0" />
+          <stop offset="0.45" stopColor="#edb04a" />
+          <stop offset="1" stopColor="#b57c22" />
         </linearGradient>
         <linearGradient id="lsk-water" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#8fc7bf" />
           <stop offset="1" stopColor="#3f6f68" />
         </linearGradient>
+        <radialGradient id="lsk-archglow" cx="0.5" cy="0.85" r="0.9">
+          <stop offset="0" stopColor="#ffce7e" stopOpacity="0.5" />
+          <stop offset="1" stopColor="#ffce7e" stopOpacity="0.06" />
+        </radialGradient>
         <pattern id="lsk-lat" width="14" height="13" patternUnits="userSpaceOnUse">
           <rect width="14" height="13" fill="#e3a93f" />
           <path d="M7 0 L14 6.5 L7 13 L0 6.5 Z" fill="none" stroke="#a9731f" strokeWidth="1.4" />
@@ -64,16 +112,39 @@ function Defs() {
   )
 }
 
+// Painted swirl strokes over the sky gradient: long brush paths, light over dark, Van-Gogh-paced.
+function SkySwirls() {
+  return (
+    <svg className="lsk-swirls" viewBox="0 0 360 420" preserveAspectRatio="none" focusable="false" aria-hidden="true">
+      <g fill="none" strokeLinecap="round">
+        <path d="M-20 60 C 60 30 140 78 210 52 C 270 30 330 48 380 32" stroke="#cfe4f6" strokeWidth="13" opacity="0.1" />
+        <path d="M-20 110 C 80 140 150 92 240 118 C 300 136 350 112 380 122" stroke="#9fc6e8" strokeWidth="10" opacity="0.12" />
+        <path d="M-20 170 C 70 150 170 196 260 170 C 310 156 360 176 380 168" stroke="#163a6e" strokeWidth="12" opacity="0.14" />
+        <path d="M-20 232 C 90 258 180 216 290 244 C 330 254 370 240 390 246" stroke="#d8ecfa" strokeWidth="9" opacity="0.1" />
+        <path d="M-20 300 C 100 278 200 320 320 292" stroke="#5f93c6" strokeWidth="11" opacity="0.12" />
+        <path d="M60 86 C 92 76 108 96 92 110 C 80 120 62 110 68 96" stroke="#dcedfb" strokeWidth="7" opacity="0.13" />
+        <path d="M268 66 C 300 58 314 80 298 92 C 286 101 270 92 275 79" stroke="#dcedfb" strokeWidth="6" opacity="0.11" />
+        <path d="M-10 356 C 110 338 230 372 370 348" stroke="#f7c98c" strokeWidth="12" opacity="0.16" />
+        <path d="M-10 390 C 120 406 240 376 370 396" stroke="#e8964f" strokeWidth="10" opacity="0.14" />
+      </g>
+    </svg>
+  )
+}
+
 function LanternArt() {
   return (
-    <svg viewBox="0 0 64 88" focusable="false" aria-hidden="true">
-      <ellipse cx="32" cy="46" rx="30" ry="36" fill="url(#lsk-halo)" />
-      <path d="M22 16 C26 11 38 11 42 16 C46.5 22 48 44 46 60 C44.5 68 19.5 68 18 60 C16 44 17.5 22 22 16 Z" fill="url(#lsk-paper)" />
-      <path d="M26 14 C24 34 24 50 26 64" fill="none" stroke="#a9731f" strokeWidth="1.5" opacity="0.18" />
-      <path d="M38 14 C40 34 40 50 38 64" fill="none" stroke="#a9731f" strokeWidth="1.5" opacity="0.18" />
-      <rect x="23" y="10" width="18" height="6" rx="2.5" fill="#8a4f16" />
-      <rect x="25" y="64" width="14" height="5" rx="2" fill="#8a4f16" />
-      <ellipse className="lsk-flame" cx="32" cy="44" rx="11" ry="15" fill="url(#lsk-core)" />
+    <svg viewBox="0 0 64 92" focusable="false" aria-hidden="true">
+      <ellipse cx="32" cy="48" rx="32" ry="38" fill="url(#lsk-halo)" />
+      <path d="M20 18 C24 12 40 12 44 18 C48 26 49 52 46.5 66 C44 74 20 74 17.5 66 C15 52 16 26 20 18 Z" fill="url(#lsk-paper)" />
+      <path d="M25 15 C23 34 23 52 25 70" fill="none" stroke="#a9731f" strokeWidth="1.4" opacity="0.16" />
+      <path d="M32 13.5 C31 34 31 52 32 71.5" fill="none" stroke="#a9731f" strokeWidth="1.4" opacity="0.14" />
+      <path d="M39 15 C41 34 41 52 39 70" fill="none" stroke="#a9731f" strokeWidth="1.4" opacity="0.16" />
+      <path d="M18 34 C26 37 38 37 46 34" fill="none" stroke="#a9731f" strokeWidth="1.2" opacity="0.12" />
+      <path d="M17 52 C26 55 38 55 47 52" fill="none" stroke="#a9731f" strokeWidth="1.2" opacity="0.12" />
+      <path d="M24 10 L40 10 L42.5 18 L21.5 18 Z" fill="#8a4f16" />
+      <rect x="24" y="70" width="16" height="5" rx="2" fill="#8a4f16" />
+      <ellipse cx="32" cy="68" rx="9" ry="3.5" fill="#ffd98a" opacity="0.5" />
+      <ellipse className="lsk-flame" cx="32" cy="46" rx="12" ry="17" fill="url(#lsk-core)" />
     </svg>
   )
 }
@@ -84,10 +155,12 @@ function LanternField({ set }) {
       {set.map(([x, s, d, delay], i) => (
         <span
           key={i}
-          className={`lsk-lantern${s < 0.6 ? ' lsk-lantern--far' : ''}`}
-          style={{ '--x': `${x}%`, '--s': s, '--d': `${d}s`, '--delay': `${delay}s`, '--rest': `${(i * 37) % 86}%` }}
+          className={`lsk-lantern${s < 0.55 ? ' lsk-lantern--far' : ''}${s >= 1.1 ? ' lsk-lantern--near' : ''}`}
+          style={{ '--x': `${x}%`, '--s': s, '--d': `${d}s`, '--delay': `${delay}s`, '--rest': `${(i * 31) % 88}%` }}
         >
-          <LanternArt />
+          <span className="lsk-riser">
+            <LanternArt />
+          </span>
         </span>
       ))}
     </div>
@@ -95,88 +168,165 @@ function LanternField({ set }) {
 }
 
 // The golden chhatri drawn around a transparent arch; the couple's photo sits in a clipped window
-// underneath, so the SVG frame covers its edges. viewBox 320x420; the window matches in percentages.
+// underneath, so the SVG frame covers its edges. viewBox 320x440; the window matches in percentages.
 function PavilionArt() {
   return (
-    <svg className="lsk-pavilion__art" viewBox="0 0 320 420" focusable="false" aria-hidden="true">
-      <path d="M160 4 L160 26" stroke="#b97f24" strokeWidth="4" strokeLinecap="round" />
-      <circle cx="160" cy="16" r="4.5" fill="#f3c968" />
-      <path d="M160 30 C206 50 234 76 234 108 C234 128 202 138 160 138 C118 138 86 128 86 108 C86 76 114 50 160 30 Z" fill="url(#lsk-dome)" />
-      <path d="M148 40 C118 58 104 80 106 104" fill="none" stroke="#f9dc93" strokeWidth="6" strokeLinecap="round" opacity="0.5" />
-      <rect x="100" y="138" width="120" height="10" rx="4" fill="#a9731f" />
-      <rect x="104" y="148" width="112" height="26" fill="url(#lsk-lat)" stroke="#a9731f" strokeWidth="1" />
-      <path d="M52 206 L268 206 L240 178 L80 178 Z" fill="url(#lsk-gold)" stroke="#a9731f" strokeWidth="1" />
-      <rect x="52" y="206" width="216" height="10" rx="3" fill="#a9731f" />
-      <rect x="80" y="216" width="26" height="10" rx="3" fill="url(#lsk-gold)" />
-      <rect x="214" y="216" width="26" height="10" rx="3" fill="url(#lsk-gold)" />
-      <rect x="85" y="226" width="16" height="120" fill="url(#lsk-gold)" stroke="#a9731f" strokeWidth="0.8" />
-      <rect x="219" y="226" width="16" height="120" fill="url(#lsk-gold)" stroke="#a9731f" strokeWidth="0.8" />
-      <rect x="80" y="344" width="26" height="12" rx="3" fill="url(#lsk-gold)" />
-      <rect x="214" y="344" width="26" height="12" rx="3" fill="url(#lsk-gold)" />
+    <svg className="lsk-pavilion__art" viewBox="0 0 320 440" focusable="false" aria-hidden="true">
+      {/* kalash finial */}
+      <path d="M160 2 L160 14" stroke="#b97f24" strokeWidth="3.5" strokeLinecap="round" />
+      <circle cx="160" cy="16" r="3.5" fill="#f6cf6f" />
+      <path d="M152 30 C152 22 168 22 168 30 C168 35 164 37 160 37 C156 37 152 35 152 30 Z" fill="url(#lsk-gold)" />
+      {/* ribbed onion dome */}
+      <path d="M160 36 C212 58 240 86 240 118 C240 140 206 150 160 150 C114 150 80 140 80 118 C80 86 108 58 160 36 Z" fill="url(#lsk-dome)" />
+      <path d="M160 36 C136 62 124 92 126 149" fill="none" stroke="#b57c22" strokeWidth="1.6" opacity="0.4" />
+      <path d="M160 36 C184 62 196 92 194 149" fill="none" stroke="#9c6a1c" strokeWidth="1.6" opacity="0.4" />
+      <path d="M160 36 C104 64 88 94 92 132" fill="none" stroke="#b57c22" strokeWidth="1.4" opacity="0.3" />
+      <path d="M160 36 C216 64 232 94 228 132" fill="none" stroke="#8a5c17" strokeWidth="1.4" opacity="0.3" />
+      <path d="M146 44 C116 64 102 90 104 122" fill="none" stroke="#fde6ad" strokeWidth="5" strokeLinecap="round" opacity="0.5" />
+      {/* collar, bead row, lattice drum */}
+      <rect x="102" y="150" width="116" height="9" rx="4" fill="#a9731f" />
+      {[110, 124, 138, 152, 166, 180, 194, 208].map((x) => (
+        <circle key={x} cx={x} cy="154.5" r="2" fill="#f6cf6f" />
+      ))}
+      <rect x="108" y="159" width="104" height="24" fill="url(#lsk-lat)" stroke="#a9731f" strokeWidth="1" />
+      {/* chhajja with corbels and a scalloped fringe */}
+      <path d="M46 216 L274 216 L246 188 L74 188 Z" fill="url(#lsk-gold)" stroke="#a9731f" strokeWidth="1" />
+      <rect x="46" y="216" width="228" height="8" rx="3" fill="#a9731f" />
+      <path
+        d="M52 224 q9.5 11 19 0 q9.5 11 19 0 q9.5 11 19 0 q9.5 11 19 0 q9.5 11 19 0 q9.5 11 19 0 q9.5 11 19 0 q9.5 11 19 0 q9.5 11 19 0 q9.5 11 19 0 q9.5 11 19 0 q9.5 11 19 0"
+        fill="none"
+        stroke="#c98a2b"
+        strokeWidth="2.5"
+        opacity="0.9"
+      />
+      {[88, 136, 184, 232].map((x) => (
+        <path key={x} d={`M${x} 188 L${x} 180 L${x + 10} 180 L${x + 10} 188`} fill="none" stroke="#8a5c17" strokeWidth="2.5" />
+      ))}
+      {/* columns with capitals, mid rings and bases */}
+      <rect x="74" y="228" width="34" height="9" rx="3" fill="url(#lsk-gold)" />
+      <rect x="212" y="228" width="34" height="9" rx="3" fill="url(#lsk-gold)" />
+      <rect x="83" y="237" width="16" height="118" fill="url(#lsk-gold)" stroke="#a9731f" strokeWidth="0.8" />
+      <rect x="221" y="237" width="16" height="118" fill="url(#lsk-gold)" stroke="#a9731f" strokeWidth="0.8" />
+      <rect x="80" y="292" width="22" height="5" rx="2.5" fill="#a9731f" />
+      <rect x="218" y="292" width="22" height="5" rx="2.5" fill="#a9731f" />
+      <rect x="78" y="355" width="26" height="11" rx="3" fill="url(#lsk-gold)" />
+      <rect x="216" y="355" width="26" height="11" rx="3" fill="url(#lsk-gold)" />
+      {/* multifoil arch band (evenodd: the opening is a hole) with spandrel rosettes */}
       <path
         fillRule="evenodd"
-        d="M102 356 L102 266 C102 224 128 202 160 198 C192 202 218 224 218 266 L218 356 Z
-           M114 356 L114 272 C114 246 126 232 136 234 C139 222 150 215 160 219 C170 215 181 222 184 234 C194 232 206 246 206 272 L206 356 Z"
+        d="M100 366 L100 282 C100 240 126 216 160 212 C194 216 220 240 220 282 L220 366 Z
+           M114 366 L114 286 C114 262 120 248 130 246 C132 236 140 230 148 232 C152 224 168 224 172 232 C180 230 188 236 190 246 C200 248 206 262 206 286 L206 366 Z"
         fill="url(#lsk-gold)"
         stroke="#a9731f"
         strokeWidth="1"
       />
-      <rect x="64" y="356" width="192" height="9" rx="3" fill="url(#lsk-gold)" />
-      {[76, 106, 136, 166, 196, 226].map((x) => (
-        <rect key={x} x={x + 8} y="365" width="6" height="18" fill="#c98a2b" />
+      <circle cx="118" cy="232" r="4" fill="#8a5c17" />
+      <circle cx="202" cy="232" r="4" fill="#8a5c17" />
+      {/* baluster railing and stepped plinth */}
+      <rect x="64" y="366" width="192" height="8" rx="3" fill="url(#lsk-gold)" />
+      {[80, 108, 136, 164, 192, 220].map((x) => (
+        <path key={x} d={`M${x} 374 C${x + 4} 377 ${x + 4} 383 ${x} 386 L${x + 6} 386 C${x + 2} 383 ${x + 2} 377 ${x + 6} 374 Z`} fill="#c98a2b" />
       ))}
-      <rect x="64" y="383" width="192" height="8" rx="3" fill="#a9731f" />
-      <rect x="56" y="391" width="208" height="12" fill="url(#lsk-gold)" />
-      <rect x="44" y="403" width="232" height="9" fill="#a9731f" />
-      <rect x="32" y="412" width="256" height="8" fill="url(#lsk-gold)" />
+      <rect x="64" y="386" width="192" height="7" rx="3" fill="#a9731f" />
+      <rect x="56" y="393" width="208" height="12" fill="url(#lsk-gold)" />
+      <rect x="44" y="405" width="232" height="10" fill="#a9731f" />
+      <rect x="30" y="415" width="260" height="11" fill="url(#lsk-gold)" />
+      <rect x="18" y="426" width="284" height="14" fill="#8a5c17" />
     </svg>
   )
 }
 
-// A lamplit courtyard: an arcade of cusped arches, a small fountain, and the water channel that the
-// CSS continues down the section.
+// A lamplit courtyard: two arcade rows, hanging glow, a tiered fountain and the pool that feeds the
+// water channel the CSS continues down the section.
 function CourtyardArt() {
   return (
-    <svg className="lsk-courtyard" viewBox="0 0 360 230" focusable="false" aria-hidden="true">
-      {[20, 86, 152, 218, 284].map((x) => (
+    <svg className="lsk-courtyard" viewBox="0 0 360 300" focusable="false" aria-hidden="true">
+      {/* distant arcade row */}
+      {[30, 76, 122, 168, 214, 260, 306].map((x) => (
+        <path key={x} d={`M${x} 84 L${x} 56 C${x + 4} 40 ${x + 20} 40 ${x + 24} 56 L${x + 24} 84`} fill="rgb(255 214 140 / 0.1)" stroke="#e8bd84" strokeWidth="1.2" opacity="0.7" />
+      ))}
+      {/* main arcade: cusped arches, each lit from within */}
+      {[18, 86, 154, 222, 290].map((x) => (
         <g key={x}>
           <path
-            d={`M${x} 150 L${x} 92 C${x + 8} 66 ${x + 42} 66 ${x + 50} 92 L${x + 50} 150`}
-            fill="rgb(255 214 140 / 0.12)"
+            d={`M${x} 190 L${x} 118 C${x} 104 ${x + 6} 96 ${x + 13} 95 C${x + 15} 88 ${x + 24} 84 ${x + 26} 84 C${x + 28} 84 ${x + 37} 88 ${x + 39} 95 C${x + 46} 96 ${x + 52} 104 ${x + 52} 118 L${x + 52} 190 Z`}
+            fill="url(#lsk-archglow)"
             stroke="#f3cf8f"
             strokeWidth="2"
           />
-          <circle cx={x + 25} cy="118" r="14" fill="url(#lsk-halo)" />
-          <circle cx={x + 25} cy="118" r="4.5" fill="#ffe9ae" />
+          <circle cx={x + 26} cy="150" r="16" fill="url(#lsk-halo)" />
+          <circle cx={x + 26} cy="152" r="4.5" fill="#ffe9ae" />
+          <path d={`M${x + 26} 112 L${x + 26} 126`} stroke="#caa36a" strokeWidth="1.5" />
+          <circle cx={x + 26} cy="130" r="4" fill="#ffd98a" />
         </g>
       ))}
-      <rect x="177" y="126" width="6" height="22" fill="#caa36a" />
-      <circle cx="180" cy="122" r="4" fill="#fff2c8" />
-      <ellipse cx="180" cy="148" rx="22" ry="6" fill="#e0b878" />
-      <rect x="172" y="152" width="16" height="16" fill="#caa36a" />
-      <path d="M180 124 C164 132 157 147 160 160" fill="none" stroke="#bfe3df" strokeWidth="2" opacity="0.8" />
-      <path d="M180 124 C196 132 203 147 200 160" fill="none" stroke="#bfe3df" strokeWidth="2" opacity="0.8" />
-      <ellipse cx="180" cy="178" rx="54" ry="13" fill="url(#lsk-water)" />
-      <ellipse cx="180" cy="178" rx="54" ry="13" fill="none" stroke="#caa36a" strokeWidth="2.5" />
-      <path d="M150 190 L210 190 L224 230 L136 230 Z" fill="url(#lsk-water)" />
-      <path d="M166 198 L162 226 M194 198 L198 226" stroke="#cfeae6" strokeWidth="1.5" opacity="0.5" />
+      {/* bokeh */}
+      {[[40, 40, 7], [120, 28, 5], [205, 44, 8], [285, 30, 6], [335, 70, 5], [70, 100, 4], [250, 104, 5]].map(([cx, cy, r]) => (
+        <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={r * 2.4} fill="url(#lsk-halo)" />
+      ))}
+      {/* tiered fountain */}
+      <circle cx="180" cy="166" r="5" fill="#fff2c8" />
+      <circle cx="180" cy="166" r="12" fill="url(#lsk-halo)" />
+      <ellipse cx="180" cy="176" rx="15" ry="4" fill="#e0b878" />
+      <rect x="177" y="178" width="6" height="14" fill="#caa36a" />
+      <ellipse cx="180" cy="194" rx="31" ry="7" fill="#e0b878" />
+      <ellipse cx="180" cy="192" rx="31" ry="6" fill="#efd3a2" />
+      <rect x="174" y="198" width="12" height="20" fill="#caa36a" />
+      <path d="M180 170 C160 180 152 202 157 222 M180 170 C200 180 208 202 203 222 M180 172 C170 184 166 202 168 220 M180 172 C190 184 194 202 192 220" fill="none" stroke="#cfeae6" strokeWidth="1.8" opacity="0.75" />
+      <circle cx="157" cy="226" r="1.6" fill="#cfeae6" opacity="0.8" />
+      <circle cx="203" cy="226" r="1.6" fill="#cfeae6" opacity="0.8" />
+      {/* basin and pool */}
+      <ellipse cx="180" cy="232" rx="62" ry="14" fill="url(#lsk-water)" />
+      <ellipse cx="180" cy="232" rx="62" ry="14" fill="none" stroke="#caa36a" strokeWidth="3" />
+      <ellipse cx="180" cy="234" rx="40" ry="8" fill="none" stroke="#cfeae6" strokeWidth="1.2" opacity="0.45" />
+      <ellipse cx="180" cy="233" rx="22" ry="4.5" fill="none" stroke="#cfeae6" strokeWidth="1" opacity="0.35" />
+      {/* channel toward the viewer, with floating diyas */}
+      <path d="M142 244 L218 244 L240 300 L120 300 Z" fill="url(#lsk-water)" />
+      <path d="M142 244 L120 300 M218 244 L240 300" stroke="#caa36a" strokeWidth="2.5" />
+      <path d="M165 254 L159 292 M195 254 L201 292 M180 250 L180 296" stroke="#cfeae6" strokeWidth="1.3" opacity="0.4" />
+      <circle cx="166" cy="272" r="3" fill="#ffd98a" />
+      <circle cx="166" cy="272" r="8" fill="url(#lsk-halo)" />
+      <circle cx="196" cy="284" r="2.5" fill="#ffd98a" />
+      <circle cx="196" cy="284" r="7" fill="url(#lsk-halo)" />
     </svg>
   )
 }
 
-// The flower cluster on the event cards' corners.
+// A small gold flourish divider for the stationery sections.
+function Flourish() {
+  return (
+    <svg className="lsk-flourish" viewBox="0 0 160 18" focusable="false" aria-hidden="true">
+      <path d="M8 9 C 36 3 56 15 72 9 M152 9 C 124 3 104 15 88 9" fill="none" stroke="#eab052" strokeWidth="1.5" strokeLinecap="round" />
+      <rect x="76" y="5" width="8" height="8" rx="1.5" transform="rotate(45 80 9)" fill="#eab052" />
+      <circle cx="68" cy="9" r="1.6" fill="#eab052" />
+      <circle cx="92" cy="9" r="1.6" fill="#eab052" />
+    </svg>
+  )
+}
+
+// The flower cluster on the event cards' corners: layered petal blossoms with sage leaves.
 function Posy({ className }) {
   return (
-    <svg className={className} viewBox="0 0 90 70" focusable="false" aria-hidden="true">
-      <ellipse cx="18" cy="48" rx="16" ry="7" fill="#9db18d" transform="rotate(-28 18 48)" />
-      <ellipse cx="72" cy="26" rx="14" ry="6" fill="#9db18d" transform="rotate(22 72 26)" />
-      <circle cx="36" cy="34" r="15" fill="#f2b98e" />
-      <circle cx="58" cy="42" r="11" fill="#e89a7c" />
-      <circle cx="52" cy="22" r="9" fill="#f7e3c2" />
-      <circle cx="36" cy="34" r="4.5" fill="#a9731f" />
-      <circle cx="58" cy="42" r="3.5" fill="#a9731f" />
-      <circle cx="52" cy="22" r="3" fill="#b97f24" />
-      <circle cx="22" cy="20" r="5" fill="#e89a7c" />
+    <svg className={className} viewBox="0 0 100 78" focusable="false" aria-hidden="true">
+      <ellipse cx="16" cy="54" rx="18" ry="7" fill="#9db18d" transform="rotate(-30 16 54)" />
+      <ellipse cx="82" cy="26" rx="16" ry="6" fill="#8aa37b" transform="rotate(24 82 26)" />
+      <ellipse cx="30" cy="16" rx="12" ry="5" fill="#9db18d" transform="rotate(-18 30 16)" />
+      {[[40, 38, 16, '#f2b98e'], [64, 48, 12, '#e89a7c'], [58, 22, 10, '#f7e3c2']].map(([cx, cy, r, fill]) => (
+        <g key={`${cx}-${cy}`}>
+          {[0, 72, 144, 216, 288].map((a) => (
+            <circle
+              key={a}
+              cx={cx + Math.cos((a * Math.PI) / 180) * r * 0.55}
+              cy={cy + Math.sin((a * Math.PI) / 180) * r * 0.55}
+              r={r * 0.52}
+              fill={fill}
+            />
+          ))}
+          <circle cx={cx} cy={cy} r={r * 0.34} fill="#b97f24" />
+        </g>
+      ))}
+      <circle cx="24" cy="30" r="5.5" fill="#e89a7c" />
+      <circle cx="84" cy="56" r="4.5" fill="#f2b98e" />
     </svg>
   )
 }
@@ -200,7 +350,9 @@ function Count({ date }) {
 
 export default function LanternSky({ invite, viaGate }) {
   const rootRef = useRef(null)
+  const sceneRef = useRef(null)
   useReveal(rootRef)
+  useTilt(sceneRef)
   const guest = guestName()
   const { couple, events = [] } = invite
   const full = invite.full || couple
@@ -210,7 +362,9 @@ export default function LanternSky({ invite, viaGate }) {
       <Defs />
 
       <section className="lsk-hero" aria-label="The invitation">
+        <SkySwirls />
         <LanternField set={DRIFT} />
+        <div className="lsk-scene" ref={sceneRef}>
         <header className="lsk-head">
           {guest && <p className="lsk-guest">Dear {guest},</p>}
           <h1 className="lsk-names">
@@ -218,15 +372,13 @@ export default function LanternSky({ invite, viaGate }) {
             <span className="lsk-names__weds">weds</span>
             <span>{couple.b}</span>
           </h1>
-          <p className="lsk-herodate">
-            <time dateTime={invite.date}>{invite.dateLabel}</time>
-          </p>
         </header>
         <div className="lsk-pavilion">
           <div className="lsk-pavilion__photo">
             <Photo slot="couple" eager focus="50% 28%" />
           </div>
           <PavilionArt />
+        </div>
         </div>
         <p className="lsk-scrollhint" aria-hidden="true">
           scroll
@@ -235,6 +387,7 @@ export default function LanternSky({ invite, viaGate }) {
       </section>
 
       <section className="lsk-blessing" aria-labelledby="lsk-bless-h">
+        <LanternField set={BLESS_DRIFT} />
         <CourtyardArt />
         <div className="lsk-blessing__text" data-reveal>
           <p className="lsk-script" data-decor>with heartfelt blessings</p>
@@ -250,6 +403,7 @@ export default function LanternSky({ invite, viaGate }) {
           {full.a} <span className="lsk-amp" aria-hidden="true">&amp;</span> {full.b}
         </p>
         {invite.tagline && <p className="lsk-script lsk-invite__tag" data-decor>{invite.tagline}</p>}
+        <Flourish />
         <div className="lsk-pair">
           <figure className="lsk-frame" data-reveal>
             <div className="lsk-frame__box">
@@ -300,6 +454,10 @@ export default function LanternSky({ invite, viaGate }) {
           <p className="lsk-venue">
             <strong>{invite.venue}</strong>
             {invite.city && <span>{invite.city}</span>}
+          </p>
+          <p className="lsk-when">
+            <time dateTime={invite.date}>{invite.dateLabel}</time>
+            {invite.timeLabel && <span> · {invite.timeLabel}</span>}
           </p>
           <div className="lsk-acts">
             <button type="button" className="lsk-btn lsk-btn--fill" onClick={() => downloadIcs(invite)}>

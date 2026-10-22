@@ -70,7 +70,10 @@
 }
 .tpl-shaadichat .sch-head { display: flex; align-items: center; gap: 10px; max-width: 44rem; margin: 0 auto; padding: 6px 16px 10px; }
 .tpl-shaadichat .sch-back { flex: none; width: 10px; height: 10px; border-left: 2px solid var(--gold-bright); border-bottom: 2px solid var(--gold-bright); transform: rotate(45deg); }
-.tpl-shaadichat .sch-pair { display: flex; flex: none; }
+.tpl-shaadichat .sch-pair { display: flex; flex: none; transition: opacity 0.25s ease; }
+/* scrolled (class set in ShaadiChat.jsx): the avatars yield so their photo boxes never sit over
+   the thread text sliding beneath the sticky header; the names and status line stay put */
+.tpl-shaadichat.sch-scrolled .sch-pair { opacity: 0; }
 .tpl-shaadichat .sch-ava { display: block; flex: none; width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: #cdbfa3; }
 .tpl-shaadichat .sch-ava img { width: 100%; height: 100%; display: block; }
 .tpl-shaadichat .sch-ava--head { width: 38px; height: 38px; border: 2px solid var(--head); }
@@ -207,7 +210,7 @@
 .tpl-shaadichat .sch-msg--b .sch-year { background: rgb(233 196 106 / 0.22); color: var(--gold-bright); }
 
 /* the photo message: one big tap target that opens the overlay */
-.tpl-shaadichat .sch-photomsg { display: grid; gap: 6px; width: 100%; padding: 2px; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.tpl-shaadichat .sch-photomsg { display: grid; gap: 8px; width: 100%; padding: 2px; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; } /* 8px: the caption clears the photo's box by well over the 2px QA grazing rule */
 .tpl-shaadichat .sch-photomsg__frame { display: block; aspect-ratio: 4 / 5; border-radius: 12px; overflow: hidden; background: #cdbfa3; transition: transform 0.25s var(--ease); }
 .tpl-shaadichat .sch-photomsg__frame img { width: 100%; height: 100%; display: block; }
 .tpl-shaadichat .sch-photomsg__cap { font-size: 0.85rem; color: var(--dim); }

@@ -65,7 +65,9 @@
   inset: 4px;
   display: grid;
   place-content: center;
-  padding: 16px 16px 16px calc(16px + 64px); /* the band owns the left edge */
+  /* the band owns the left edge; the text box must also clear the focused band's ink outline and
+     shadow, or the contrast sampler reads those ink pixels as "behind" the text (worst case ~95px) */
+  padding: 16px 16px 16px calc(16px + 92px);
   background: var(--frost);
   backdrop-filter: blur(9px);
   -webkit-backdrop-filter: blur(9px);
