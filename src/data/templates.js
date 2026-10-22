@@ -155,6 +155,50 @@ const contemporary = [
     palette: ['#1a1210', '#fbeed8', '#f0a35e'], font: "'Playfair Display', serif", shape: 'circle',
     Component: lazy(() => import('../templates/goldenhour/GoldenHour.jsx')),
   },
+  // The Instagram-trend five (researched Oct 2026): chat invite, scratch card, music player,
+  // scrollytelling film and vellum stationery. All photo-first.
+  {
+    id: 'shaadichat', name: 'Shaadi Chat', group: 'Playful', photos: true,
+    blurb: 'The invite lands as a chat: the news breaks bubble by bubble.',
+    signature: 'A lock-screen notification opens a messaging thread of location, calendar and photo cards.',
+    palette: ['#f3ecdd', '#26231c', '#0e5e54'], font: "'Kalam', cursive", shape: 'rect',
+    Component: lazy(() => import('../templates/shaadichat/ShaadiChat.jsx')),
+  },
+  {
+    id: 'scratchfoil', name: 'Scratch Card', group: 'Playful', photos: true,
+    blurb: 'A golden lottery ticket; the prize under the foil is the two of them.',
+    signature: 'Rub the gold foil off each panel with your thumb; confetti marks every reveal.',
+    palette: ['#f9f0dc', '#581722', '#8a5e14'], font: "'Barlow Condensed', sans-serif", shape: 'ticket',
+    Component: lazy(() => import('../templates/scratchfoil/ScratchFoil.jsx')),
+  },
+  {
+    id: 'nowplaying', name: 'Now Playing', group: 'Modern', photos: true,
+    blurb: 'A music-player invite: album-art photo, events as the tracklist.',
+    signature: 'Tap play on the mini-player and the countdown becomes the progress bar.',
+    palette: ['#0b0b0f', '#f2f2f5', '#f2a0b7'], font: "'Manrope', sans-serif", shape: 'rect',
+    Component: lazy(() => import('../templates/nowplaying/NowPlaying.jsx')),
+  },
+  {
+    id: 'scrollcinema', name: 'Scroll Cinema', group: 'Romantic', photos: true,
+    blurb: 'A scroll-driven film in three chapters, ending in a framed keepsake.',
+    signature: 'Scroll draws the timeline; the portraits converge and the couple settles into a frame.',
+    palette: ['#170a1c', '#f7eee1', '#e89b4b'], font: "'Bodoni Moda', serif", shape: 'rect',
+    Component: lazy(() => import('../templates/scrollcinema/ScrollCinema.jsx')),
+  },
+  {
+    id: 'vellumpeel', name: 'Vellum Peel', group: 'Romantic', photos: true,
+    blurb: 'Frosted vellum sheets peel off the portrait, sharpening it step by step.',
+    signature: 'Drag the translucent sheets aside until the couple sits crisp in the frame.',
+    palette: ['#f6f1e7', '#44403a', '#99515c'], font: "'Cormorant Garamond', serif", shape: 'oval',
+    Component: lazy(() => import('../templates/vellumpeel/VellumPeel.jsx')),
+  },
+  {
+    id: 'lanternsky', name: 'Lantern Sky', group: 'Romantic', photos: true,
+    blurb: 'A dusk sky of rising lanterns over a golden pavilion.',
+    signature: 'Lanterns drift up the painted sky; the couple glows inside the pavilion arch.',
+    palette: ['#2a5fa3', '#fdf3dd', '#eab052'], font: "'Cormorant Garamond', serif", shape: 'arch',
+    Component: lazy(() => import('../templates/lanternsky/LanternSky.jsx')),
+  },
 ]
 
 // Tradition-specific designs (Hindu, Marwadi, Jain). Each reads its own sample in data/samples/.

@@ -45,6 +45,7 @@ Thumbs.db
 # Local AI / tooling state
 .claude/
 .codegraph/
+.base-check/
 graphify-out/
 
 # Browser test output

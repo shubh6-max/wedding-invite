@@ -1,0 +1,114 @@
+/* Lantern Sky gate: the names over one monogrammed paper lantern against a night sky (the background
+   photo dimmed to texture). Sequence (ms): flame blooms 0-350, lantern rises 100-1400, gate fades
+   1100-1800 (useGate ms = 1900). Only transform and opacity animate; scoped under .gate-lanternsky. */
+.gate-lanternsky.gate {
+  --night: #101f38;
+  --ivory: #fdf3dd;
+  --gold: #eab052;
+  --ease: cubic-bezier(0.3, 0.6, 0.2, 1);
+  background: var(--night);
+  color: var(--ivory);
+  font: 500 1rem/1.5 'Cormorant Garamond', Georgia, serif;
+}
+.gate-lanternsky *,
+.gate-lanternsky *::before,
+.gate-lanternsky *::after { box-sizing: border-box; }
+.gate-lanternsky p { margin: 0; }
+
+/* ---- the night: the background photo dimmed deep blue, with a faint star-grain ---- */
+.gate-lanternsky .lskg-sky { position: absolute; inset: 0; overflow: hidden; background: var(--night); }
+.gate-lanternsky .lskg-sky img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: blur(10px) saturate(0.6); /* set once, never animated */
+  transform: scale(1.1); /* hides the blur's soft edge */
+  opacity: 0.4;
+}
+.gate-lanternsky .lskg-sky::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(10 20 42 / 0.88), rgb(16 31 56 / 0.78) 55%, rgb(44 42 48 / 0.86));
+}
+
+/* ---- the stack: names above the lantern button ---- */
+.gate-lanternsky .lskg-in { position: relative; display: grid; justify-items: center; gap: clamp(20px, 5vh, 40px); padding: 20px; }
+.gate-lanternsky .lskg-text { display: grid; gap: 10px; text-align: center; overflow-wrap: anywhere; transition: opacity 0.5s ease; }
+.gate-lanternsky .lskg-guest { font: italic 500 clamp(0.9375rem, 2.6vw, 1.1rem)/1.3 'Cormorant Garamond', Georgia, serif; color: #ffd98a; }
+.gate-lanternsky .lskg-names {
+  font: 600 clamp(1.6rem, 7vw, 2.6rem)/1.15 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: 0.1em;
+  text-indent: 0.1em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: #fff;
+}
+.gate-lanternsky .lskg-date { font: 700 0.8125rem/1.4 'Karla', system-ui, sans-serif; letter-spacing: 0.22em; text-indent: 0.22em; text-transform: uppercase; }
+
+/* ---- the lantern: the one real control ---- */
+.gate-lanternsky .lskg-lantern {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  width: clamp(130px, 34vw, 170px);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ivory);
+  cursor: pointer;
+}
+.gate-lanternsky .lskg-lantern:focus-visible { outline: 3px solid var(--gold); outline-offset: 6px; border-radius: 20px; }
+/* the lantern body bobs (and later rises) inside the button, so the tap target's box never moves */
+.gate-lanternsky .lskg-body { position: relative; display: block; width: 100%; animation: lsk-gate-bob 3.4s ease-in-out infinite; }
+.gate-lanternsky .lskg-lantern svg { width: 100%; height: auto; display: block; overflow: visible; }
+.gate-lanternsky .lskg-flame { animation: lsk-gate-flicker 2.6s ease-in-out infinite; }
+.gate-lanternsky .lskg-mono {
+  position: absolute;
+  top: 36%;
+  left: 50%;
+  transform: translateX(-50%);
+  font: 400 clamp(1.7rem, 7vw, 2.3rem)/1 'Pinyon Script', cursive;
+  color: #6d3a0a;
+}
+.gate-lanternsky .lskg-cta { font: 700 0.8125rem/1.2 'Karla', system-ui, sans-serif; letter-spacing: 0.2em; text-indent: 0.2em; text-transform: uppercase; }
+@media (hover: hover) and (pointer: fine) {
+  .gate-lanternsky:not(.is-opening) .lskg-lantern:hover { transform: translateY(-4px); transition: transform 0.3s ease; }
+}
+
+/* ---- opening: the flame blooms, the lantern rises away, the gate fades ---- */
+.gate-lanternsky.is-opening .lskg-lantern { pointer-events: none; }
+.gate-lanternsky.is-opening .lskg-body { animation: lsk-gate-rise 1.4s var(--ease) 0.1s forwards; }
+.gate-lanternsky.is-opening .lskg-flame { animation: lsk-gate-bloom 0.35s ease forwards; }
+.gate-lanternsky.is-opening .lskg-haloshape { animation: lsk-gate-bloom 0.5s ease forwards; }
+.gate-lanternsky.is-opening .lskg-text { opacity: 0; }
+.gate-lanternsky.is-opening .lskg-cta { opacity: 0; transition: opacity 0.3s ease; }
+.gate-lanternsky.is-opening { animation: lsk-gate-out 0.7s ease 1.1s forwards; }
+@keyframes lsk-gate-rise {
+  20% { transform: translate(2%, -4%) rotate(1.5deg); opacity: 1; }
+  60% { transform: translate(-3%, -46vh) rotate(-3deg); opacity: 1; }
+  100% { transform: translate(4%, -112vh) rotate(4deg); opacity: 0.9; }
+}
+@keyframes lsk-gate-bloom { to { transform: scale(1.35); transform-origin: center; opacity: 1; } }
+@keyframes lsk-gate-out { to { opacity: 0; } }
+@keyframes lsk-gate-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes lsk-gate-flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+/* a phone held sideways: tighten the vertical rhythm so the lantern stays fully on screen */
+@media (max-height: 520px) and (orientation: landscape) {
+  .gate-lanternsky .lskg-in { grid-template-columns: auto auto; align-items: center; gap: clamp(16px, 6vw, 44px); }
+  .gate-lanternsky .lskg-lantern { width: clamp(110px, 26vh, 150px); }
+}
+
+/* reduced motion: nothing bobs or rises; the gate simply fades (useGate hands over in 250ms) */
+@media (prefers-reduced-motion: reduce) {
+  .gate-lanternsky .lskg-body { animation: none; }
+  .gate-lanternsky .lskg-flame,
+  .gate-lanternsky .lskg-haloshape { animation: none; }
+  .gate-lanternsky.is-opening .lskg-body { animation: none; }
+  .gate-lanternsky.is-opening .lskg-flame { animation: none; }
+  .gate-lanternsky.is-opening { animation: lsk-gate-out 0.25s ease both; }
+}

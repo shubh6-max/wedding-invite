@@ -16,6 +16,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100svh;
+  background: #fbf7f0; /* the gallery's ivory; each design re-tints the page behind itself */
 }
 
 button,

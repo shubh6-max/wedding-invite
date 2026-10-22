@@ -1,0 +1,102 @@
+/* Scroll Cinema gate: the couple's photo barely visible behind two dark overlay halves that part like
+   light curtains on tap. Only transform and opacity animate.
+   Sequence (ms, useGate ms = 1800): on tap the title card fades 0-400, the halves part 0-1100,
+   the whole gate fades 1000-1700 onto the page mounting beneath. */
+.gate-scrollcinema.gate {
+  --deep: #170a1c;
+  --amber: #e89b4b;
+  --glow: #ffcd96;
+  --ivory: #f7eee1;
+  --ease: cubic-bezier(0.7, 0, 0.2, 1);
+
+  background: var(--deep);
+  color: var(--ivory);
+  font: 400 1rem/1.5 'Archivo', system-ui, sans-serif;
+}
+.gate-scrollcinema *,
+.gate-scrollcinema *::before,
+.gate-scrollcinema *::after { box-sizing: border-box; }
+.gate-scrollcinema p { margin: 0; }
+
+/* the photo, barely visible under the halves until they part */
+.gate-scrollcinema .gate-scrollcinema__photo { position: absolute; inset: 0; overflow: hidden; }
+.gate-scrollcinema .gate-scrollcinema__photo img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* the curtains: two near-opaque dusk halves meeting on a thin amber seam */
+.gate-scrollcinema .gate-scrollcinema__half {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background: linear-gradient(170deg, rgb(32 13 38 / 0.94), rgb(23 10 28 / 0.95));
+  transition: transform 1.1s var(--ease);
+}
+.gate-scrollcinema .gate-scrollcinema__half--l { left: 0; border-right: 1px solid rgb(232 155 75 / 0.5); }
+.gate-scrollcinema .gate-scrollcinema__half--r { right: 0; }
+
+/* the title card */
+.gate-scrollcinema .gate-scrollcinema__center {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 26px;
+  padding: 0 24px;
+  text-align: center;
+  transition: opacity 0.4s ease;
+}
+.gate-scrollcinema .gate-scrollcinema__text { display: grid; justify-items: center; gap: 10px; max-width: 36rem; overflow-wrap: anywhere; }
+.gate-scrollcinema .gate-scrollcinema__slate {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+.gate-scrollcinema .gate-scrollcinema__guest { font: italic 400 1.15rem/1.3 'Bodoni Moda', 'Playfair Display', Georgia, serif; color: var(--glow); }
+.gate-scrollcinema .gate-scrollcinema__names {
+  font: 400 clamp(2rem, 10vw, 4rem)/1.12 'Bodoni Moda', 'Playfair Display', Georgia, serif;
+  text-wrap: balance;
+}
+.gate-scrollcinema .gate-scrollcinema__names i { color: var(--amber); }
+.gate-scrollcinema .gate-scrollcinema__date { font-size: 0.9375rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; }
+
+.gate-scrollcinema .gate-scrollcinema__btn {
+  min-height: 52px;
+  padding: 0 30px;
+  border: 1.5px solid var(--amber);
+  border-radius: 999px;
+  background: var(--amber);
+  color: var(--deep);
+  font: 700 1rem inherit;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+.gate-scrollcinema .gate-scrollcinema__btn:focus-visible { outline: 3px solid var(--ivory); outline-offset: 4px; }
+
+/* ---- opening: the card fades, the curtains part, the gate dissolves onto the page ---- */
+.gate-scrollcinema.is-opening { animation: scc-gate-out 0.7s ease 1s forwards; }
+.gate-scrollcinema.is-opening .gate-scrollcinema__center { opacity: 0; }
+.gate-scrollcinema.is-opening .gate-scrollcinema__half--l { transform: translateX(-101%); }
+.gate-scrollcinema.is-opening .gate-scrollcinema__half--r { transform: translateX(101%); }
+@keyframes scc-gate-out { to { opacity: 0; } }
+
+@media (hover: hover) and (pointer: fine) {
+  .gate-scrollcinema:not(.is-opening) .gate-scrollcinema__btn:hover { transform: scale(1.04); }
+}
+
+/* a short screen (phone held sideways): a tighter card so names and button both stay in view */
+@media (max-height: 520px) {
+  .gate-scrollcinema .gate-scrollcinema__center { gap: 14px; }
+  .gate-scrollcinema .gate-scrollcinema__text { gap: 6px; }
+  .gate-scrollcinema .gate-scrollcinema__names { font-size: clamp(1.6rem, 10svh, 2.6rem); }
+}
+
+/* Reduced motion: the curtains do not move; the gate simply fades away (useGate shortens its timer). */
+@media (prefers-reduced-motion: reduce) {
+  .gate-scrollcinema .gate-scrollcinema__half { transition: none; }
+  .gate-scrollcinema.is-opening .gate-scrollcinema__half--l,
+  .gate-scrollcinema.is-opening .gate-scrollcinema__half--r { transform: none; }
+  .gate-scrollcinema.is-opening .gate-scrollcinema__center { transition: none; opacity: 1; }
+  .gate-scrollcinema.is-opening { animation: scc-gate-out 0.25s ease both; }
+}

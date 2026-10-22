@@ -19,6 +19,12 @@ const DESIGNS = {
   bentoday: { name: 'BentoDay', prefix: 'bt' },
   goldenhour: { name: 'GoldenHour', prefix: 'gh' },
   velvetseal: { name: 'VelvetSeal', prefix: 'vs' },
+  shaadichat: { name: 'ShaadiChat', prefix: 'sch' },
+  scratchfoil: { name: 'ScratchFoil', prefix: 'scf' },
+  nowplaying: { name: 'NowPlaying', prefix: 'npl' },
+  scrollcinema: { name: 'ScrollCinema', prefix: 'scc' },
+  vellumpeel: { name: 'VellumPeel', prefix: 'vpl' },
+  lanternsky: { name: 'LanternSky', prefix: 'lsk' },
 }
 const BANNED_FONTS = /\b(Fraunces|Inter|Roboto|Geist|Plus Jakarta Sans|Space Grotesk)\b/i
 // Fonts the device already has; fine as fallbacks without being loaded.

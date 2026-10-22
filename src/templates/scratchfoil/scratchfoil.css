@@ -1,0 +1,316 @@
+/* Scratch Foil: a cream lottery ticket with serrated edges over a soft-focus scene. Gold foil panels hide
+   the prizes; the canvases sit on top of their frames and fade out once scratched. Only transform and
+   opacity animate. Everything scoped under .tpl-scratchfoil. */
+.tpl-scratchfoil {
+  --stock: #f9f0dc;
+  --ink: #581722;
+  --soft: rgb(88 23 34 / 0.74);
+  --gold: #8a5e14; /* ink-gold: dark enough to read on the cream stock */
+  --gold-hi: #f2d98b;
+  --maroon: #2d0c12;
+  --line: rgb(138 94 20 / 0.45);
+  --caps: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --serif: 'Playfair Display', Georgia, serif;
+  --mono: 'IBM Plex Mono', Consolas, monospace;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 100svh;
+  overflow-x: clip;
+  background: var(--maroon);
+  color: var(--ink);
+  font: 400 1rem/1.55 'Karla', system-ui, sans-serif;
+  overflow-wrap: anywhere; /* a very long word wraps instead of pushing the page sideways */
+}
+.tpl-scratchfoil > * { grid-area: 1 / 1; }
+.tpl-scratchfoil *,
+.tpl-scratchfoil *::before,
+.tpl-scratchfoil *::after { box-sizing: border-box; }
+.tpl-scratchfoil h1,
+.tpl-scratchfoil h2,
+.tpl-scratchfoil h3,
+.tpl-scratchfoil p,
+.tpl-scratchfoil ol { margin: 0; padding: 0; }
+.tpl-scratchfoil ol { list-style: none; }
+
+/* ---------- the scene: the background photo, a soft band behind the ticket's masthead that fades into
+   the maroon page. Kept to the top 480px so only the masthead (marked data-over-photo, on opaque ticket
+   stock) ever sits over the photo; the first foil panel's caption starts well below it at every width. */
+.tpl-scratchfoil .scf-scene {
+  position: relative;
+  align-self: start;
+  z-index: 0;
+  height: 480px;
+  overflow: hidden;
+  background: linear-gradient(170deg, #4a161f, var(--maroon));
+}
+.tpl-scratchfoil .scf-scene img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: blur(7px) brightness(0.72); /* static soft focus; nothing here animates */
+  transform: scale(1.06); /* hides the blur's bright edge */
+}
+.tpl-scratchfoil .scf-scene::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(45 12 18 / 0) 55%, var(--maroon)),
+    radial-gradient(ellipse 120% 80% at 50% 30%, rgb(45 12 18 / 0.25), rgb(45 12 18 / 0.78));
+}
+
+/* ---------- the column of ticket + stubs ---------- */
+.tpl-scratchfoil .scf-col {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 468px);
+  margin: 0 auto;
+  padding: clamp(20px, 5vh, 48px) 16px 140px;
+  display: grid;
+  gap: 18px;
+}
+.tpl-scratchfoil .scf-col.via-gate { animation: scf-rise 0.7s cubic-bezier(0.22, 0.8, 0.2, 1) 0.8s backwards; }
+@keyframes scf-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+/* serrated ticket edges: round bites along both sides, like a torn-off stub */
+.tpl-scratchfoil .scf-ticket,
+.tpl-scratchfoil .scf-stub {
+  background: var(--stock);
+  -webkit-mask:
+    radial-gradient(circle 7px at left, rgb(0 0 0 / 0) 97%, #000) left / 51% 26px repeat-y,
+    radial-gradient(circle 7px at right, rgb(0 0 0 / 0) 97%, #000) right / 51% 26px repeat-y;
+  mask:
+    radial-gradient(circle 7px at left, rgb(0 0 0 / 0) 97%, #000) left / 51% 26px repeat-y,
+    radial-gradient(circle 7px at right, rgb(0 0 0 / 0) 97%, #000) right / 51% 26px repeat-y;
+}
+.tpl-scratchfoil .scf-ticket { padding: 26px 22px 24px; display: grid; gap: 20px; }
+.tpl-scratchfoil .scf-stub { padding: 26px 22px 28px; text-align: center; }
+
+/* ---------- masthead ---------- */
+.tpl-scratchfoil .scf-cap {
+  display: block;
+  font: 700 0.8125rem/1.3 var(--caps);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.tpl-scratchfoil .scf-mast {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding-bottom: 18px;
+  border-bottom: 2px dashed var(--line);
+  text-align: center;
+}
+.tpl-scratchfoil .scf-names { font: 400 clamp(1.7rem, 8vw, 2.4rem)/1.15 var(--serif); text-wrap: balance; }
+.tpl-scratchfoil .scf-names span { color: var(--gold); font-style: italic; }
+.tpl-scratchfoil .scf-hosts { font-size: 0.875rem; color: var(--soft); }
+.tpl-scratchfoil .scf-when { font: 700 0.9375rem/1.4 var(--caps); letter-spacing: 0.08em; text-transform: uppercase; }
+.tpl-scratchfoil .scf-lucky { display: grid; gap: 6px; justify-items: center; margin-top: 6px; }
+.tpl-scratchfoil .scf-lucky__row { display: flex; gap: 5px; }
+.tpl-scratchfoil .scf-lucky__row b {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1.5px solid var(--gold);
+  border-radius: 50%;
+  font: 500 0.8125rem var(--mono);
+}
+
+/* ---------- scratch panels ---------- */
+.tpl-scratchfoil .scf-scratch { position: relative; display: grid; gap: 8px; justify-items: center; }
+.tpl-scratchfoil .scf-scratch__frame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: #efe2c4; /* the frame colour the illustration fallback sits on */
+}
+.tpl-scratchfoil .scf-scratch__prize { display: grid; }
+.tpl-scratchfoil .scf-scratch__foil {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none; /* a drag scratches instead of scrolling */
+  cursor: crosshair;
+  transition: opacity 0.5s ease;
+}
+.tpl-scratchfoil .scf-scratch.is-won .scf-scratch__foil { opacity: 0; pointer-events: none; }
+.tpl-scratchfoil .scf-scratch__reveal {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 14px;
+  border: 0;
+  background: none;
+  color: var(--soft);
+  font: 700 0.8125rem/1 var(--caps);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* confetti: a dozen ticket-coloured rectangles thrown from the panel's centre, then gone */
+.tpl-scratchfoil .scf-burst { position: absolute; left: 50%; top: 45%; z-index: 2; pointer-events: none; }
+.tpl-scratchfoil .scf-burst i {
+  position: absolute;
+  width: 10px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--gold);
+  opacity: 0;
+  animation: scf-pop 0.85s ease-out var(--d, 0s) forwards;
+}
+.tpl-scratchfoil .scf-burst i:nth-child(3n) { width: 6px; height: 10px; background: var(--ink); }
+.tpl-scratchfoil .scf-burst i:nth-child(3n + 1) { background: var(--gold-hi); }
+@keyframes scf-pop {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--tx, 20px), var(--ty, -40px)) rotate(var(--r, 180deg)); }
+}
+
+/* the grand prize: the couple's photo and a caption, all on ticket stock (no text over the photo) */
+.tpl-scratchfoil .scf-main__photo { aspect-ratio: 4 / 5; }
+.tpl-scratchfoil .scf-main__photo img { width: 100%; height: 100%; display: block; }
+.tpl-scratchfoil .scf-main__line { display: grid; gap: 2px; padding: 12px 14px 14px; font: 400 1.15rem/1.3 var(--serif); text-align: center; }
+
+/* the medallions: two round coins, bride and groom */
+.tpl-scratchfoil .scf-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.tpl-scratchfoil .scf-medal { display: grid; gap: 6px; justify-items: center; text-align: center; }
+.tpl-scratchfoil .scf-medal__coin { width: 100%; }
+.tpl-scratchfoil .scf-medal__coin .scf-scratch__frame { aspect-ratio: 1; border-radius: 50%; }
+.tpl-scratchfoil .scf-medal__coin img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tpl-scratchfoil .scf-medal__who { display: grid; gap: 2px; }
+.tpl-scratchfoil .scf-medal__who b { font: 400 1.1rem/1.25 var(--serif); }
+
+/* the final panel: the win line */
+.tpl-scratchfoil .scf-final .scf-scratch__frame { min-height: 120px; }
+.tpl-scratchfoil .scf-final .scf-scratch__prize { gap: 4px; align-content: center; min-height: 116px; padding: 16px; text-align: center; }
+.tpl-scratchfoil .scf-final__win { font: 400 1.45rem/1.2 var(--serif); color: var(--ink); }
+.tpl-scratchfoil .scf-final__where { font-weight: 700; font-size: 0.9375rem; }
+.tpl-scratchfoil .scf-final__by { font-size: 0.875rem; color: var(--soft); }
+
+/* ---------- stubs below the ticket ---------- */
+.tpl-scratchfoil .scf-h2 { font: 400 clamp(1.5rem, 6.4vw, 1.9rem)/1.2 var(--serif); }
+.tpl-scratchfoil .scf-clock { display: grid; grid-template-columns: repeat(4, 1fr); max-width: 22rem; margin: 18px auto 0; }
+.tpl-scratchfoil .scf-clock div { display: grid; gap: 2px; }
+.tpl-scratchfoil .scf-clock b { font: 500 clamp(1.5rem, 7.5vw, 2.1rem)/1.1 var(--mono); }
+.tpl-scratchfoil .scf-clock span { font: 700 0.8125rem/1.3 var(--caps); letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); }
+.tpl-scratchfoil .scf-clock__done { margin-top: 16px; font: italic 400 1.3rem/1.3 var(--serif); color: var(--gold); }
+.tpl-scratchfoil .scf-stub__venue { margin-top: 16px; color: var(--soft); }
+.tpl-scratchfoil .scf-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 18px; }
+.tpl-scratchfoil .scf-btn {
+  display: inline-grid;
+  place-items: center;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: none;
+  color: var(--ink);
+  font: 700 0.9375rem var(--caps);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+.tpl-scratchfoil .scf-btn--fill { background: var(--ink); color: var(--stock); border-color: var(--ink); }
+
+/* schedule */
+.tpl-scratchfoil .scf-plan { max-width: 24rem; margin: 14px auto 0; text-align: left; }
+.tpl-scratchfoil .scf-plan li { display: grid; grid-template-columns: minmax(78px, 30%) 1fr; gap: 14px; padding: 14px 0; border-top: 2px dashed var(--line); }
+.tpl-scratchfoil .scf-plan li:first-child { border-top: 0; }
+.tpl-scratchfoil .scf-plan__when { display: grid; align-content: start; gap: 2px; }
+.tpl-scratchfoil .scf-plan__when b { font: 500 0.9375rem var(--mono); color: var(--gold); }
+.tpl-scratchfoil .scf-plan__when span { font-size: 0.8125rem; color: var(--soft); }
+.tpl-scratchfoil .scf-plan h3 { font: 400 1.25rem/1.25 var(--serif); }
+.tpl-scratchfoil .scf-plan li p { margin-top: 2px; font-size: 0.9375rem; color: var(--soft); }
+
+/* story */
+.tpl-scratchfoil .scf-story { max-width: 24rem; margin: 14px auto 0; display: grid; gap: 14px; text-align: left; }
+.tpl-scratchfoil .scf-story li { display: grid; grid-template-columns: 58px 1fr; gap: 12px; }
+.tpl-scratchfoil .scf-story__yr { font: 500 0.875rem/1.6 var(--mono); color: var(--gold); }
+.tpl-scratchfoil .scf-story h3 { font: 400 1.2rem/1.3 var(--serif); }
+.tpl-scratchfoil .scf-story p { margin-top: 2px; font-size: 0.9375rem; color: var(--soft); }
+
+/* ---------- RSVP (shared form, styled for ticket stock) ---------- */
+.tpl-scratchfoil .scf-rsvp__by { margin-top: 8px; color: var(--soft); }
+.tpl-scratchfoil .rsvp,
+.tpl-scratchfoil .rsvp__done { display: grid; gap: 14px; max-width: 340px; margin: 20px auto 0; text-align: left; }
+.tpl-scratchfoil .rsvp label { display: grid; gap: 5px; }
+.tpl-scratchfoil .rsvp label span { font: 700 0.8125rem var(--caps); letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+.tpl-scratchfoil .rsvp input,
+.tpl-scratchfoil .rsvp select,
+.tpl-scratchfoil .rsvp textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 13px;
+  border: 1.5px solid rgb(88 23 34 / 0.5);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.55);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem; /* 16px: iOS does not zoom the page when this is focused */
+}
+.tpl-scratchfoil .rsvp button {
+  min-height: 50px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--stock);
+  font: 700 0.9375rem var(--caps);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.tpl-scratchfoil .rsvp__error { color: #a3261f; }
+.tpl-scratchfoil .rsvp__msg { padding: 12px 13px; border-radius: 10px; background: rgb(88 23 34 / 0.08); white-space: pre-wrap; user-select: text; }
+.tpl-scratchfoil .rsvp__reply { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.tpl-scratchfoil .rsvp__reply a,
+.tpl-scratchfoil .rsvp__reply button {
+  display: inline-grid;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--ink);
+  font: 600 1rem 'Karla', system-ui, sans-serif;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.tpl-scratchfoil .rsvp__hint { min-height: 1.5em; font-size: 0.9rem; color: var(--gold); }
+
+.tpl-scratchfoil .scf-btn:focus-visible,
+.tpl-scratchfoil .scf-scratch__reveal:focus-visible,
+.tpl-scratchfoil .rsvp input:focus-visible,
+.tpl-scratchfoil .rsvp select:focus-visible,
+.tpl-scratchfoil .rsvp textarea:focus-visible,
+.tpl-scratchfoil .rsvp__reply a:focus-visible,
+.tpl-scratchfoil .rsvp button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .tpl-scratchfoil .scf-btn:hover { background: var(--gold); border-color: var(--gold); color: var(--stock); }
+  .tpl-scratchfoil .scf-scratch__reveal:hover { color: var(--ink); }
+}
+
+/* a wide screen: the ticket keeps its phone proportions, centred on more of the scene */
+@media (min-width: 1024px) {
+  .tpl-scratchfoil .scf-col { padding-top: 56px; }
+}
+
+/* Reduced motion: panels start revealed (JSX), so still the leftovers - no confetti, no entrance, no fades. */
+@media (prefers-reduced-motion: reduce) {
+  .tpl-scratchfoil .scf-col.via-gate { animation: none; }
+  .tpl-scratchfoil .scf-burst i { animation: none; opacity: 0; }
+  .tpl-scratchfoil .scf-scratch__foil { transition: none; }
+}

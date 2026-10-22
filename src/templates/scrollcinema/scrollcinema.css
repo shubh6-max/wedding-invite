@@ -1,0 +1,345 @@
+/* Scroll Cinema: a three-chapter film driven only by native scroll. The background photo sits under the
+   chapters behind a heavy dusk grade; every moving thing reads --p (0..1, set by the page's scroll driver)
+   and animates transform/opacity only. Everything scoped under .tpl-scrollcinema. */
+.tpl-scrollcinema {
+  --plum: #241028;
+  --deep: #170a1c;
+  --amber: #e89b4b;
+  --glow: #ffcd96;
+  --ivory: #f7eee1;
+  --muted: rgb(247 238 225 / 0.78);
+  --card: rgb(23 10 28 / 0.95); /* near-opaque, so ivory text holds 4.5:1 even over a pure-white photo */
+  --line: rgb(232 155 75 / 0.32);
+  --ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+  --serif: 'Bodoni Moda', 'Playfair Display', Georgia, serif;
+  --sans: 'Archivo', system-ui, sans-serif;
+
+  min-height: 100svh;
+  overflow-x: clip; /* converging cards slide in from past the edges; nothing widens the page */
+  background: var(--deep);
+  color: var(--ivory);
+  font: 400 1.0625rem/1.6 var(--sans);
+  overflow-wrap: anywhere;
+}
+.tpl-scrollcinema *,
+.tpl-scrollcinema *::before,
+.tpl-scrollcinema *::after { box-sizing: border-box; }
+.tpl-scrollcinema h1,
+.tpl-scrollcinema h2,
+.tpl-scrollcinema h3,
+.tpl-scrollcinema p,
+.tpl-scrollcinema ol,
+.tpl-scrollcinema figure { margin: 0; padding: 0; }
+.tpl-scrollcinema ol { list-style: none; }
+.tpl-scrollcinema h1,
+.tpl-scrollcinema h2,
+.tpl-scrollcinema h3 { font-family: var(--serif); font-weight: 400; line-height: 1.12; text-wrap: balance; }
+.tpl-scrollcinema .scc-hide { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+/* the small-caps film slate line used everywhere */
+.tpl-scrollcinema .scc-kicker {
+  font: 600 0.8125rem/1.4 var(--sans);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+.tpl-scrollcinema .scc-kicker--pill {
+  justify-self: center;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--card);
+}
+
+/* ---------- the film: sticky background photo + the chapters over it ---------- */
+.tpl-scrollcinema .scc-film { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); }
+.tpl-scrollcinema .scc-film > * { grid-area: 1 / 1; }
+.tpl-scrollcinema .scc-bg {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  height: 100lvh;
+  overflow: hidden;
+  background: linear-gradient(170deg, #35173c, var(--deep) 70%);
+}
+/* counter-parallax: the photo drifts down slowly while the film scrolls up (--p spans the whole film) */
+.tpl-scrollcinema .scc-bg__move {
+  position: absolute;
+  inset: 0;
+  transform: translateY(calc((var(--p, 0) - 0.5) * 8%)) scale(1.16);
+}
+.tpl-scrollcinema .scc-bg__move img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.tpl-scrollcinema .scc-bg__grade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(23 10 28 / 0.82) 0%, rgb(54 20 40 / 0.72) 50%, rgb(110 56 26 / 0.8) 100%);
+}
+.tpl-scrollcinema .scc-fg { position: relative; z-index: 1; }
+
+/* ---------- chapter I: the opening ---------- */
+.tpl-scrollcinema .scc-open { display: grid; place-items: center; min-height: 100svh; padding: 48px 16px; }
+.tpl-scrollcinema .scc-panel {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  width: min(100%, 36rem);
+  padding: clamp(24px, 7vw, 48px) clamp(16px, 5vw, 36px);
+  border: 1px solid var(--line);
+  background: var(--card);
+  text-align: center;
+  animation: scc-rise 1s var(--ease) 0.15s backwards;
+}
+.tpl-scrollcinema .scc-open.via-gate .scc-panel { animation-delay: 0.8s; } /* the gate's curtains are still parting */
+@keyframes scc-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+.tpl-scrollcinema .scc-guest { font: italic 400 1.15rem/1.3 var(--serif); color: var(--glow); }
+.tpl-scrollcinema .scc-hosts { font-size: 0.875rem; font-weight: 600; letter-spacing: 0.08em; color: var(--muted); }
+.tpl-scrollcinema .scc-names { font-size: clamp(2rem, 9.5vw, 4rem); }
+.tpl-scrollcinema .scc-amp { font-style: italic; color: var(--amber); }
+.tpl-scrollcinema .scc-tagline { font: italic 400 1.2rem/1.35 var(--serif); color: var(--muted); }
+.tpl-scrollcinema .scc-date { font: 600 0.9375rem/1.4 var(--sans); letter-spacing: 0.18em; text-transform: uppercase; }
+.tpl-scrollcinema .scc-cue { margin-top: 14px; font-size: 0.8125rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+/* the cue line stays dim: a brighter amber inside the panel would sit under 4.5:1 against ivory text */
+.tpl-scrollcinema .scc-cue::after { content: ''; display: block; width: 1px; height: 26px; margin: 8px auto 0; background: linear-gradient(rgb(232 155 75 / 0.4), transparent); }
+
+/* ---------- the milestones: an SVG timeline that draws itself as the story passes ---------- */
+.tpl-scrollcinema .scc-reel { position: relative; max-width: 36rem; margin: 0 auto; padding: 48px 16px 48px 56px; }
+.tpl-scrollcinema .scc-line { position: absolute; left: 26px; top: 48px; bottom: 48px; width: 3px; }
+.tpl-scrollcinema .scc-line svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.tpl-scrollcinema .scc-line path { fill: none; stroke-width: 3; vector-effect: non-scaling-stroke; }
+.tpl-scrollcinema .scc-line__track { stroke: rgb(232 155 75 / 0.22); }
+.tpl-scrollcinema .scc-line__draw {
+  stroke: var(--amber);
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--p, 0)); /* pathLength=1, so the offset IS the scroll progress */
+}
+.tpl-scrollcinema .scc-mile { position: relative; padding: 18px 0; }
+/* each milestone's dot sits on the line and lights up as its card arrives */
+.tpl-scrollcinema .scc-mile::before {
+  content: '';
+  position: absolute;
+  left: -36px;
+  top: 38px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--glow);
+  box-shadow: 0 0 10px 2px rgb(232 155 75 / 0.55);
+  opacity: var(--p, 0);
+}
+/* the caption cards drift up a touch faster than the background as they enter */
+.tpl-scrollcinema .scc-mile__card {
+  display: grid;
+  gap: 8px;
+  padding: 20px 20px 22px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  opacity: var(--p, 0);
+  transform: translateY(calc((1 - var(--p, 0)) * 36px));
+}
+.tpl-scrollcinema .scc-yr { font: 600 0.8125rem/1.4 var(--sans); letter-spacing: 0.22em; color: var(--amber); }
+.tpl-scrollcinema .scc-mile__card h2 { font-size: clamp(1.5rem, 6.4vw, 2rem); }
+.tpl-scrollcinema .scc-txt { color: var(--muted); text-wrap: pretty; }
+
+/* ---------- chapter II: the two of them converge from opposite edges ---------- */
+.tpl-scrollcinema .scc-meet { display: grid; gap: 28px; padding: 72px 16px; }
+.tpl-scrollcinema .scc-duo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(12px, 4vw, 28px);
+  width: min(100%, 36rem);
+  margin: 0 auto;
+}
+.tpl-scrollcinema .scc-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--plum); /* the frame colour a missing photo falls back onto */
+  opacity: calc(0.25 + var(--p, 0) * 0.75);
+}
+.tpl-scrollcinema .scc-card--bride { transform: translateX(calc((1 - var(--p, 0)) * -52%)); }
+.tpl-scrollcinema .scc-card--groom { transform: translateX(calc((1 - var(--p, 0)) * 52%)); }
+.tpl-scrollcinema .scc-card__ph { aspect-ratio: 3 / 4; }
+.tpl-scrollcinema .scc-card__ph img { width: 100%; height: 100%; display: block; }
+.tpl-scrollcinema .scc-card figcaption {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 36px 12px 12px;
+  /* the fade turns near-opaque before the text's 36px offset, whatever the caption's height */
+  background: linear-gradient(rgb(23 10 28 / 0), rgb(23 10 28 / 0.95) 30px);
+  font: italic 400 clamp(1rem, 4.4vw, 1.25rem)/1.25 var(--serif);
+  text-align: center;
+}
+
+/* ---------- chapter III: the couple settles into a framed keepsake ---------- */
+.tpl-scrollcinema .scc-us { display: grid; gap: 28px; padding: 72px 16px 110px; }
+.tpl-scrollcinema .scc-keep { width: min(100%, 34rem); margin: 0 auto; }
+.tpl-scrollcinema .scc-keep__in {
+  position: relative;
+  overflow: hidden;
+  background: var(--plum);
+  transform: scale(calc(1.14 - var(--p, 0) * 0.14)); /* full-bleed at first sight, settled when read */
+}
+/* the mat appears as the photo settles */
+.tpl-scrollcinema .scc-keep__in::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 10px solid var(--deep);
+  outline: 1px solid var(--amber);
+  outline-offset: -14px;
+  opacity: var(--p, 0);
+}
+.tpl-scrollcinema .scc-keep__ph { aspect-ratio: 4 / 5; }
+.tpl-scrollcinema .scc-keep__ph img { width: 100%; height: 100%; display: block; }
+.tpl-scrollcinema .scc-keep figcaption {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 44px 20px 24px;
+  /* near-opaque before the text's 44px offset, whatever the caption's height */
+  background: linear-gradient(rgb(23 10 28 / 0), rgb(23 10 28 / 0.95) 38px);
+  font: italic 400 clamp(1.15rem, 5vw, 1.5rem)/1.3 var(--serif);
+  text-align: center;
+}
+
+/* ---------- the floor: opaque dusk-to-amber ground under everything after the film ---------- */
+.tpl-scrollcinema .scc-floor {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(180deg, var(--deep) 0%, #2d1430 40%, #4a2316 100%);
+  text-align: center;
+}
+.tpl-scrollcinema .scc-floor section { padding: 72px 20px 16px; }
+.tpl-scrollcinema .scc-h2 { margin-top: 10px; font-size: clamp(1.9rem, 8.4vw, 2.8rem); }
+
+.tpl-scrollcinema .scc-when__date { margin-top: 14px; font-size: clamp(1.8rem, 7.6vw, 2.7rem); }
+.tpl-scrollcinema .scc-when__time { margin-top: 6px; font: 600 0.9375rem/1.4 var(--sans); letter-spacing: 0.18em; text-transform: uppercase; color: var(--glow); }
+.tpl-scrollcinema .scc-when__venue { margin-top: 18px; font: 400 1.4rem/1.3 var(--serif); }
+.tpl-scrollcinema .scc-when__city { margin-top: 2px; color: var(--muted); }
+.tpl-scrollcinema .scc-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 26px; }
+.tpl-scrollcinema .scc-btn {
+  display: inline-grid;
+  place-items: center;
+  min-height: 52px;
+  padding: 0 26px;
+  border: 1.5px solid var(--amber);
+  border-radius: 999px;
+  background: none;
+  color: var(--ivory);
+  font: 600 1rem var(--sans);
+  text-decoration: none;
+  cursor: pointer;
+}
+.tpl-scrollcinema .scc-btn--fill { background: var(--amber); color: var(--deep); }
+
+/* the countdown, styled as a film leader: four numbered discs */
+.tpl-scrollcinema .scc-leader { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 24rem; margin: 26px auto 0; }
+.tpl-scrollcinema .scc-leader__cell {
+  display: grid;
+  gap: 2px;
+  align-content: center;
+  aspect-ratio: 1;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  background: rgb(23 10 28 / 0.5);
+}
+.tpl-scrollcinema .scc-leader__cell b { font: 700 clamp(1.3rem, 6vw, 1.8rem)/1.1 var(--sans); font-variant-numeric: tabular-nums; }
+.tpl-scrollcinema .scc-leader__cell span { font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.tpl-scrollcinema .scc-leader__done { margin-top: 26px; font: italic 400 1.4rem/1.3 var(--serif); color: var(--glow); }
+
+/* the schedule as scene cards */
+.tpl-scrollcinema .scc-scenes { display: grid; gap: 14px; max-width: 30rem; margin: 30px auto 0; text-align: left; }
+.tpl-scrollcinema .scc-scenes li { padding: 20px 20px 22px; border: 1px solid var(--line); background: rgb(23 10 28 / 0.5); }
+.tpl-scrollcinema .scc-scene__no { font: 600 0.8125rem/1.4 var(--sans); letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); }
+.tpl-scrollcinema .scc-scenes h3 { margin-top: 4px; font-size: 1.5rem; }
+.tpl-scrollcinema .scc-scene__when { margin-top: 6px; font-weight: 600; font-size: 0.9375rem; color: var(--glow); }
+.tpl-scrollcinema .scc-scene__meta { margin-top: 2px; font-size: 0.9375rem; color: var(--muted); }
+
+/* ---------- end credits: the RSVP ---------- */
+.tpl-scrollcinema .scc-floor .scc-credits { padding-bottom: 120px; } /* clear of the gallery's nav pill */
+.tpl-scrollcinema .scc-by { margin-top: 10px; color: var(--muted); }
+.tpl-scrollcinema .scc-fin { margin-top: 56px; font: italic 400 2rem/1 var(--serif); color: var(--amber); }
+.tpl-scrollcinema .rsvp,
+.tpl-scrollcinema .rsvp__done { display: grid; gap: 16px; max-width: 380px; margin: 28px auto 0; text-align: left; }
+.tpl-scrollcinema .rsvp label { display: grid; gap: 6px; }
+.tpl-scrollcinema .rsvp label span { font-size: 0.875rem; font-weight: 600; letter-spacing: 0.06em; color: var(--glow); }
+.tpl-scrollcinema .rsvp input,
+.tpl-scrollcinema .rsvp select,
+.tpl-scrollcinema .rsvp textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid rgb(232 155 75 / 0.55);
+  border-radius: 10px;
+  background: rgb(247 238 225 / 0.06);
+  color: var(--ivory);
+  font: inherit;
+  font-size: 1rem; /* 16px: iOS does not zoom the page when this is focused */
+}
+.tpl-scrollcinema .rsvp select option { color: #170a1c; }
+.tpl-scrollcinema .rsvp button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--amber);
+  color: var(--deep);
+  font: 700 1rem var(--sans);
+  cursor: pointer;
+}
+.tpl-scrollcinema .rsvp__error { color: #ffb4a2; }
+.tpl-scrollcinema .rsvp__msg { padding: 12px 14px; border-radius: 10px; background: rgb(247 238 225 / 0.08); white-space: pre-wrap; user-select: text; }
+.tpl-scrollcinema .rsvp__reply { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.tpl-scrollcinema .rsvp__reply a { display: inline-grid; align-items: center; min-height: 44px; color: var(--glow); }
+.tpl-scrollcinema .rsvp__reply button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: 600 1rem var(--sans);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.tpl-scrollcinema .rsvp__hint { min-height: 1.5em; font-size: 0.875rem; color: var(--glow); }
+
+.tpl-scrollcinema .scc-btn:focus-visible,
+.tpl-scrollcinema .rsvp input:focus-visible,
+.tpl-scrollcinema .rsvp select:focus-visible,
+.tpl-scrollcinema .rsvp textarea:focus-visible,
+.tpl-scrollcinema .rsvp button:focus-visible,
+.tpl-scrollcinema .rsvp__reply a:focus-visible { outline: 3px solid var(--glow); outline-offset: 3px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .tpl-scrollcinema .scc-btn:hover { background: var(--glow); border-color: var(--glow); color: var(--deep); }
+}
+
+/* a wide screen: the duo and keepsake breathe a little more */
+@media (min-width: 900px) {
+  .tpl-scrollcinema .scc-duo { width: min(100%, 44rem); }
+  .tpl-scrollcinema .scc-keep { width: min(100%, 38rem); }
+}
+
+/* a short screen (phone held sideways): tighter openings so a whole thought fits in view */
+@media (max-height: 560px) {
+  .tpl-scrollcinema .scc-open { padding: 24px 16px; }
+  .tpl-scrollcinema .scc-panel { gap: 6px; padding: 20px 24px; }
+  .tpl-scrollcinema .scc-names { font-size: clamp(1.6rem, 9svh, 2.6rem); }
+  .tpl-scrollcinema .scc-cue { display: none; }
+}
+
+/* Reduced motion: no parallax, no converge, no settle; the film is static stacked sections (the
+   scroll driver never starts, so nothing writes --p and these end states are the only states). */
+@media (prefers-reduced-motion: reduce) {
+  .tpl-scrollcinema .scc-panel { animation: none; }
+  .tpl-scrollcinema .scc-bg__move { transform: scale(1.06); }
+  .tpl-scrollcinema .scc-line__draw { stroke-dashoffset: 0; }
+  .tpl-scrollcinema .scc-mile::before,
+  .tpl-scrollcinema .scc-mile__card { opacity: 1; transform: none; }
+  .tpl-scrollcinema .scc-card--bride,
+  .tpl-scrollcinema .scc-card--groom { opacity: 1; transform: none; }
+  .tpl-scrollcinema .scc-keep__in { transform: none; }
+  .tpl-scrollcinema .scc-keep__in::after { opacity: 1; }
+}

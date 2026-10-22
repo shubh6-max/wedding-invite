@@ -123,8 +123,9 @@ function Design({ id, params }) {
   const Gate = tpl?.Gate
   return (
     <>
+      {/* Suspense fallbacks keep the design's own ground: an ivory flash over a dark design reads as a glitch. */}
       {phase !== 'closed' && (
-        <Suspense fallback={<div className="loading" role="status">Opening the invitation…</div>}>
+        <Suspense fallback={<div className="loading" role="status" style={tpl ? { background: tpl.palette[0] } : undefined}><span className="sr-only">Opening the invitation…</span></div>}>
           <InviteContext.Provider value={invite}>
             {/* viaGate: the guest just tapped this design's gate, so a design that has its own
                 opening (doors, cover, lamp) should start already opened rather than open twice. */}
@@ -133,7 +134,7 @@ function Design({ id, params }) {
         </Suspense>
       )}
       {phase !== 'open' && Gate && (
-        <Suspense fallback={<div className="loading" role="status">Preparing your invitation…</div>}>
+        <Suspense fallback={<div className="loading" role="status" style={tpl ? { background: tpl.palette[0] } : undefined}><span className="sr-only">Preparing your invitation…</span></div>}>
           {/* Same context as the page, so a gate can show the couple's photos (components/Photo.jsx). */}
           <InviteContext.Provider value={invite}>
             <Gate key={id} invite={invite} onOpen={onOpen} onDone={onDone} />

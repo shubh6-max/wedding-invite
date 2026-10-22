@@ -31,6 +31,9 @@ import { presets } from '../src/data/presets.js'
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const AREAS = ['edit-live', 'share', 'hostile', 'storage', 'gallery', 'mobile', 'focus', 'proof']
 const EXPECTED_DESIGNS = 25
+// The gallery lists every row of the registry, so count the rows instead of keeping a number here that goes stale
+// each time a design is added (it was 25, and then 36).
+const GALLERY_DESIGNS = [...fs.readFileSync(path.join(ROOT, 'src/data/templates.js'), 'utf8').matchAll(/\bid:\s*['"][\w-]+['"],\s*name:/g)].length
 
 const arg = (name, fallback) => (process.argv.find((a) => a.startsWith(`--${name}=`)) || '').split('=')[1] || fallback
 const base = arg('base', process.env.BASE_URL || 'http://127.0.0.1:4173').replace(/\/+$/, '')
@@ -478,7 +481,7 @@ async function gallery() {
     await page.goto(`${base}/#/`)
     await page.waitForSelector('.card')
     const cards = await page.locator('.card').count()
-    if (cards !== 25) fail('gallery', `${cards} cards, expected 25`)
+    if (cards !== GALLERY_DESIGNS) fail('gallery', `${cards} cards, expected ${GALLERY_DESIGNS}`)
     // Customize shows only on editable designs, as a link to their Studio; the rest are explained once by a note.
     const buttons = await page.evaluate(() => [...document.querySelectorAll('.card__actions .btn')].map((a) => a.getAttribute('href')))
     if (!buttons.length) fail('gallery', 'no card offers Customize (expected at least the proof design)')
@@ -494,7 +497,7 @@ async function gallery() {
     const eager = await page.evaluate(() => [...document.querySelectorAll('.card img')].filter((i) => i.loading !== 'lazy').length)
     if (eager) fail('gallery', `${eager} tile images are not lazy-loaded`)
     const heads = await page.evaluate(() => document.querySelectorAll('.card h3.card__name').length)
-    if (heads !== 25) fail('gallery', `${heads} design names are headings, expected 25`)
+    if (heads !== GALLERY_DESIGNS) fail('gallery', `${heads} design names are headings, expected ${GALLERY_DESIGNS}`)
     const small = await page.evaluate(() => [...document.querySelectorAll('.card__actions a, .hero__actions a, .hero__actions button, .chip')].filter((a) => a.getBoundingClientRect().height < 44).length)
     if (small) fail('gallery', `${small} gallery controls under 44px high`)
     if ((await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)) > 0) fail('gallery', 'the gallery scrolls sideways')

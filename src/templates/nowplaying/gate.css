@@ -1,0 +1,127 @@
+/* Now Playing gate: blurred backdrop, the cover text high, a mini-player bar low (clear of the bottom 88px).
+   On tap the bar sweeps up toward the full player's place while the gate fades. Transform/opacity only.
+   Sequence (ms): on tap: cover fades 0-400, bar sweeps 0-900, gate fades 600-1500 (useGate ms = 1800). */
+.gate-nowplaying.gate {
+  --chrome: #0b0b0f;
+  --ink: #f2f2f5;
+  --muted: rgb(242 242 245 / 0.66);
+  --rose: #f2a0b7;
+  --ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+
+  background: var(--chrome);
+  color: var(--ink);
+  font: 400 1rem/1.5 'Manrope', system-ui, sans-serif;
+}
+.gate-nowplaying *,
+.gate-nowplaying *::before,
+.gate-nowplaying *::after { box-sizing: border-box; }
+.gate-nowplaying p { margin: 0; }
+
+/* ---- backdrop: the background photo blurred into ambient light, darkened well past 4.5:1 ---- */
+.gate-nowplaying .gate-nowplaying__back { position: absolute; inset: 0; overflow: hidden; }
+.gate-nowplaying .gate-nowplaying__back img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: blur(40px) saturate(1.2);
+  transform: scale(1.25);
+}
+.gate-nowplaying .gate-nowplaying__back::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgb(11 11 15 / 0.84);
+}
+
+/* ---- the cover: a complete readable front before anything is tapped ---- */
+.gate-nowplaying .gate-nowplaying__cover {
+  position: absolute;
+  inset: 0 0 auto;
+  padding: calc(env(safe-area-inset-top) + clamp(32px, 12svh, 96px)) 24px 24px;
+  text-align: center;
+  transition: opacity 0.4s ease, transform 0.6s var(--ease);
+}
+.gate-nowplaying .gate-nowplaying__text { display: grid; justify-items: center; gap: 10px; max-width: 30rem; margin: 0 auto; overflow-wrap: anywhere; }
+.gate-nowplaying .gate-nowplaying__guest { font-size: 0.9375rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--rose); }
+.gate-nowplaying .gate-nowplaying__hosts { font-size: 0.9375rem; color: var(--muted); }
+.gate-nowplaying .gate-nowplaying__names { font-size: clamp(2rem, 9vw, 3.2rem); font-weight: 600; line-height: 1.12; text-wrap: balance; }
+.gate-nowplaying .gate-nowplaying__names i { font-style: normal; color: var(--rose); }
+.gate-nowplaying .gate-nowplaying__date { font: 500 0.875rem/1.5 'IBM Plex Mono', menlo, consolas, monospace; color: var(--ink); }
+
+/* ---- the mini-player bar: thumbnail, track label, one big round Play ---- */
+.gate-nowplaying .gate-nowplaying__bar {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: calc(88px + 18px); /* fully clear of the gallery nav pill's strip */
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  max-width: 26rem;
+  margin: 0 auto;
+  padding: 10px 10px 10px 12px;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: 20px;
+  background: rgb(22 21 28 / 0.92);
+  box-shadow: 0 18px 50px rgb(0 0 0 / 0.5);
+  animation: npl-gate-in 0.7s var(--ease) 0.15s backwards;
+  transition: transform 0.9s var(--ease);
+}
+.gate-nowplaying .gate-nowplaying__thumb {
+  position: relative;
+  width: 48px;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #241d26; /* holds the frame when the photo is the bundled illustration */
+}
+.gate-nowplaying .gate-nowplaying__thumb img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.gate-nowplaying .gate-nowplaying__song { display: grid; gap: 1px; min-width: 0; }
+.gate-nowplaying .gate-nowplaying__song b { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gate-nowplaying .gate-nowplaying__song i { font-style: normal; font-size: 0.8125rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gate-nowplaying .gate-nowplaying__play {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 1px;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--rose);
+  color: var(--chrome);
+  font: 700 0.75rem 'Manrope', system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+.gate-nowplaying .gate-nowplaying__play svg { width: 22px; height: 22px; fill: currentColor; }
+.gate-nowplaying .gate-nowplaying__play:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+@keyframes npl-gate-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+
+/* ---- opening: the bar sweeps up into the player's place as the whole gate dissolves ---- */
+.gate-nowplaying.is-opening { animation: npl-gate-out 0.9s ease 0.6s forwards; }
+.gate-nowplaying.is-opening .gate-nowplaying__cover { opacity: 0; transform: translateY(-14px); }
+.gate-nowplaying.is-opening .gate-nowplaying__bar { transform: translateY(calc(-50svh + 50% + 88px + 18px)) scale(1.05); }
+@keyframes npl-gate-out { to { opacity: 0; } }
+
+@media (hover: hover) and (pointer: fine) {
+  .gate-nowplaying:not(.is-opening) .gate-nowplaying__play:hover { transform: scale(1.06); }
+}
+
+/* phone held sideways: the cover hugs the top so it clears the bar */
+@media (max-height: 520px) and (orientation: landscape) {
+  .gate-nowplaying .gate-nowplaying__cover { padding-top: calc(env(safe-area-inset-top) + 14px); }
+  .gate-nowplaying .gate-nowplaying__text { gap: 4px; }
+  .gate-nowplaying .gate-nowplaying__names { font-size: clamp(1.5rem, 6vh, 2.2rem); }
+}
+
+/* reduced motion: nothing sweeps; the gate simply fades (useGate already shortens the timer) */
+@media (prefers-reduced-motion: reduce) {
+  .gate-nowplaying .gate-nowplaying__bar { animation: none; transition: none; }
+  .gate-nowplaying.is-opening { animation: npl-gate-out 0.25s ease both; }
+  .gate-nowplaying.is-opening .gate-nowplaying__cover { transition: none; transform: none; opacity: 1; }
+  .gate-nowplaying.is-opening .gate-nowplaying__bar { transform: none; }
+}

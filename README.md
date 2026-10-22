@@ -1,11 +1,11 @@
 # Wedding Invite Designs
 
-A gallery of 36 animated digital wedding invitations (10 contemporary, eleven photo invites, plus 5 each for Hindu, Marwadi and Jain weddings), plus the original Sakshi & Chinmay invite kept as-is.
+A gallery of 41 animated digital wedding invitations (10 contemporary, sixteen photo invites, plus 5 each for Hindu, Marwadi and Jain weddings), plus the original Sakshi & Chinmay invite kept as-is.
 Built with React 19, Vite 8 and plain CSS (no router or animation library).
 
-## The 36 designs
+## The 41 designs
 
-Contemporary (10), Photo Invites (11), Hindu (5: Kohbar Ghar, Lagnachauk, Gold Mantapa, Vastu Mandala, Sadhya Leaf), Marwadi (5: Leheriya Safa, Bandhani Untie, Haveli Fresco, Kathputli Stage, Baori Descent), Jain (5: Ranakpur Hall, Vijnapti Patra, Ratnatraya Prism, Matsyayugala, Panch Rang Dhvaj).
+Contemporary (10), Photo Invites (16), Hindu (5: Kohbar Ghar, Lagnachauk, Gold Mantapa, Vastu Mandala, Sadhya Leaf), Marwadi (5: Leheriya Safa, Bandhani Untie, Haveli Fresco, Kathputli Stage, Baori Descent), Jain (5: Ranakpur Hall, Vijnapti Patra, Ratnatraya Prism, Matsyayugala, Panch Rang Dhvaj).
 
 **Cultural review needed.** The tradition-specific designs and their sample copy (invocations, Devanagari/Gujarati phrases, ritual names, symbols) were researched from public sources and checked by automated reviewers only. Each carries open questions for a reader from that community; confirm them before any client release. See `src/data/samples/*.js` for the wording used.
 
@@ -17,9 +17,10 @@ Each has its own layout, type, palette and one signature interaction (see `src/d
 Every design includes a live countdown, event schedule, story, RSVP form (front-end only, no backend yet),
 add-to-calendar (.ics) and a map link. All sample names, venues and dates are fictional.
 
-### The eleven photo-first designs
+### The sixteen photo-first designs
 
-Story Reel, Polaroid Wall, Now Showing, Jharokha Portraits, Two Become One, Locket, Toran Frames, Passport, Bento Day, Golden Hour, Velvet Seal.
+Story Reel, Polaroid Wall, Now Showing, Jharokha Portraits, Two Become One, Locket, Toran Frames, Passport, Bento Day, Golden Hour, Velvet Seal, Shaadi Chat, Scratch Card, Now Playing, Scroll Cinema, Vellum Peel.
+The last five were built from Instagram-trend research (Oct 2026): a lock-screen-and-chat invite, a canvas scratch-off foil ticket, an unbranded music-player screen whose progress bar is the countdown, a scroll-driven three-chapter story film, and frosted vellum sheets peeled off the couple's portrait.
 Each shows the couple's photographs in a layout of its own (see "Photo designs" below), and they have their own **Photo Invites** tab in the gallery (a design tagged `photos: true` in `src/data/templates.js` is listed there instead of under its tradition; the tab label lives in the `traditions` list at the bottom of that file).
 
 ## Project structure

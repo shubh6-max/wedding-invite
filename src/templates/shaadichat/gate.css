@@ -1,0 +1,106 @@
+/* Shaadi Chat gate: a phone lock screen. The couple photo is the wallpaper under a soft dark scrim; a thin
+   clock and the wedding date at the top; one notification banner as the button. Tap: the banner lifts, the
+   scrim brightens, the lock screen fades onto the chat. Only transform and opacity animate.
+   Sequence (ms): banner slides in on load 300-900; on tap: clock fades 0-400, banner lifts 0-500,
+   scrim brightens 0-700, gate fades 700-1500 (useGate ms = 1800). */
+.gate-shaadichat.gate {
+  --ink: #12181f;
+  --paper: #f6f1e6;
+  --gold: #e9c46a;
+  background: var(--ink);
+  color: var(--paper);
+  font: 400 1rem/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+.gate-shaadichat *,
+.gate-shaadichat *::before,
+.gate-shaadichat *::after { box-sizing: border-box; }
+.gate-shaadichat p { margin: 0; }
+
+/* ---- the wallpaper and its scrim ---- */
+.gate-shaadichat .gate-shaadichat__wall { position: absolute; inset: 0; overflow: hidden; animation: sch-gate-drift 24s ease-in-out infinite alternate; }
+.gate-shaadichat .gate-shaadichat__wall img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+@keyframes sch-gate-drift { from { transform: scale(1.03); } to { transform: scale(1.1) translate3d(-1.5%, -1%, 0); } }
+.gate-shaadichat .gate-shaadichat__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(10 13 18 / 0.86) 0, rgb(10 13 18 / 0.62) 42%, rgb(10 13 18 / 0.7) 100%);
+  transition: opacity 0.7s ease;
+}
+
+/* ---- the clock block: thin time, the wedding date beneath it, the guest's name as a pill ---- */
+.gate-shaadichat .gate-shaadichat__clock {
+  position: absolute;
+  inset: calc(env(safe-area-inset-top) + clamp(36px, 9svh, 80px)) 20px auto;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  text-align: center;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.gate-shaadichat .gate-shaadichat__time { font-size: clamp(3rem, 17vw, 4.6rem); font-weight: 200; line-height: 1; letter-spacing: 0.01em; }
+.gate-shaadichat .gate-shaadichat__date { font-size: 1rem; font-weight: 600; }
+.gate-shaadichat .gate-shaadichat__guest {
+  padding: 5px 14px;
+  border: 1px solid rgb(233 196 106 / 0.35);
+  border-radius: 999px;
+  background: rgb(18 24 31 / 0.95); /* near-solid: the gold name never depends on the photo behind it */
+  color: var(--gold);
+  font-size: 0.9rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* ---- the notification banner: the one real control ---- */
+.gate-shaadichat .gate-shaadichat__note {
+  position: absolute;
+  left: 50%;
+  top: min(48svh, 420px);
+  display: grid;
+  gap: 5px;
+  width: min(92vw, 26rem);
+  min-height: 48px;
+  padding: 14px 16px;
+  border: 1px solid rgb(246 241 230 / 0.14);
+  border-radius: 22px;
+  background: rgb(18 24 31 / 0.92); /* near-solid: the text never depends on the photo behind it */
+  color: var(--paper);
+  font: inherit;
+  text-align: left;
+  box-shadow: 0 14px 34px rgb(0 0 0 / 0.4);
+  cursor: pointer;
+  transform: translateX(-50%);
+  animation: sch-gate-note 0.6s cubic-bezier(0.22, 0.8, 0.2, 1) 0.3s backwards;
+  transition: transform 0.5s ease;
+}
+@keyframes sch-gate-note { from { opacity: 0; transform: translateX(-50%) translateY(14px); } to { opacity: 1; transform: translateX(-50%); } }
+.gate-shaadichat .gate-shaadichat__note:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
+.gate-shaadichat .gate-shaadichat__note-head { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgb(246 241 230 / 0.76); }
+.gate-shaadichat .gate-shaadichat__appicon { flex: none; width: 18px; height: 18px; border-radius: 5px; background: linear-gradient(135deg, var(--gold), #0e5e54); }
+.gate-shaadichat .gate-shaadichat__now { margin-left: auto; }
+.gate-shaadichat .gate-shaadichat__note-title { font-size: 1.05rem; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+.gate-shaadichat .gate-shaadichat__note-body { font-size: 0.95rem; color: rgb(246 241 230 / 0.86); }
+
+/* ---- opening: the banner lifts, the wallpaper brightens, the lock screen dissolves ---- */
+.gate-shaadichat.is-opening { animation: sch-gate-out 0.8s ease 0.7s forwards; }
+@keyframes sch-gate-out { to { opacity: 0; } }
+.gate-shaadichat.is-opening .gate-shaadichat__clock { opacity: 0; transform: translateY(-10px); }
+.gate-shaadichat.is-opening .gate-shaadichat__scrim { opacity: 0.3; }
+.gate-shaadichat.is-opening .gate-shaadichat__note { animation: sch-gate-open 0.5s ease forwards; }
+@keyframes sch-gate-open { to { transform: translateX(-50%) translateY(-12px) scale(1.05); } }
+
+/* a short screen (phone held sideways): smaller clock, banner higher, still clear of the bottom 88px */
+@media (max-height: 480px) {
+  .gate-shaadichat .gate-shaadichat__clock { inset: calc(env(safe-area-inset-top) + 14px) 20px auto; gap: 4px; }
+  .gate-shaadichat .gate-shaadichat__time { font-size: 2.4rem; }
+  .gate-shaadichat .gate-shaadichat__note { top: 38svh; }
+}
+
+/* reduced motion: nothing drifts or lifts; the lock screen simply fades away */
+@media (prefers-reduced-motion: reduce) {
+  .gate-shaadichat .gate-shaadichat__wall,
+  .gate-shaadichat .gate-shaadichat__note { animation: none; }
+  .gate-shaadichat.is-opening { animation: sch-gate-out 0.25s ease both; }
+  .gate-shaadichat.is-opening .gate-shaadichat__note { animation: none; }
+  .gate-shaadichat.is-opening .gate-shaadichat__clock { opacity: 1; transform: none; transition: none; }
+  .gate-shaadichat.is-opening .gate-shaadichat__scrim { opacity: 1; transition: none; }
+}
