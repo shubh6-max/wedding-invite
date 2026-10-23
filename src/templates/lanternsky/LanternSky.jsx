@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Photo from '../../components/Photo.jsx'
 import RsvpForm from '../../components/RsvpForm.jsx'
 import { guestName } from '../../lib/guest.js'
 import { useCountdown, useReveal } from '../../lib/hooks.js'
 import { downloadIcs } from '../../lib/ics.js'
+import { holdSong, releaseSong, song } from './song.js'
 import './lanternsky.css'
 
 // Lantern Sky: a hand-painted dusk sky full of rising paper lanterns over a golden chhatri pavilion, the
@@ -61,7 +62,7 @@ function useTilt(ref) {
         const r = stage.getBoundingClientRect()
         const x = (e.clientX - r.left) / r.width - 0.5
         const y = (e.clientY - r.top) / r.height - 0.5
-        apply(-y * 4, x * 5)
+        apply(-y * 8, x * 10)
       }
       const leave = () => {
         cancelAnimationFrame(raf)
@@ -91,8 +92,8 @@ function useTilt(ref) {
         got = true
         if (debug) debug.textContent = `tilt β ${e.beta.toFixed(1)} γ ${e.gamma.toFixed(1)}`
         if (!base) base = { b: e.beta, g: e.gamma }
-        const clamp = (v) => Math.max(-8, Math.min(8, v))
-        apply(clamp((base.b - e.beta) * 0.35), clamp((e.gamma - base.g) * 0.35))
+        const clamp = (v) => Math.max(-16, Math.min(16, v))
+        apply(clamp((base.b - e.beta) * 0.7), clamp((e.gamma - base.g) * 0.7))
       }
       // rotating the phone swaps the sensor axes: start level from the new grip
       const reb = () => { base = null }
@@ -161,6 +162,14 @@ function Defs() {
         <linearGradient id="lsk-water" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#8fc7bf" />
           <stop offset="1" stopColor="#3f6f68" />
+        </linearGradient>
+        <linearGradient id="lsk-wall" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#c89355" />
+          <stop offset="1" stopColor="#8f6228" />
+        </linearGradient>
+        <linearGradient id="lsk-mist" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#4f837b" stopOpacity="0" />
+          <stop offset="1" stopColor="#4f837b" />
         </linearGradient>
         <radialGradient id="lsk-archglow" cx="0.5" cy="0.85" r="0.9">
           <stop offset="0" stopColor="#ffce7e" stopOpacity="0.5" />
@@ -304,49 +313,115 @@ function PavilionArt() {
 function CourtyardArt() {
   return (
     <svg className="lsk-courtyard" viewBox="0 0 360 300" focusable="false" aria-hidden="true">
-      {/* distant arcade row */}
-      {[30, 76, 122, 168, 214, 260, 306].map((x) => (
-        <path key={x} d={`M${x} 84 L${x} 56 C${x + 4} 40 ${x + 20} 40 ${x + 24} 56 L${x + 24} 84`} fill="rgb(255 214 140 / 0.1)" stroke="#e8bd84" strokeWidth="1.2" opacity="0.7" />
+      {/* the mahal: one continuous palace facade, cut by the frame so it clearly runs on past it */}
+      <rect x="0" y="64" width="360" height="92" fill="url(#lsk-wall)" />
+      {[0, 20, 40, 60, 80, 100, 120, 240, 260, 280, 300, 320, 340].map((x) => (
+        <path key={`m-${x}`} d={`M${x + 4} 64 L${x + 6} 56 L${x + 14} 56 L${x + 16} 64 Z`} fill="#a9731f" />
       ))}
-      {/* main arcade: cusped arches, each lit from within */}
-      {[18, 86, 154, 222, 290].map((x) => (
-        <g key={x}>
-          <path
-            d={`M${x} 190 L${x} 118 C${x} 104 ${x + 6} 96 ${x + 13} 95 C${x + 15} 88 ${x + 24} 84 ${x + 26} 84 C${x + 28} 84 ${x + 37} 88 ${x + 39} 95 C${x + 46} 96 ${x + 52} 104 ${x + 52} 118 L${x + 52} 190 Z`}
-            fill="url(#lsk-archglow)"
-            stroke="#f3cf8f"
-            strokeWidth="2"
-          />
-          <circle cx={x + 26} cy="150" r="16" fill="url(#lsk-halo)" />
-          <circle cx={x + 26} cy="152" r="4.5" fill="#ffe9ae" />
-          <path d={`M${x + 26} 112 L${x + 26} 126`} stroke="#caa36a" strokeWidth="1.5" />
-          <circle cx={x + 26} cy="130" r="4" fill="#ffd98a" />
+      <path d="M0 64 L360 64" stroke="#8a5c17" strokeWidth="1.5" />
+      {/* flanking chhatris on the parapet */}
+      {[52, 308].map((x) => (
+        <g key={`ch-${x}`}>
+          <path d={`M${x} 30 C${x + 11} 35 ${x + 15} 41 ${x + 15} 46 L${x - 15} 46 C${x - 15} 41 ${x - 11} 35 ${x} 30 Z`} fill="url(#lsk-dome)" />
+          <path d={`M${x} 24 L${x} 30`} stroke="#b97f24" strokeWidth="2" strokeLinecap="round" />
+          <rect x={x - 17} y="46" width="34" height="4" rx="2" fill="#a9731f" />
+          <path d={`M${x - 12} 50 L${x - 12} 64 M${x + 12} 50 L${x + 12} 64`} stroke="#8a5c17" strokeWidth="2.5" />
         </g>
       ))}
+      {/* central gate tower, its dome rising behind the fountain's jet */}
+      <rect x="138" y="42" width="84" height="114" fill="url(#lsk-wall)" stroke="#a9731f" strokeWidth="1.2" />
+      <path d="M180 6 C208 20 220 34 220 46 C220 54 202 58 180 58 C158 58 140 54 140 46 C140 34 152 20 180 6 Z" fill="url(#lsk-dome)" />
+      <path d="M180 0 L180 8" stroke="#b97f24" strokeWidth="2.5" strokeLinecap="round" />
+      <rect x="146" y="58" width="68" height="6" rx="3" fill="#a9731f" />
+      <path d="M150 156 L150 100 C150 86 158 76 166 74 C168 66 176 62 180 62 C184 62 192 66 194 74 C202 76 210 86 210 100 L210 156 Z" fill="url(#lsk-archglow)" stroke="#f3cf8f" strokeWidth="1.6" />
+      {/* lit arches along the wall */}
+      {[14, 76, 246, 308].map((x) => (
+        <g key={`a-${x}`}>
+          <path
+            d={`M${x} 156 L${x} 118 C${x} 108 ${x + 4} 102 ${x + 9} 101 C${x + 11} 95 ${x + 17} 92 ${x + 19} 92 C${x + 21} 92 ${x + 27} 95 ${x + 29} 101 C${x + 34} 102 ${x + 38} 108 ${x + 38} 118 L${x + 38} 156 Z`}
+            fill="url(#lsk-archglow)"
+            stroke="#f3cf8f"
+            strokeWidth="1.4"
+          />
+          <circle cx={x + 19} cy="136" r="10" fill="url(#lsk-halo)" />
+          <circle cx={x + 19} cy="138" r="3.2" fill="#ffd98a" />
+        </g>
+      ))}
+      <rect x="0" y="152" width="360" height="4" fill="#8a5c17" opacity="0.5" />
       {/* bokeh */}
       {[[40, 40, 7], [120, 28, 5], [205, 44, 8], [285, 30, 6], [335, 70, 5], [70, 100, 4], [250, 104, 5]].map(([cx, cy, r]) => (
         <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={r * 2.4} fill="url(#lsk-halo)" />
       ))}
-      {/* tiered fountain */}
-      <circle cx="180" cy="166" r="5" fill="#fff2c8" />
-      <circle cx="180" cy="166" r="12" fill="url(#lsk-halo)" />
-      <ellipse cx="180" cy="176" rx="15" ry="4" fill="#e0b878" />
-      <rect x="177" y="178" width="6" height="14" fill="#caa36a" />
-      <ellipse cx="180" cy="194" rx="31" ry="7" fill="#e0b878" />
-      <ellipse cx="180" cy="192" rx="31" ry="6" fill="#efd3a2" />
-      <rect x="174" y="198" width="12" height="20" fill="#caa36a" />
-      <path d="M180 170 C160 180 152 202 157 222 M180 170 C200 180 208 202 203 222 M180 172 C170 184 166 202 168 220 M180 172 C190 184 194 202 192 220" fill="none" stroke="#cfeae6" strokeWidth="1.8" opacity="0.75" />
-      <circle cx="157" cy="226" r="1.6" fill="#cfeae6" opacity="0.8" />
-      <circle cx="203" cy="226" r="1.6" fill="#cfeae6" opacity="0.8" />
-      {/* basin and pool */}
-      <ellipse cx="180" cy="232" rx="62" ry="14" fill="url(#lsk-water)" />
-      <ellipse cx="180" cy="232" rx="62" ry="14" fill="none" stroke="#caa36a" strokeWidth="3" />
-      <ellipse cx="180" cy="234" rx="40" ry="8" fill="none" stroke="#cfeae6" strokeWidth="1.2" opacity="0.45" />
-      <ellipse cx="180" cy="233" rx="22" ry="4.5" fill="none" stroke="#cfeae6" strokeWidth="1" opacity="0.35" />
-      {/* channel toward the viewer, with floating diyas */}
-      <path d="M142 244 L218 244 L240 300 L120 300 Z" fill="url(#lsk-water)" />
-      <path d="M142 244 L120 300 M218 244 L240 300" stroke="#caa36a" strokeWidth="2.5" />
-      <path d="M165 254 L159 292 M195 254 L201 292 M180 250 L180 296" stroke="#cfeae6" strokeWidth="1.3" opacity="0.4" />
+      {/* the fountain, shaded and in perspective: a glowing jet over a wide gold chalice,
+          water sheets falling into an octagonal pool, the channel flowing toward the viewer */}
+      <circle cx="180" cy="190" r="64" fill="url(#lsk-halo)" />
+      <circle cx="180" cy="160" r="30" fill="url(#lsk-core)" />
+      {/* octagonal pool: gold paving rim around dusk water */}
+      <path d="M150 212 L210 212 L250 228 L210 246 L150 246 L110 228 Z" fill="url(#lsk-gold)" stroke="#b58a4a" strokeWidth="2" />
+      <path d="M155 217 L205 217 L238 228 L205 241 L155 241 L122 228 Z" fill="url(#lsk-water)" />
+      <ellipse cx="180" cy="230" rx="38" ry="6.5" fill="none" stroke="#cfeae6" strokeWidth="1.1" opacity="0.4" />
+      <ellipse cx="180" cy="229" rx="22" ry="4" fill="none" stroke="#cfeae6" strokeWidth="1" opacity="0.3" />
+      <ellipse cx="180" cy="231" rx="15" ry="4" fill="#f7e3b8" opacity="0.2" />
+      {/* tiered octagonal pedestal rising from the water */}
+      <path d="M142 216 L162 210 L198 210 L218 216 L198 222 L162 222 Z" fill="url(#lsk-gold)" stroke="#8a5f28" strokeWidth="1" />
+      <path d="M156 209 L170 204 L190 204 L204 209 L190 214 L170 214 Z" fill="url(#lsk-dome)" stroke="#8a5f28" strokeWidth="1" />
+      <path d="M174 195 L172 205 L188 205 L186 195 Z" fill="url(#lsk-gold)" stroke="#8a5f28" strokeWidth="1" />
+      {/* chalice bowl: shaded body, lit rim, water inside */}
+      <path d="M146 172 C150 188 164 196 180 196 C196 196 210 188 214 172 C204 181 192 184 180 184 C168 184 156 181 146 172 Z" fill="url(#lsk-dome)" stroke="#8a5f28" strokeWidth="1" />
+      <ellipse cx="180" cy="168" rx="37" ry="9.5" fill="url(#lsk-dome)" stroke="#8a5f28" strokeWidth="1" />
+      <ellipse cx="180" cy="166.5" rx="37" ry="9.5" fill="#caa36a" stroke="#f7e3b8" strokeWidth="1.4" />
+      <ellipse cx="180" cy="167" rx="31" ry="7" fill="url(#lsk-water)" />
+      <ellipse cx="171" cy="165" rx="12" ry="2.4" fill="#e7f6f2" opacity="0.45" />
+      {/* the jet and its crown of droplets */}
+      <path
+        d="M180 158 C180 148 179 142 177 136 M180 158 C180 147 182 141 185 135 M180 158 C175 148 170 144 164 142 M180 158 C185 148 190 144 196 142"
+        fill="none" stroke="#e7f6f2" strokeWidth="1.7" strokeLinecap="round" opacity="0.9"
+      />
+      {[[164, 139], [177, 133], [185, 132], [196, 139]].map(([cx, cy]) => (
+        <circle key={`jet-${cx}`} cx={cx} cy={cy} r="1.5" fill="#e7f6f2" opacity="0.9" />
+      ))}
+      <circle cx="180" cy="156" r="3" fill="#ffe9ae" />
+      {/* water sheets spilling from the rim into the pool */}
+      <path d="M146 172 C140 192 138 206 140 219 L148 221 C146 206 148 192 152 176 Z" fill="#cfeae6" opacity="0.16" />
+      <path d="M214 172 C220 192 222 206 220 219 L212 221 C214 206 212 192 208 176 Z" fill="#cfeae6" opacity="0.16" />
+      <path
+        d="M149 176 C145 192 144 206 145 218 M158 180 C155 192 154 204 155 216 M202 180 C205 192 206 204 205 216 M211 176 C215 192 216 206 215 218"
+        fill="none" stroke="#dff2ee" strokeWidth="1.4" strokeLinecap="round" opacity="0.6"
+      />
+      {/* diyas afloat on the pool */}
+      {[[136, 231], [218, 233], [199, 224]].map(([cx, cy]) => (
+        <g key={`diya-${cx}`}>
+          <circle cx={cx} cy={cy} r="7" fill="url(#lsk-halo)" />
+          <circle cx={cx} cy={cy} r="2.2" fill="#ffd98a" />
+        </g>
+      ))}
+      {/* gardens flanking the water, outside its walls */}
+      <path d="M0 240 L112 230 L150 246 L0 296 Z" fill="#2f5a47" />
+      <path d="M360 240 L248 230 L210 246 L360 296 Z" fill="#2f5a47" />
+      {[[26, 208], [68, 222], [334, 208], [292, 222]].map(([x, y]) => (
+        <g key={`tree-${x}`}>
+          <path d={`M${x} ${y} C${x - 5} ${y + 18} ${x - 5} ${y + 34} ${x} ${y + 44} C${x + 5} ${y + 34} ${x + 5} ${y + 18} ${x} ${y}`} fill="#25463c" />
+          <path d={`M${x} ${y + 44} L${x} ${y + 50}`} stroke="#1d3a31" strokeWidth="2" />
+        </g>
+      ))}
+      {[[46, 252, 13], [96, 262, 11], [314, 252, 13], [264, 262, 11]].map(([x, y, r]) => (
+        <ellipse key={`hedge-${x}`} cx={x} cy={y} rx={r} ry={r * 0.45} fill="#35604f" />
+      ))}
+      {[[40, 246], [102, 256], [320, 246], [258, 256]].map(([x, y]) => (
+        <circle key={`fl-${x}`} cx={x} cy={y} r="1.3" fill="#ffd98a" opacity="0.9" />
+      ))}
+      {/* the channel floods out toward the viewer and becomes the page: full width at the bottom
+          edge, so the water-teal sections below continue it seamlessly */}
+      <path d="M150 246 L210 246 L360 300 L0 300 Z" fill="url(#lsk-water)" />
+      <path d="M165 256 L140 296 M195 256 L220 296 M180 252 L180 298 M152 262 L96 300 M208 262 L264 300" stroke="#cfeae6" strokeWidth="1.3" opacity="0.4" />
+      {/* the bottom edge dissolves into the exact --teal of the sections below: no seam */}
+      <rect x="0" y="268" width="360" height="32" fill="url(#lsk-mist)" />
+      {/* the inclined gold walls that contain the water: drawn over the mist so they stay crisp
+          to the frame's corners, where the page's vertical gold banks continue them downward */}
+      <path d="M152 245 L3 299" stroke="url(#lsk-gold)" strokeWidth="6" />
+      <path d="M208 245 L357 299" stroke="url(#lsk-gold)" strokeWidth="6" />
+      <path d="M156 250 L10 300" stroke="#8a5c17" strokeWidth="1.5" opacity="0.7" />
+      <path d="M204 250 L350 300" stroke="#8a5c17" strokeWidth="1.5" opacity="0.7" />
       <circle cx="166" cy="272" r="3" fill="#ffd98a" />
       <circle cx="166" cy="272" r="8" fill="url(#lsk-halo)" />
       <circle cx="196" cy="284" r="2.5" fill="#ffd98a" />
@@ -394,6 +469,57 @@ function Posy({ className }) {
   )
 }
 
+// The pause control for the song the gate's tap started: sound that plays on its own must be stoppable
+// (WCAG 1.4.2). Hidden when the file fails to load, so it is never a dead control. Hiding the tab pauses
+// the song and coming back resumes it only if it was playing; leaving the page stops and rewinds it.
+function Music() {
+  const [on, setOn] = useState(false)
+  const [ok, setOk] = useState(true)
+  useEffect(() => {
+    const a = song()
+    if (!a) return undefined
+    holdSong()
+    const sync = () => setOn(!a.paused)
+    const fail = () => setOk(false)
+    if (a.error) fail()
+    sync()
+    let resume = false
+    const vis = () => {
+      if (document.hidden) {
+        resume = !a.paused
+        a.pause()
+      } else if (resume) {
+        a.play()?.catch(() => {})
+      }
+    }
+    a.addEventListener('play', sync)
+    a.addEventListener('pause', sync)
+    a.addEventListener('error', fail)
+    document.addEventListener('visibilitychange', vis)
+    return () => {
+      a.removeEventListener('play', sync)
+      a.removeEventListener('pause', sync)
+      a.removeEventListener('error', fail)
+      document.removeEventListener('visibilitychange', vis)
+      releaseSong()
+    }
+  }, [])
+  if (!ok) return null
+  const toggle = () => {
+    const a = song()
+    if (a.paused) a.play()?.catch(() => {})
+    else a.pause()
+  }
+  return (
+    <button type="button" className="lsk-music" aria-pressed={on} aria-label={on ? 'Pause music' : 'Play music'} onClick={toggle}>
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M9 18V6l10-2v12M9 18a3 3 0 1 1-3-3 3 3 0 0 1 3 3Zm10-2a3 3 0 1 1-3-3 3 3 0 0 1 3 3Z" />
+        {!on && <path d="M4 4l16 16" />}
+      </svg>
+    </button>
+  )
+}
+
 // Its own component so the 1 s countdown tick re-renders four numbers, not the whole page.
 function Count({ date }) {
   const t = useCountdown(date)
@@ -423,6 +549,7 @@ export default function LanternSky({ invite, viaGate }) {
   return (
     <div className={`tpl tpl-lanternsky${viaGate ? ' via-gate' : ''}`} ref={rootRef}>
       <Defs />
+      <Music />
 
       <section className="lsk-hero" aria-label="The invitation">
         <SkySwirls />
@@ -437,7 +564,8 @@ export default function LanternSky({ invite, viaGate }) {
           </h1>
         </header>
         <div className="lsk-pavilion">
-          <div className="lsk-pavilion__photo">
+          {/* below the first viewport: the couple fades in once the guest scrolls down to the arch */}
+          <div className="lsk-pavilion__photo" data-reveal>
             <Photo slot="couple" eager focus="50% 28%" />
           </div>
           <PavilionArt />

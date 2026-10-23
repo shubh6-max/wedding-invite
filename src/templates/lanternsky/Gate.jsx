@@ -3,6 +3,7 @@ import Photo from '../../components/Photo.jsx'
 import { useGate } from '../../lib/gate.js'
 import { firstGrapheme } from '../../lib/fit.js'
 import { guestName } from '../../lib/guest.js'
+import { playSong, song } from './song.js'
 import './gate.css'
 
 // Lantern Sky gate: night sky (the background photo dimmed to a texture), the names above one paper
@@ -12,12 +13,20 @@ export default function Gate({ invite, onOpen, onDone }) {
   const { trigger, opening } = useGate({ onOpen, onDone, ms: 1900 })
   const { a, b } = invite.couple
   const guest = guestName()
-  // Once the gate has settled, fetch the page's other pictures (hidden), so they are ready after the tap.
+  // Once the gate has settled, fetch the page's other pictures (hidden) and the song, so they are ready after the tap.
   const [warm, setWarm] = useState(false)
   useEffect(() => {
-    const t = setTimeout(() => setWarm(true), 1200)
+    const t = setTimeout(() => {
+      setWarm(true)
+      song()
+    }, 1200)
     return () => clearTimeout(t)
   }, [])
+  // The song must start inside this tap (see song.js); it rises with the lanterns as the page opens.
+  const light = () => {
+    playSong()
+    trigger()
+  }
 
   return (
     <div role="region" aria-label={`Invitation for ${a} and ${b}`} className={`gate gate-lanternsky${opening ? ' is-opening' : ''}`}>
@@ -38,7 +47,7 @@ export default function Gate({ invite, onOpen, onDone }) {
           <p className="lskg-date" data-over-photo>{invite.dateLabel}</p>
         </div>
 
-        <button type="button" className="lskg-lantern" data-gate-primary onClick={trigger} disabled={opening} autoFocus>
+        <button type="button" className="lskg-lantern" data-gate-primary onClick={light} disabled={opening} autoFocus>
           {/* the bob lives on this wrapper, not the button: a tap target must keep a stable box */}
           <span className="lskg-body" aria-hidden="true">
           <svg viewBox="0 0 120 150" focusable="false" aria-hidden="true">

@@ -61,7 +61,7 @@ function NotYet({ tpl }) {
 }
 
 function StudioScreen({ tpl, params }) {
-  const preset = presetFor(tpl.tradition)
+  const preset = presetFor(tpl.tradition, tpl.sample)
   const values = useMemo(() => presetValues(preset), [preset])
   const draft = useDraft(tpl.tradition)
   const invite = useMemo(() => compose(preset, draft.overrides), [preset, draft.overrides])

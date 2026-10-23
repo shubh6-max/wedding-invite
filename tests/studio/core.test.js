@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { presets } from '../../src/data/presets.js'
+import { presetFor, presets } from '../../src/data/presets.js'
 import { FIELDS, FIELD_BY_KEY, GROUPS, appliesTo, fieldsFor, splitScopes, staleBuckets } from '../../src/studio/fields.js'
 import { addDays, clip, clock, dateFromLabel, diffDays, glen, longDate, parseDate, plainDate, shortDate, timeFromLabel } from '../../src/studio/format.js'
 import { checkField, cleanOverrides, normaliseUrl, problemFields, waNumber } from '../../src/studio/sanitise.js'
@@ -186,6 +186,16 @@ test('changing the first name also replaces the sample full name', () => {
   assert.deepEqual(inv.full, { a: 'Meera', b: 'Rohan Iyer' })
   assert.deepEqual(compose(presets.contemporary, { ca: 'Meera', fa: 'Meera Rao' }).full, { a: 'Meera Rao', b: 'Rohan Iyer' })
   assert.equal(compose(presets.contemporary, { fa: '' }).full.a, 'Anaya')
+})
+test("a design's own sample lies over its tradition's preset, with one stable identity", () => {
+  const own = { couple: { a: 'Komal', b: 'Prem' }, full: { a: 'Komal', b: 'Prem' } }
+  const p = presetFor('contemporary', own)
+  assert.equal(presetFor('contemporary'), presets.contemporary)
+  assert.equal(presetFor('contemporary', own), p) // same object: the Studio memoises on it
+  assert.equal(p.venue, presets.contemporary.venue)
+  assert.deepEqual(compose(p, {}).couple, { a: 'Komal', b: 'Prem' })
+  assert.deepEqual(compose(p, {}).full, { a: 'Komal', b: 'Prem' })
+  assert.deepEqual(compose(p, { cb: 'Arjun' }).couple, { a: 'Komal', b: 'Arjun' }) // a guest link still renames
 })
 test('map link follows the venue unless one is pasted', () => {
   assert.equal(compose(hindu, {}).mapUrl, hindu.mapUrl)

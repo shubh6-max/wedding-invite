@@ -1,4 +1,5 @@
 import { lazy } from 'react'
+import { sageEnvelopeSample } from './samples/sageenvelope.js'
 
 // Registry of the contemporary designs, then the tradition-specific ones. Each template lives in src/templates/<id>/ and default-exports
 // a component taking `{ invite }` (see data/sample.js). To add one: create the folder, add a row here.
@@ -82,6 +83,14 @@ const contemporary = [
     signature: 'Tap the seal and the letter slides out; scratch the gold foil to reveal the date.',
     palette: ['#24150e', '#f1e3cb', '#c9a24a'], font: "'Gloock', serif", shape: 'rect',
     Component: lazy(() => import('../templates/velvetseal/VelvetSeal.jsx')),
+  },
+  {
+    id: 'sageenvelope', name: 'Sage Envelope', group: 'Romantic',
+    blurb: 'A painted sage envelope, then a watercolour wedding day, one scene per event.',
+    signature: 'Tap the seal; scratch the orange card for the date, then scroll through five themed events.',
+    palette: ['#fdfcf9', '#3e3935', '#b79b40'], font: "'Great Vibes', cursive", shape: 'rect', // page ground, ink, gold
+    sample: sageEnvelopeSample, // Komal & Prem; the rest is placeholder content (data/samples/sageenvelope.js)
+    Component: lazy(() => import('../templates/sageenvelope/SageEnvelope.jsx')),
   },
   // Photo-first designs: each shows the couple's bride, groom, couple and background photos through
   // components/Photo.jsx (see lib/photos.js; placeholders until a photo is supplied).

@@ -46,6 +46,6 @@ export function useInviteSource(tpl, params, onReplay) {
     } else overrides = decoded.overrides
   }
 
-  const invite = useMemo(() => (tpl && status === 'ready' ? compose(presetFor(tradition), overrides) : null), [tpl, tradition, status, overrides])
+  const invite = useMemo(() => (tpl && status === 'ready' ? compose(presetFor(tradition, tpl.sample), overrides) : null), [tpl, tradition, status, overrides])
   return { status, invite, code, personal: !!d }
 }

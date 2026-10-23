@@ -61,6 +61,9 @@ qa-out/
 # Scratch / throwaway scripts
 scratch-*
 
+# Local reference kits (source video, reference frames, planning notes)
+temp/
+
 # Local test photos of real people: never committed (see README, "Photo designs")
 public/bride/
 public/groom/

@@ -1,0 +1,106 @@
+/* Sage Envelope gate: the original's envelope page at 390px, layer for layer. Only transform, scale, rotate and
+   opacity animate. Arrival 0-800ms (the stage grows from 0.8 and fades in); on tap, 0-800ms the seal shrinks to
+   nothing, the envelope swells to 1.05, tilts 10deg and fades, the words drop 40px and fade, the stage grows to
+   1.2; the gradient and corner flowers hold until App removes the gate at 1200ms (useGate ms). */
+.gate-sageenvelope.gate {
+  padding: 0; /* the envelope fills the screen; the seal and words sit clear of the nav pill on their own */
+  background: linear-gradient(to bottom right, #a8bfa2, #c8d5b9, #a8bfa2);
+  color: #3e3935;
+  perspective: 1000px;
+}
+.gate-sageenvelope p,
+.gate-sageenvelope h2 { margin: 0; }
+
+/* Faint flowers in the corners, hidden under the envelope until it fades. */
+.gate-sageenvelope .gate-sageenvelope__corner { position: absolute; font-size: 60px; line-height: 1; opacity: 0.2; }
+.gate-sageenvelope .gate-sageenvelope__corner--tl { top: 32px; left: 32px; }
+.gate-sageenvelope .gate-sageenvelope__corner--tr { top: 32px; right: 32px; }
+.gate-sageenvelope .gate-sageenvelope__corner--bl { bottom: 32px; left: 32px; }
+.gate-sageenvelope .gate-sageenvelope__corner--br { bottom: 32px; right: 32px; }
+
+.gate-sageenvelope .gate-sageenvelope__stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: se-gate-arrive 0.8s ease both;
+  transition: scale 0.8s ease;
+}
+@keyframes se-gate-arrive { from { opacity: 0; scale: 0.8; } }
+
+/* The envelope fills the height; on a phone narrower than its 0.57 ratio it is squeezed to the width, as in the original. */
+.gate-sageenvelope .gate-sageenvelope__envelope {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  object-fit: fill;
+  transition: transform 0.8s ease, opacity 0.8s ease;
+}
+
+.gate-sageenvelope .gate-sageenvelope__seal {
+  position: absolute;
+  top: calc(50% + 8px);
+  left: 50%;
+  width: min(296px, 35dvh);
+  height: min(296px, 35dvh);
+  translate: -50% -50%;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.8s ease, opacity 0.8s ease;
+}
+.gate-sageenvelope .gate-sageenvelope__seal img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.gate-sageenvelope .gate-sageenvelope__seal:focus-visible { outline: 2px solid #fff; outline-offset: -24px; }
+.gate-sageenvelope .gate-sageenvelope__seal:active { transform: scale(0.95); }
+
+/* Shrink-to-fit from the centre line, as the original does: "Tap to open your invitation" wraps onto two lines. */
+.gate-sageenvelope .gate-sageenvelope__words {
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  translate: -50% 0;
+  padding: 0 16px;
+  text-align: center;
+  animation: se-gate-words 0.6s ease both;
+  transition: transform 0.6s ease, opacity 0.6s ease;
+}
+@keyframes se-gate-words { from { opacity: 0; transform: translateY(20px); } }
+.gate-sageenvelope .gate-sageenvelope__words h2 { font: 400 30px/36px 'Great Vibes', cursive; filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06)); }
+.gate-sageenvelope .gate-sageenvelope__words p { margin-top: 16px; font: 400 18px/28px 'Cormorant', Georgia, serif; letter-spacing: 0.025em; color: rgb(62 57 53 / 0.8); }
+.gate-sageenvelope .gate-sageenvelope__words .gate-sageenvelope__guest { margin: 0 0 6px; font-style: italic; font-weight: 600; }
+
+.gate-sageenvelope .gate-sageenvelope__rule {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  height: 4px;
+  background: linear-gradient(to right, transparent, #c8a882, transparent);
+  opacity: 0.3;
+}
+.gate-sageenvelope .gate-sageenvelope__rule--top { top: 16px; }
+.gate-sageenvelope .gate-sageenvelope__rule--bottom { bottom: 16px; }
+
+/* ---- opening ---- */
+.gate-sageenvelope.is-opening .gate-sageenvelope__stage { scale: 1.2; }
+.gate-sageenvelope.is-opening .gate-sageenvelope__envelope { transform: scale(1.05) rotateX(10deg); opacity: 0; }
+.gate-sageenvelope.is-opening .gate-sageenvelope__seal { transform: scale(0); opacity: 0; }
+.gate-sageenvelope.is-opening .gate-sageenvelope__words { transform: translateY(40px); opacity: 0; }
+
+@media (hover: hover) and (pointer: fine) {
+  .gate-sageenvelope:not(.is-opening) .gate-sageenvelope__seal:hover { transform: scale(1.1) rotate(5deg); }
+}
+
+/* Reduced motion: no growth or tilt; everything simply fades (lib/gate.js also shortens the hand-over to 250ms). */
+@media (prefers-reduced-motion: reduce) {
+  .gate-sageenvelope .gate-sageenvelope__stage,
+  .gate-sageenvelope .gate-sageenvelope__words { animation: none; }
+  .gate-sageenvelope.is-opening .gate-sageenvelope__stage { scale: none; }
+  .gate-sageenvelope.is-opening .gate-sageenvelope__envelope,
+  .gate-sageenvelope.is-opening .gate-sageenvelope__seal,
+  .gate-sageenvelope.is-opening .gate-sageenvelope__words { transform: none; transition-duration: 0.2s; }
+}
