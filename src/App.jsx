@@ -16,6 +16,8 @@ const Studio = lazy(() => import('./studio/Studio.jsx'))
 const PROBLEM = {
   unsupported: 'This link needs a newer phone or browser. Ask the sender for the link for older phones.',
   version: 'This link was made with a newer version of the studio. Ask the sender to share it again.',
+  'not-found': 'No invitation has this name. Ask the sender to check the link.',
+  offline: 'The invitation could not load. Check your internet connection and try again.',
 }
 
 // A personalised link that cannot be read. A guest must never be shown a different couple's sample.

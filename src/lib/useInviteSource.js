@@ -4,12 +4,14 @@ import { decodePayload } from '../studio/codec.js'
 import { compose } from '../studio/compose.js'
 import { cleanOverrides } from '../studio/sanitise.js'
 import { useEmbedOverrides } from '../studio/useEmbedOverrides.js'
+import { fetchShort, isSlug } from './shortlink.js'
 
 const NONE = {} // one shared empty object keeps the composed invite stable between renders
 
 // Where the invitation's content comes from, for one design:
 //   preview inside the Studio (?embed=1)  -> drafts posted by the parent window
 //   guest link (?d=<payload>)             -> decoded from the link
+//   short link (?d=<name>)                -> payload fetched from /api/invite, then decoded the same way
 //   otherwise                             -> the design's sample, as before
 // Returns { status: 'ready' | 'loading' | 'error', invite, code, personal, edit }. `edit` is the tap-to-edit
 // context (lib/editing.js) in the Studio's edit preview, else null. `invite` is null unless ready.
@@ -24,7 +26,9 @@ export function useInviteSource(tpl, params, onReplay) {
   useEffect(() => {
     if (!d) return undefined
     let live = true
-    decodePayload(d)
+    const payload = isSlug(d) ? fetchShort(d) : Promise.resolve(d)
+    payload
+      .then(decodePayload)
       .then((raw) => live && setDecoded({ d, overrides: cleanOverrides(raw, tradition, design).overrides, code: null }))
       .catch((e) => live && setDecoded({ d, overrides: null, code: e?.code || 'corrupt' }))
     return () => {

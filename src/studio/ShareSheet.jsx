@@ -1,8 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { designLink, pageBase } from '../lib/route.js'
+import { isSlug, saveShort, slugify } from '../lib/shortlink.js'
 import { encodePayload } from './codec.js'
 import { staleBuckets } from './fields.js'
 import { cleanOverrides, problemFields } from './sanitise.js'
+
+const SHORT_PROBLEM = {
+  bad: 'Use 3 to 40 letters or numbers, with dashes between words.',
+  taken: 'Another invitation already uses this name. Add something to it, like the year.',
+  failed: 'The short link could not be saved. Check your connection and try again, or send the long link.',
+}
 
 // Where a field sits, for a message: "Place (ceremony 2)".
 const nameOf = (f) => (f.sub === 'events' ? `${f.label} (ceremony ${f.index + 1})` : f.sub === 'story' ? `${f.label} (story moment ${f.index + 1})` : f.label)
@@ -15,7 +22,12 @@ export default function ShareSheet({ id, tradition, design = null, names, overri
   const input = useRef(null)
   const olderInput = useRef(null)
   const olderBox = useRef(null)
+  const messageBox = useRef(null)
   const [to, setTo] = useState('')
+  const [label, setLabel] = useState('')
+  const [slug, setSlug] = useState(() => slugify(names))
+  // The last short-link save: its name, the payload it stored, and '' | 'saving' | 'saved' | a SHORT_PROBLEM key.
+  const [short, setShort] = useState({ slug: '', d: '', state: '' })
   const [links, setLinks] = useState({ for: null, main: '', plain: '', failed: false })
   const [note, setNote] = useState('')
   const clean = useMemo(() => cleanOverrides(overrides, tradition, design).overrides, [overrides, tradition, design])
@@ -40,15 +52,31 @@ export default function ShareSheet({ id, tradition, design = null, names, overri
 
   const loading = links.for !== clean
   const url = (payload) => designLink(pageBase(), id, { d: payload, to: to.trim() })
-  const main = loading || links.failed ? '' : url(links.main)
-  const older = !loading && links.main.startsWith('z.') ? url(links.plain) : ''
-  const message = `${names} are getting married. Open the invitation: ${main}`
+  // The short link stores the plain payload, so it opens on every phone and needs no "older phones" link.
+  const shortReady = !loading && short.state === 'saved' && short.slug === slug && short.d === links.plain
+  const main = loading || links.failed ? '' : url(shortReady ? slug : links.main)
+  const older = !shortReady && !loading && links.main.startsWith('z.') ? url(links.plain) : ''
+
+  const makeShort = async () => {
+    if (!isSlug(slug)) return setShort({ slug, d: '', state: 'bad' })
+    const d = links.plain
+    setShort({ slug, d, state: 'saving' })
+    try {
+      setShort({ slug, d, state: await saveShort(slug, d) })
+    } catch {
+      setShort({ slug, d, state: 'failed' })
+    }
+  }
+  // WhatsApp cannot hide a link behind text, so the custom name goes on its own line in bold
+  // (*...*; stray asterisks would break the bold) with the link under it.
+  const title = label.replace(/\*/g, '').trim() || `${names}'s wedding invitation`
+  const message = main ? `*${title}*\n${main}` : ''
 
   // `field` is the readonly input that holds `text`, so the manual fallback selects the link that was asked for.
-  const copy = async (text, field) => {
+  const copy = async (text, field, done = 'Link copied.') => {
     try {
       await navigator.clipboard.writeText(text)
-      setNote('Link copied.')
+      setNote(done)
     } catch {
       // The long link lives in a collapsed <details>: open it first or the input cannot take focus.
       if (field.current === olderInput.current && olderBox.current) olderBox.current.open = true
@@ -64,7 +92,7 @@ export default function ShareSheet({ id, tradition, design = null, names, overri
       {/* No implicit submission: Enter in the guest name field must not close the sheet (Close is an explicit button). */}
       <form className="share__body" onSubmit={(e) => e.preventDefault()}>
         <h2 id="share-h">Send your invitation</h2>
-        <p className="share__lede">This link opens the invitation with your details. Free, no account, nothing stored on a server.</p>
+        <p className="share__lede">This link opens the invitation with your details. Free, no account.</p>
 
         {problems.length > 0 && (
           <div className="share__check" role="group" aria-labelledby="share-fix-h">
@@ -88,6 +116,18 @@ export default function ShareSheet({ id, tradition, design = null, names, overri
           <small>Greets them by name and fills in the reply form.</small>
         </label>
 
+        <div className="share__short">
+          <label>
+            <span>Short link name</span>
+            <input value={slug} onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, '-'))} maxLength={40} autoComplete="off" spellCheck={false} placeholder="komal-prem" />
+            <small>Your link ends in ?d={slug || 'your-name'}. Saving it keeps your details on our server so the name can find them.</small>
+          </label>
+          <button type="button" className="btn btn--quiet" disabled={loading || links.failed || short.state === 'saving' || shortReady} onClick={makeShort}>
+            {shortReady ? 'Short link saved' : short.state === 'saving' ? 'Saving…' : 'Make short link'}
+          </button>
+          {SHORT_PROBLEM[short.state] && short.slug === slug && <p className="share__warn" role="alert">{SHORT_PROBLEM[short.state]}</p>}
+        </div>
+
         <label className="share__link">
           <span>Invitation link</span>
           <input ref={input} readOnly value={main} onFocus={(e) => e.target.select()} aria-busy={loading} />
@@ -95,10 +135,22 @@ export default function ShareSheet({ id, tradition, design = null, names, overri
         {links.failed && <p className="share__warn" role="alert">The link could not be made. Reload the page and try again.</p>}
         {main.length > 2000 && <p className="share__warn">This link is long. Some apps may cut it off; try WhatsApp or email.</p>}
 
+        <label className="share__to">
+          <span>Link name (optional)</span>
+          <input value={label} onChange={(e) => setLabel(e.target.value)} maxLength={80} autoComplete="off" placeholder={`${names}'s wedding invitation`} />
+          <small>Shown in bold above the link in your message.</small>
+        </label>
+
+        <label className="share__message">
+          <span>Message</span>
+          <textarea ref={messageBox} readOnly rows={3} value={message} onFocus={(e) => e.target.select()} aria-busy={loading} />
+        </label>
+
         <div className="share__actions">
           <button type="button" className="btn" disabled={!main} onClick={() => copy(main, input)}>Copy link</button>
+          <button type="button" className="btn btn--quiet" disabled={!main} onClick={() => copy(message, messageBox, 'Message copied.')}>Copy message</button>
           {main && <a className="btn btn--quiet" href={`https://wa.me/?text=${encodeURIComponent(message)}`} target="_blank" rel="noreferrer">Send on WhatsApp</a>}
-          {canShare && <button type="button" className="btn btn--quiet" disabled={!main} onClick={() => navigator.share({ title: `${names}'s wedding invitation`, url: main }).catch(() => {})}>More options</button>}
+          {canShare && <button type="button" className="btn btn--quiet" disabled={!main} onClick={() => navigator.share({ title, text: title, url: main }).catch(() => {})}>More options</button>}
           {main && <a className="btn btn--quiet" href={main} target="_blank" rel="noreferrer">Open as a guest</a>}
         </div>
         <p className="share__note" role="status">{note}</p>
@@ -114,7 +166,7 @@ export default function ShareSheet({ id, tradition, design = null, names, overri
             <button type="button" className="btn btn--quiet" onClick={() => copy(older, olderInput)}>Copy long link</button>
           </details>
         )}
-        <p className="share__fine">If you change something later, copy the link again. Links you already sent keep the old details. Anyone with the link can see the details in it.</p>
+        <p className="share__fine">If you change something later, open this again. Make the short link again with the same name and guests who already have it see the new details; a long link you already sent keeps the old ones. Anyone with the link can see the details in it.</p>
         <button type="button" className="btn btn--quiet share__close" onClick={() => dialog.current.close()}>Close</button>
       </form>
     </dialog>

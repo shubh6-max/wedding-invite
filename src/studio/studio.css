@@ -158,12 +158,15 @@
 .share h3 { font-size: 1.1rem; }
 .share p, .share small { margin: 0; color: var(--soft); }
 .share label { display: grid; gap: 6px; font-weight: 600; }
-.share input { width: 100%; min-height: 48px; padding: 10px 14px; border: 1px solid var(--edge); border-radius: var(--r-control); font: inherit; font-size: max(16px, 1rem); }
+.share textarea { resize: none; }
+.share input, .share textarea { width: 100%; min-height: 48px; padding: 10px 14px; border: 1px solid var(--edge); border-radius: var(--r-control); font: inherit; font-size: max(16px, 1rem); }
 .share small { font-weight: 400; font-size: 14px; }
 .share__check { padding: 12px 14px; border: 1px solid var(--kumkum); border-radius: var(--r-paper); background: #fbf1ef; }
 .share__check p { color: var(--ink); }
 .share__check .btn { margin-top: 8px; }
 .share__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.share__short { display: grid; gap: 8px; justify-items: start; }
+.share__short label { justify-self: stretch; }
 .share__warn { color: var(--kumkum); font-weight: 600; }
 .share__note { min-height: 1.5em; color: var(--peacock); font-weight: 600; }
 .share__older summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 600; }
