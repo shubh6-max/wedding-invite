@@ -25,6 +25,7 @@ import { fileURLToPath } from 'node:url'
 import { CASES, RENDERED_KEYS, expectations, forTradition } from './fixtures/studio-cases.mjs'
 import { decodePayload, encodePayload } from '../src/studio/codec.js'
 import { cleanOverrides } from '../src/studio/sanitise.js'
+import { MAX_DRAFT_KEYS } from '../src/studio/protocol.js'
 import { presets } from '../src/data/presets.js'
 
 // Paths come from the repo root, not the shell's current directory, so a run from anywhere sees all designs.
@@ -386,7 +387,7 @@ async function messages() {
         ['overrides as an array', draft(14, ['Arrayed']), 'Arrayed'],
         ['overrides as a string', draft(15, 'Stringed'), 'Stringed'],
         ['overrides null', draft(16, null), 'Nullover'],
-        ['more than 80 keys', draft(17, { ca: 'Toomany', ...Object.fromEntries(Array.from({ length: 90 }, (_, i) => [`x${i}`, 'y'])) }), 'Toomany'],
+        ['more keys than the cap', draft(17, { ca: 'Toomany', ...Object.fromEntries(Array.from({ length: MAX_DRAFT_KEYS + 10 }, (_, i) => [`x${i}`, 'y'])) }), 'Toomany'], // follows protocol.js
         ['unknown type', { ns: 'wi-studio', v: 1, type: 'eval', seq: 18, overrides: { ca: 'Unknowntype' } }, 'Unknowntype'],
       ]
       for (const [label, m, marker] of ignored) {

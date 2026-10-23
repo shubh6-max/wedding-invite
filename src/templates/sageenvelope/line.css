@@ -1,0 +1,48 @@
+/* Sage Envelope lines (Line.jsx). On the invitation a line only carries its text; the rules below marked
+   "edit" apply in the Studio's edit preview, where lines are tapped, typed into and resized. */
+.se-line__t { white-space: pre-line; overflow-wrap: anywhere; }
+
+/* ---- edit ---- */
+[data-line] { scroll-margin-top: 72px; position: relative; cursor: text; border-radius: 4px; outline: 1px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s ease; }
+[data-line]:hover,
+[data-line]:focus-visible { outline-color: rgb(80 120 220 / 0.7); }
+[data-line].is-selected { outline: 2px solid #3d6fd6; outline-offset: 3px; }
+[data-line].is-empty .se-line__t { opacity: 0.45; font-style: italic; } /* an emptied line shows its name, faintly */
+
+.se-line__input {
+  display: block;
+  width: 100%;
+  min-height: 1.2em;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.55);
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  text-transform: inherit;
+  white-space: pre-wrap;
+  resize: none;
+  outline: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.se-handle {
+  position: absolute;
+  z-index: 60;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #3d6fd6;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+  touch-action: none;
+}
+.se-handle::after { content: ''; position: absolute; inset: -11px; } /* a 44px target for a thumb */
+/* Width on the right edge, size below the middle: apart even on a one-line, 15px-high line. */
+.se-handle--width { top: 50%; right: -12px; translate: 0 -50%; cursor: ew-resize; }
+.se-handle--size { bottom: -28px; left: 50%; translate: -50% 0; cursor: ns-resize; }

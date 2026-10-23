@@ -24,13 +24,13 @@ export default function Field({ field, value, sample, weddingDate, onChange, onF
     onBlur: () => setSeen(true),
     onFocus: (e) => {
       onFocus?.()
-      if (sample && (field.control === 'text' || field.control === 'textarea')) e.target.select()
+      if (sample && ['text', 'textarea', 'lines'].includes(field.control)) e.target.select()
     },
   }
 
   let control
-  if (field.control === 'textarea') {
-    control = <textarea {...shared} rows={2} value={value} onChange={(e) => onChange(e.target.value)} />
+  if (field.control === 'textarea' || field.control === 'lines') {
+    control = <textarea {...shared} rows={field.control === 'lines' ? 3 : 2} value={value} onChange={(e) => onChange(e.target.value)} />
   } else if (field.control === 'select') {
     control = (
       <select {...shared} value={value} onChange={(e) => onChange(e.target.value)}>

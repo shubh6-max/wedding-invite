@@ -70,6 +70,14 @@ Free features that competitors usually put behind a paid plan, none of which nee
 - To make the next design editable, work through the checklist in `docs/superpowers/specs/2026-10-15-invitation-studio-design.md` section 12, run `node scripts/qa-studio.mjs --only=edit-live,proof --design=<id>`, and set `editable: true` in the same commit.
 - Checks: `npm test` (pure functions, `node --test`), and with `npm run preview` running, `npm run qa:studio` (browser areas: edit-live, share, hostile, storage, gallery, mobile, focus, proof; use `--only=` and `--design=`).
 
+### Editing on the invitation itself (Sage Envelope)
+
+Sage Envelope (`editor: 'inline'` in `src/data/templates.js`) is edited on the page, not in a form. In `#/studio/sageenvelope` you tap any line of the invitation and type over it; handles on the selected line change its box width and text size. The panel beside it (a sheet on a phone) holds the same line's words, size, width, space above, alignment, colour and font. With nothing selected, the panel orders and hides whole sections (the envelope is always first) and holds the details several lines share: names, wedding date and time, venue, map link and address. Undo and Redo cover every change, and Preview hides the editing outlines.
+
+- Every line is listed once in `src/templates/sageenvelope/lines.js`. Each line's words (`t-<line>`), look (`y-<line>`), each event's date and time, and the section order (`o`) are fields of the design's own scope in the field table. So they are cleaned, saved on the device, carried in the share link and checked like every other field. Never rename a line id: links already sent use it.
+- Line text can include `{bride}`, `{groom}` and `{venue}`, which are filled in from the couple's details.
+- Checks: `npm test` (`tests/studio/inline.test.js`), and with the site running, `node scripts/qa-sageenvelope.mjs <url>`. It types in place, restyles, reorders, undoes, shares, and opens the link as a guest.
+
 ## Photo designs
 
 The eleven photo-first designs show four pictures: `bride`, `groom`, `couple` and `background`. A design never uses an `<img>` itself; it renders `<Photo slot="bride" />` (`src/components/Photo.jsx`), which reads `invite.photos` from the invite context.

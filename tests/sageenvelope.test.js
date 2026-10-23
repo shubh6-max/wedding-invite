@@ -49,3 +49,8 @@ test("the design's own content composes: Komal & Prem, five events in the reel's
   assert.equal(invite.families.length, 2)
   assert.ok(invite.address.includes(invite.venue))
 })
+
+test('an event date picked in the Studio (YYYY-MM-DD) reads the same as the sample label', () => {
+  assert.deepEqual(eventWhen('2027-02-11'), eventWhen('11 Feb 2027'))
+  assert.equal(eventWhen('2027-02-30'), null)
+})

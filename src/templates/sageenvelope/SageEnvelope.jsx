@@ -1,8 +1,12 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
+import { useEditing } from '../../lib/editing.js'
 import { useCountdown } from '../../lib/hooks.js'
 import { clearedShare } from '../../lib/scratch.js'
+import { clock } from '../../studio/format.js'
 import { art } from './art.js'
 import { directionsUrl, eventWhen, footerDate, mapEmbedUrl, revealDate } from './format.js'
+import Line from './Line.jsx'
+import { DEFAULT_ORDER, normaliseOrder } from './lines.js'
 import './sageenvelope.css'
 
 // Sage Envelope page: the original invitation's mobile layout (390px), rebuilt layer for layer from its own artwork
@@ -144,12 +148,14 @@ function useSections(rootRef, wait) {
 // The orange coating over the date card. Pointer drags erase it (canvas, destination-out, 17.5px brush); at 40%
 // cleared it goes and the date stays. Keyboard and screen-reader guests get a button that reveals it at once.
 // touch-action: none sits on the coating only, so the page scrolls normally around it.
-function ScratchDate({ label }) {
+// In the Studio's edit preview the coating is a plain box whose words can be edited; nothing scratches.
+function ScratchDate({ label, coatText, editing }) {
   const [open, setOpen] = useState(false)
   const doneRef = useRef(false)
   const cvsRef = useRef(null)
 
   useEffect(() => {
+    if (editing) return undefined
     const cvs = cvsRef.current
     const ctx = cvs?.getContext('2d')
     const finish = () => {
@@ -174,7 +180,7 @@ function ScratchDate({ label }) {
       ctx.font = "20px 'Cormorant', serif"
       ctx.fillStyle = '#fff'
       ctx.textAlign = 'center'
-      ctx.fillText('Scratch to reveal', r0.width / 2, r0.height / 2)
+      ctx.fillText(coatText, r0.width / 2, r0.height / 2)
       ctx.globalCompositeOperation = 'destination-out'
       ctx.lineCap = 'round'
       ctx.lineWidth = 35
@@ -228,7 +234,7 @@ function ScratchDate({ label }) {
       cvs.removeEventListener('pointerup', up)
       cvs.removeEventListener('pointercancel', up)
     }
-  }, [])
+  }, [editing, coatText])
 
   const reveal = () => {
     doneRef.current = true
@@ -237,10 +243,16 @@ function ScratchDate({ label }) {
   return (
     <div className={`se-scratch${open ? ' is-open' : ''}`}>
       <div className="se-scratch__card">
-        <p className="se-scratch__date se-t" aria-hidden={!open} style={{ '--d': '0.1s' }}>{label}</p>
+        <Line id="wd" className="se-scratch__date se-t" fallback={label} aria-hidden={!open && !editing} style={{ '--d': '0.1s' }} />
       </div>
-      {!open && <canvas ref={cvsRef} className="se-scratch__coat" aria-hidden="true" />}
-      {!open && <button type="button" className="se-scratch__key" onClick={reveal}><span className="sr-only">Reveal the wedding date</span></button>}
+      {editing ? (
+        <div className="se-scratch__coat se-scratch__coat--edit">
+          <Line id="ws" as="span" fallback="Scratch to reveal" />
+        </div>
+      ) : (
+        !open && <canvas ref={cvsRef} className="se-scratch__coat" aria-hidden="true" />
+      )}
+      {!open && !editing && <button type="button" className="se-scratch__key" onClick={reveal}><span className="sr-only">Reveal the wedding date</span></button>}
       <p className="sr-only" aria-live="polite">{open ? `The wedding date: ${label}` : ''}</p>
     </div>
   )
@@ -249,165 +261,183 @@ function ScratchDate({ label }) {
 // Its own component so the 1 s tick re-renders four numbers, not the page. A past date shows zeros.
 function Countdown({ iso }) {
   const t = useCountdown(iso)
-  const cells = [[t.days, 'days'], [t.hours, 'hours'], [t.minutes, 'minutes'], [t.seconds, 'seconds']]
+  const cells = [t.days, t.hours, t.minutes, t.seconds]
   return (
     <div className="se-count" role="group" aria-label="Time until the wedding">
-      {cells.map(([n, unit]) => (
-        <div key={unit}>
+      {cells.map((n, i) => (
+        <div key={i}>
           <b>{t.pad(n)}</b>
-          <span>{unit}</span>
+          <Line id={`wl${i}`} as="span" fallback={['days', 'hours', 'minutes', 'seconds'][i]} />
         </div>
       ))}
     </div>
   )
 }
 
-function Event({ event }) {
-  const theme = PROPS[event.id] ? event.id : 'wedding' // an unknown event borrows the wedding garden
-  const when = eventWhen(event.day)
+// The value a line shows, before tokens: the couple's text, or the design's own.
+const own = (invite, id, fallback) => invite.design?.[`t-${id}`] ?? fallback
+
+// Event slots keep their scene whatever they are called (lines.js): 0 Mehendi ... 4 Cocktail.
+const SLOT_THEME = ['mehendi', 'sangeet', 'wedding', 'reception', 'cocktail']
+
+function Event({ invite, i }) {
+  const ev = invite.events[i] || {}
+  const s = `e${i}`
+  const theme = SLOT_THEME[i]
+  const day = invite.design?.[`t-${s}d`] ?? ev.day
+  const when = eventWhen(day)
+  const picked = invite.design?.[`t-${s}t`]
+  const time = picked ? clock(picked) : ev.time ?? ''
+  const after = own(invite, `${s}o`, 'onwards')
   return (
-    <section className={`se-event se-event--${theme}`} style={bg(BACKDROP[theme])} data-sec aria-labelledby={`se-h-${event.id}`}>
-      {PROPS[theme].map((p, i) => <Img key={i} p={p} />)}
+    <section className={`se-event se-event--${theme}`} style={bg(BACKDROP[theme])} data-sec data-studio-section={s} aria-labelledby={`se-h-${s}`}>
+      {PROPS[theme].map((p, k) => <Img key={k} p={p} />)}
       <div className="se-event__copy">
-        <h3 id={`se-h-${event.id}`} className="se-t" style={{ '--ty': '-50px' }}>{event.name}</h3>
-        {event.subtitle && <p className="se-event__sub se-t" style={{ '--d': '0.2s' }}>{event.subtitle}</p>}
+        <Line id={`${s}n`} htmlId={`se-h-${s}`} as="h3" fallback={ev.name ?? ''} className="se-t" style={{ '--ty': '-50px' }} />
+        <Line id={`${s}s`} fallback={ev.subtitle ?? ''} className="se-event__sub se-t" style={{ '--d': '0.2s' }} />
         <div className="se-event__when se-t" style={{ '--d': '0.3s' }}>
-          {when ? (
-            <>
-              <p>{when.weekday}</p>
-              <p>{when.month} <span className="se-event__daynum">{when.day}</span> {when.year}</p>
-            </>
-          ) : (
-            <p>{event.day}</p>
-          )}
-          <p>{event.time} onwards</p>
-          <p className="se-event__place">{event.place}</p>
+          <Line id={`${s}k`} fallback={when?.weekday ?? ''} />
+          <Line id={`${s}d`} fallback={when ? `${when.month} ${when.day} ${when.year}` : day ?? ''}>
+            {when && <>{when.month} <span className="se-event__daynum">{when.day}</span> {when.year}</>}
+          </Line>
+          <Line id={`${s}t`} fallback={[time, after].filter(Boolean).join(' ')} />
+          <Line id={`${s}p`} fallback={ev.place ?? ''} className="se-event__place" />
         </div>
-        {event.dress && (
-          <>
-            <p className="se-event__dresslabel">Dress code</p>
-            <p className="se-event__dress se-t" style={{ '--d': '0.4s' }}>{event.dress}</p>
-          </>
-        )}
+        <Line id={`${s}l`} fallback={ev.dress ? 'Dress code' : ''} className="se-event__dresslabel" />
+        <Line id={`${s}w`} fallback={ev.dress ?? ''} className="se-event__dress se-t" style={{ '--d': '0.4s' }} />
       </div>
     </section>
   )
 }
 
+// The Get Directions link: a map link the couple pasted, else directions to the address.
+const directionsFor = (invite, address) => (invite.mapUrl && !invite.mapUrl.includes('/maps/search/') ? invite.mapUrl : directionsUrl(address))
+
 export default function SageEnvelope({ invite, viaGate }) {
   const rootRef = useRef(null)
+  const edit = useEditing()
   // Wait out the gate's 1.2 s hand-over (only 250 ms under reduced motion, lib/gate.js) before the first entrances.
   const calm = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
   useSections(rootRef, viaGate && !calm ? 1200 : 0)
   const { a, b } = invite.couple // a = bride, b = groom
-  const address = invite.address || [invite.venue, invite.city].filter(Boolean).join(', ')
-  // The hero's lines, in order; each rises in 0.2 s after the one before.
-  const hero = [
-    ['se-hero__namah', invite.invocation?.text && `||${invite.invocation.text}||`],
-    ['se-hero__small', invite.blessings && 'With the blessings Of'],
-    ['se-hero__blessings', invite.blessings],
-    ['se-hero__hosts', invite.hosts],
-    ['se-hero__line', invite.inviteLine],
-  ].filter(([, text]) => text)
-  const after = [
-    ['se-hero__strong', invite.brideLine],
-    ['se-hero__strong', invite.dateRange || invite.dateLabel],
-    ['se-hero__strong se-hero__at', 'at'],
-    ['se-hero__strong se-hero__venue', invite.venue],
-  ].filter(([, text]) => text)
+  const address = own(invite, 'va', invite.address || [invite.venue, invite.city].filter(Boolean).join(', '))
+  const addressLine = address.replace(/\n/g, ', ')
+  const order = (normaliseOrder(invite.design?.o ?? '') ?? DEFAULT_ORDER).split(',')
+  const families = [0, 1].map((i) => ({ i, title: own(invite, `f${i}t`, invite.families?.[i]?.title ?? ''), names: own(invite, `f${i}n`, invite.families?.[i]?.names?.join('\n') ?? '') }))
+  // The hero's lines rise in one after another, 0.2 s apart.
+  const rise = (n) => ({ '--d': `${n * 0.2}s`, '--ty': '40px' })
 
-  return (
-    <main ref={rootRef} className={`tpl tpl-sageenvelope${viaGate ? ' is-via-gate' : ''}`}>
-      <header className="se-hero" style={bg('hero-sky')} data-sec>
+  const sections = {
+    hero: (
+      <header key="hero" className="se-hero" style={bg('hero-sky')} data-sec data-studio-section="hero">
         <div className="se-petals" aria-hidden="true">
           {PETALS.map((style, i) => <span key={i} style={style}>🌸</span>)}
         </div>
         <div className="se-hero__scene" style={bg('hero-scene')}>
           <div className="se-hero__copy">
             <img className="se-hero__ganesha" src={art('ganesha')} alt="" />
-            {hero.map(([cls, text], i) => <p key={i} className={`${cls} se-t`} style={{ '--d': `${i * 0.2}s`, '--ty': '40px' }}>{text}</p>)}
+            <Line id="hn" fallback={invite.invocation?.text ? `||${invite.invocation.text}||` : ''} className="se-hero__namah se-t" style={rise(0)} />
+            <Line id="hb" fallback={invite.blessings ? 'With the blessings Of' : ''} className="se-hero__small se-t" style={rise(1)} />
+            <Line id="hg" fallback={invite.blessings ?? ''} className="se-hero__blessings se-t" style={rise(2)} />
+            <Line id="hh" fallback={invite.hosts ?? ''} className="se-hero__hosts se-t" style={rise(3)} />
+            <Line id="hi" fallback={invite.inviteLine ?? ''} className="se-hero__line se-t" style={rise(4)} />
             <h1>
-              <span className="se-t" style={{ '--d': `${hero.length * 0.2}s`, '--ty': '40px' }}>{b}</span>
-              <small className="se-t" style={{ '--d': `${(hero.length + 1) * 0.2}s`, '--ty': '40px' }}>WITH</small>
-              <span className="se-t" style={{ '--d': `${(hero.length + 2) * 0.2}s`, '--ty': '40px' }}>{a}</span>
+              <Line id="hgr" as="span" fallback={b} className="se-t" style={rise(5)} />
+              <Line id="hw" as="small" fallback="WITH" className="se-t" style={rise(6)} />
+              <Line id="hbr" as="span" fallback={a} className="se-t" style={rise(7)} />
             </h1>
-            {after.map(([cls, text], i) => <p key={i} className={`${cls} se-t`} style={{ '--d': `${(hero.length + 3 + i) * 0.2}s`, '--ty': '40px' }}>{text}</p>)}
+            <Line id="hd" fallback={invite.brideLine ?? ''} className="se-hero__strong se-t" style={rise(8)} />
+            <Line id="hr" fallback={invite.dateRange || invite.dateLabel} className="se-hero__strong se-t" style={rise(9)} />
+            <Line id="ha" fallback="at" className="se-hero__strong se-hero__at se-t" style={rise(10)} />
+            <Line id="hv" fallback={invite.venue} className="se-hero__strong se-hero__venue se-t" style={rise(11)} />
           </div>
           <div className="se-dancers">
             {DANCERS.map((p) => <Img key={p.img} p={p} />)}
           </div>
         </div>
       </header>
-
-      <section className="se-welcome" data-sec aria-labelledby="se-h-welcome">
+    ),
+    welcome: (
+      <section key="welcome" className="se-welcome" data-sec data-studio-section="welcome" aria-labelledby="se-h-welcome">
         <div className="se-welcome__top">
-          <p className="se-welcome__eyebrow se-t" style={{ '--d': '0.1s' }}>With immense joy and love</p>
-          <h2 id="se-h-welcome" className="se-welcome__names se-t">{a} &amp; {b}</h2>
-          <ScratchDate label={revealDate(invite.date)} />
+          <Line id="we" fallback="With immense joy and love" className="se-welcome__eyebrow se-t" style={{ '--d': '0.1s' }} />
+          <Line id="wn" htmlId="se-h-welcome" as="h2" fallback="{bride} & {groom}" className="se-welcome__names se-t" />
+          <ScratchDate label={revealDate(invite.date)} coatText={own(invite, 'ws', 'Scratch to reveal')} editing={!!edit} />
         </div>
         <img className="se-welcome__couple" src={art('couple')} alt="" />
         <Countdown iso={invite.date} />
         <div className="se-welcome__save">
-          <p className="se-t" style={{ '--d': '0.1s' }}>Save the date</p>
-          <h2 className="se-t" style={{ '--d': '0.1s' }}>Wedding Events</h2>
+          <Line id="wv" fallback="Save the date" className="se-t" style={{ '--d': '0.1s' }} />
+          <Line id="wt" as="h2" fallback="Wedding Events" className="se-t" style={{ '--d': '0.1s' }} />
         </div>
       </section>
-
-      {invite.events.map((e) => <Event key={e.id} event={e} />)}
-
-      <section className="se-closing" data-sec aria-labelledby="se-h-closing">
-        {invite.closing && (
-          <div className="se-closing__card">
-            <h2 id="se-h-closing"><Words text={invite.closing.title} /></h2>
-            <p><Words text={invite.closing.text} from={0.3} /></p>
-          </div>
-        )}
-        {invite.families?.length > 0 && (
-          <>
-            <div className="se-families__head">
-              <p><Words text="WITH LOVE" from={0.5} /></p>
-              <h2><Words text="The Families" from={0.6} /></h2>
-            </div>
-            {invite.families.map((f, i) => (
-              <div key={f.title} className={`se-family se-family--${i % 2 ? 'r' : 'l'}`} data-sec>
-                <h3><Words text={f.title} from={0.2} /></h3>
-                <div className="se-family__names">
-                  {f.names.map((n, k) => <p key={n}><Words text={n} from={0.4 + k * 0.1} /></p>)}
-                </div>
-              </div>
-            ))}
-          </>
-        )}
+    ),
+    ...Object.fromEntries([0, 1, 2, 3, 4].map((i) => [`e${i}`, <Event key={`e${i}`} invite={invite} i={i} />])),
+    closing: (
+      <section key="closing" className="se-closing" data-sec data-studio-section="closing" aria-labelledby="se-h-closing">
+        <div className="se-closing__card">
+          <Line id="ct" htmlId="se-h-closing" as="h2" fallback={invite.closing?.title ?? ''}>{(t) => <Words text={t} />}</Line>
+          <Line id="cx" fallback={invite.closing?.text ?? ''}>{(t) => <Words text={t} from={0.3} />}</Line>
+        </div>
       </section>
-
-      <section className="se-venue" style={bg('venue-bg')} data-sec aria-labelledby="se-h-venue">
+    ),
+    families: (
+      <section key="families" className="se-families" data-sec data-studio-section="families" aria-labelledby="se-h-families">
+        <div className="se-families__head">
+          <Line id="fl" fallback="WITH LOVE">{(t) => <Words text={t} from={0.5} />}</Line>
+          <Line id="ft" htmlId="se-h-families" as="h2" fallback="The Families">{(t) => <Words text={t} from={0.6} />}</Line>
+        </div>
+        {families.filter((f) => edit || f.title || f.names).map((f) => (
+          <div key={f.i} className={`se-family se-family--${f.i % 2 ? 'r' : 'l'}`} data-sec>
+            <Line id={`f${f.i}t`} as="h3" fallback={f.title}>{(t) => <Words text={t} from={0.2} />}</Line>
+            <Line id={`f${f.i}n`} as="div" fallback={f.names} className="se-family__names">
+              {(t) => t.split('\n').map((n, k) => <span key={k} className="se-family__name"><Words text={n} from={0.4 + k * 0.1} /></span>)}
+            </Line>
+          </div>
+        ))}
+      </section>
+    ),
+    venue: (
+      <section key="venue" className="se-venue" style={bg('venue-bg')} data-sec data-studio-section="venue" aria-labelledby="se-h-venue">
         <div className="se-venue__head se-once">
           <svg className="se-venue__pin" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
             <circle cx="12" cy="10" r="3" />
           </svg>
-          <h2 id="se-h-venue">Where We Celebrate</h2>
-          <p>{address}</p>
+          <Line id="vh" htmlId="se-h-venue" as="h2" fallback="Where We Celebrate" />
+          <Line id="va" fallback={address} className="se-venue__address" />
         </div>
         <div className="se-venue__map se-once" style={{ '--d': '0.2s', '--ty': '40px' }}>
-          <iframe title={`Map showing ${invite.venue}`} src={mapEmbedUrl(address)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+          <iframe title={`Map showing ${invite.venue}`} src={mapEmbedUrl(addressLine)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
         </div>
         <div className="se-venue__go se-once" style={{ '--d': '0.4s', '--ty': '20px' }}>
-          <a href={directionsUrl(address)} target="_blank" rel="noopener noreferrer">
+          {/* While editing, tapping the button's words edits them; the link is not followed. */}
+          <a href={directionsFor(invite, addressLine)} target="_blank" rel="noopener noreferrer" onClick={edit ? (e) => e.preventDefault() : undefined}>
             <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11" /></svg>
-            Get Directions
+            <Line id="vb" as="span" fallback="Get Directions" />
           </a>
         </div>
       </section>
-
-      <footer className="se-footer" data-sec>
+    ),
+    footer: (
+      <footer key="footer" className="se-footer" data-sec data-studio-section="footer">
         <div className="se-once" style={{ '--ty': '20px' }}>
-          <p className="se-footer__names">{b} &amp; {a}</p>
+          <Line id="on" fallback="{groom} & {bride}" className="se-footer__names" />
           <div className="se-footer__flower" aria-hidden="true"><i /><span>💐</span><i /></div>
-          <p className="se-footer__date">{footerDate(invite.date)}</p>
-          {invite.hashtag && <p className="se-footer__tag">{invite.hashtag}</p>}
+          <Line id="od" fallback={footerDate(invite.date)} className="se-footer__date" />
+          <Line id="oh" fallback={invite.hashtag ?? ''} className="se-footer__tag" />
         </div>
       </footer>
+    ),
+  }
+
+  // In the Studio's edit preview a tap outside every line ends the edit.
+  const deselect = (e) => {
+    if (edit && !e.target.closest('[data-line]')) edit.select('')
+  }
+  return (
+    <main ref={rootRef} className={`tpl tpl-sageenvelope${viaGate ? ' is-via-gate' : ''}${edit ? ' is-editing' : ''}`} onClick={edit ? deselect : undefined}>
+      {order.map((id) => sections[id])}
     </main>
   )
 }

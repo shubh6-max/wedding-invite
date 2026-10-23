@@ -1,6 +1,7 @@
 import { useGate } from '../../lib/gate.js'
 import { guestName } from '../../lib/guest.js'
 import { art } from './art.js'
+import Line from './Line.jsx'
 import './gate.css'
 
 // Sage Envelope gate, as the original invitation draws it: the painted sage envelope filling the screen over a
@@ -24,8 +25,8 @@ export default function Gate({ invite, onOpen, onDone }) {
         </button>
         <div className="gate-sageenvelope__words">
           {guest && <p className="gate-sageenvelope__guest">For {guest}</p>}
-          <h2>You’re Invited</h2>
-          <p>Tap to open your invitation</p>
+          <Line id="gi" as="h2" fallback="You’re Invited" />
+          <Line id="gt" fallback="Tap to open your invitation" />
         </div>
         <i className="gate-sageenvelope__rule gate-sageenvelope__rule--top" aria-hidden="true" />
         <i className="gate-sageenvelope__rule gate-sageenvelope__rule--bottom" aria-hidden="true" />

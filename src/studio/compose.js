@@ -2,6 +2,7 @@
 // (dateLabel, timeLabel, event day and time, rsvpBy) are derived from dates and times, never typed.
 // With no overrides it returns a copy of the preset, field for field (tests pin this).
 import { addDays, clock, dateFromLabel, diffDays, joinWhen, longDate, plainDate, shortDate, splitWhen, timeFromLabel } from './format.js'
+import { scopeOf } from './fields.js'
 import { cleanOverrides, waNumber } from './sanitise.js'
 
 // Editable values hidden in a preset's display strings: wedding date/time/zone and each ceremony's
@@ -39,8 +40,9 @@ export function presetValues(preset) {
 
 export const mapSearchUrl = (venue, city) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venue}, ${city}`)}`
 
-export function compose(preset, rawOverrides = {}) {
-  const { overrides } = cleanOverrides(rawOverrides, preset.tradition)
+// `design` names the design being composed for: its own edits (lines, styles, order) arrive as `invite.design`.
+export function compose(preset, rawOverrides = {}, design = null) {
+  const { overrides } = cleanOverrides(rawOverrides, preset.tradition, design)
   const def = presetDefaults(preset)
   const has = (k) => Object.hasOwn(overrides, k)
   // A required field that is empty was dropped by cleanOverrides, so `get` only ever sees real values.
@@ -100,5 +102,7 @@ export function compose(preset, rawOverrides = {}) {
       meaning: get(`${p}m`, preset[name].meaning),
     }
   }
+  const own = Object.fromEntries(Object.entries(overrides).filter(([k]) => scopeOf(k) === 'design'))
+  if (Object.keys(own).length) invite.design = own // only when edited: no overrides still reproduces the preset exactly
   return invite
 }

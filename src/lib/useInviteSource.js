@@ -11,26 +11,28 @@ const NONE = {} // one shared empty object keeps the composed invite stable betw
 //   preview inside the Studio (?embed=1)  -> drafts posted by the parent window
 //   guest link (?d=<payload>)             -> decoded from the link
 //   otherwise                             -> the design's sample, as before
-// Returns { status: 'ready' | 'loading' | 'error', invite, code, personal }. `invite` is null unless ready.
+// Returns { status: 'ready' | 'loading' | 'error', invite, code, personal, edit }. `edit` is the tap-to-edit
+// context (lib/editing.js) in the Studio's edit preview, else null. `invite` is null unless ready.
 // `onReplay` is called when the parent asks the preview to close the gate again.
 export function useInviteSource(tpl, params, onReplay) {
   const embed = params.get('embed') === '1'
   const d = embed ? null : params.get('d')
   const tradition = tpl?.tradition || 'contemporary'
+  const design = tpl?.id || null // a design edited in place reads its own fields from the link too
 
   const [decoded, setDecoded] = useState({ d: null, overrides: null, code: null })
   useEffect(() => {
     if (!d) return undefined
     let live = true
     decodePayload(d)
-      .then((raw) => live && setDecoded({ d, overrides: cleanOverrides(raw, tradition).overrides, code: null }))
+      .then((raw) => live && setDecoded({ d, overrides: cleanOverrides(raw, tradition, design).overrides, code: null }))
       .catch((e) => live && setDecoded({ d, overrides: null, code: e?.code || 'corrupt' }))
     return () => {
       live = false
     }
-  }, [d, tradition])
+  }, [d, tradition, design])
 
-  const embedded = useEmbedOverrides(embed, onReplay)
+  const embedded = useEmbedOverrides(embed, onReplay, embed && params.get('edit') === '1')
 
   let status = 'ready'
   let code = null
@@ -46,6 +48,6 @@ export function useInviteSource(tpl, params, onReplay) {
     } else overrides = decoded.overrides
   }
 
-  const invite = useMemo(() => (tpl && status === 'ready' ? compose(presetFor(tradition, tpl.sample), overrides) : null), [tpl, tradition, status, overrides])
-  return { status, invite, code, personal: !!d }
+  const invite = useMemo(() => (tpl && status === 'ready' ? compose(presetFor(tradition, tpl.sample), overrides, design) : null), [tpl, tradition, design, status, overrides])
+  return { status, invite, code, personal: !!d, edit: embedded?.edit ?? null }
 }

@@ -3,6 +3,7 @@ import { templates } from './data/templates.js'
 import { sample } from './data/sample.js'
 import Gallery from './gallery/Gallery.jsx'
 import Pill from './components/Pill.jsx'
+import { EditContext } from './lib/editing.js'
 import { InviteContext } from './lib/guest.js'
 import { useRoute, useSmoothScroll } from './lib/hooks.js'
 import { useInviteSource } from './lib/useInviteSource.js'
@@ -127,9 +128,11 @@ function Design({ id, params }) {
       {phase !== 'closed' && (
         <Suspense fallback={<div className="loading" role="status" style={tpl ? { background: tpl.palette[0] } : undefined}><span className="sr-only">Opening the invitation…</span></div>}>
           <InviteContext.Provider value={invite}>
+            <EditContext.Provider value={source.edit}>
             {/* viaGate: the guest just tapped this design's gate, so a design that has its own
                 opening (doors, cover, lamp) should start already opened rather than open twice. */}
             <Page invite={invite} viaGate={hasGate} />
+            </EditContext.Provider>
           </InviteContext.Provider>
         </Suspense>
       )}
@@ -137,7 +140,9 @@ function Design({ id, params }) {
         <Suspense fallback={<div className="loading" role="status" style={tpl ? { background: tpl.palette[0] } : undefined}><span className="sr-only">Preparing your invitation…</span></div>}>
           {/* Same context as the page, so a gate can show the couple's photos (components/Photo.jsx). */}
           <InviteContext.Provider value={invite}>
-            <Gate key={id} invite={invite} onOpen={onOpen} onDone={onDone} />
+            <EditContext.Provider value={source.edit}>
+              <Gate key={id} invite={invite} onOpen={onOpen} onDone={onDone} />
+            </EditContext.Provider>
           </InviteContext.Provider>
         </Suspense>
       )}

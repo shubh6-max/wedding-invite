@@ -8,9 +8,15 @@
 //   child  -> parent  applied { seq }            draft seq is on screen (tests, "Updated" hint)
 //   parent -> child   replay                     close the gate again (same as the Replay button)
 //   parent -> child   scroll { section }         bring [data-studio-section=<section>] into view
+// Tap-to-edit (a design edited in place, preview opened with &edit=1):
+//   both ways         select { line, text? }     the line now being edited ('' for none); from the child,
+//                                                its current words, so the Studio's panel shows them
+//   child  -> parent  set { key, value }         the person typed or resized on the page; the parent
+//                                                stores it in the draft (cleaned like any other input)
+//   parent -> child   mode { edit }              show edit affordances (true) or a plain preview (false)
 export const NS = 'wi-studio'
 export const PROTOCOL = 1
-export const MAX_DRAFT_KEYS = 80
+export const MAX_DRAFT_KEYS = 400 // a full Sage Envelope edit is about 250 keys
 
 export const messages = {
   ready: () => ({ ns: NS, v: PROTOCOL, type: 'ready' }),
@@ -18,7 +24,11 @@ export const messages = {
   applied: (seq) => ({ ns: NS, v: PROTOCOL, type: 'applied', seq }),
   replay: () => ({ ns: NS, v: PROTOCOL, type: 'replay' }),
   scroll: (section) => ({ ns: NS, v: PROTOCOL, type: 'scroll', section }),
+  select: (line, text) => ({ ns: NS, v: PROTOCOL, type: 'select', line, ...(text !== undefined && { text }) }),
+  set: (key, value) => ({ ns: NS, v: PROTOCOL, type: 'set', key, value }),
+  mode: (edit) => ({ ns: NS, v: PROTOCOL, type: 'mode', edit }),
 }
+export const MAX_SET_VALUE = 4000 // longer than any field allows; the draft's sanitiser cuts to the field's limit
 
 // Which [data-studio-section] a form group should bring into view. Designs that do not mark
 // sections simply ignore the message.
@@ -40,7 +50,15 @@ export function accept(event, { source, origin }) {
     case 'applied':
       return Number.isInteger(m.seq) && m.seq >= 0 ? { type: 'applied', seq: m.seq } : null
     case 'scroll':
-      return typeof m.section === 'string' && /^[a-z-]{1,20}$/.test(m.section) ? { type: 'scroll', section: m.section } : null
+      return typeof m.section === 'string' && /^[a-z0-9-]{1,20}$/.test(m.section) ? { type: 'scroll', section: m.section } : null
+    case 'select':
+      if (typeof m.line !== 'string' || !/^[a-z0-9]{0,8}$/.test(m.line)) return null
+      if (m.text === undefined) return { type: 'select', line: m.line }
+      return typeof m.text === 'string' && m.text.length <= MAX_SET_VALUE ? { type: 'select', line: m.line, text: m.text } : null
+    case 'set':
+      return typeof m.key === 'string' && /^[a-z0-9-]{1,12}$/.test(m.key) && typeof m.value === 'string' && m.value.length <= MAX_SET_VALUE ? { type: 'set', key: m.key, value: m.value } : null
+    case 'mode':
+      return typeof m.edit === 'boolean' ? { type: 'mode', edit: m.edit } : null
     default:
       return null
   }

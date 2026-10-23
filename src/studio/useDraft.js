@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { browserStorage, clearField, emptyDraft, importOverrides, isEmpty, loadDraft, mergedFor, saveDraft, setField } from './store.js'
 
-// The person's draft for one design family, autosaved to this device.
+// The person's draft for one design family (and, for a design edited in place, that design), autosaved to this device.
 // status: 'saved' (on this device), 'saving' (a change is waiting 400 ms to be written), 'unsaved'
 // (storage refused: the draft lives in memory and the share link still carries everything).
-export function useDraft(tradition) {
+export function useDraft(tradition, design = null) {
   const [draft, setDraft] = useState(() => loadDraft(browserStorage()))
   const [status, setStatus] = useState('saved')
   const [undo, setUndo] = useState(null) // the draft before the last "start over"
@@ -37,9 +37,9 @@ export function useDraft(tradition) {
     }
   }, [flush])
 
-  const set = useCallback((key, value) => commit(setField(latest.current, tradition, key, value)), [commit, tradition])
-  const clear = useCallback((key) => commit(clearField(latest.current, tradition, key)), [commit, tradition])
-  const replaceWith = useCallback((flat) => commit(importOverrides(latest.current, tradition, flat)), [commit, tradition])
+  const set = useCallback((key, value) => commit(setField(latest.current, tradition, key, value, design)), [commit, tradition, design])
+  const clear = useCallback((key) => commit(clearField(latest.current, tradition, key, design)), [commit, tradition, design])
+  const replaceWith = useCallback((flat) => commit(importOverrides(latest.current, tradition, flat, design)), [commit, tradition, design])
   const startOver = useCallback(() => {
     setUndo(latest.current)
     commit(emptyDraft())
@@ -50,6 +50,6 @@ export function useDraft(tradition) {
   }, [commit, undo])
   const dismissUndo = useCallback(() => setUndo(null), [])
 
-  const overrides = useMemo(() => mergedFor(draft, tradition), [draft, tradition])
+  const overrides = useMemo(() => mergedFor(draft, tradition, design), [draft, tradition, design])
   return { overrides, edited: !isEmpty(draft), status, set, clear, replaceWith, startOver, undo: undo ? undoStartOver : null, dismissUndo }
 }

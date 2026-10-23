@@ -66,6 +66,8 @@ for (const w of [360, 375, 390, 430]) {
     if (doc.snap.some((s) => s !== 'none')) fail(where, `scroll snapping is on: ${doc.snap}`)
     if (doc.overflowX > 0) fail(where, `horizontal overflow ${doc.overflowX}px`)
     if (doc.events.join() !== EVENTS.join()) fail(where, `events out of order: ${doc.events}`)
+    const unlabeled = await page.evaluate(() => [...document.querySelectorAll('[aria-labelledby]')].filter((e) => !document.getElementById(e.getAttribute('aria-labelledby'))).map((e) => e.getAttribute('aria-labelledby')))
+    if (unlabeled.length) fail(where, `sections whose label is missing: ${unlabeled}`)
 
     await page.locator('.se-scratch').scrollIntoViewIfNeeded()
     await page.waitForTimeout(300)
@@ -132,6 +134,150 @@ for (const w of [360, 375, 390, 430]) {
     if ((await page.locator('.tpl-sageenvelope section').count()) < 8) fail('reduced', 'a section is missing')
   } catch (e) {
     fail('reduced', e.message.split('\n')[0])
+  } finally {
+    await ctx.close()
+  }
+}
+
+// The tap-to-edit Studio (#/studio/sageenvelope): type in place, restyle, reorder, undo, share; a guest opening
+// the link sees exactly that, with no editing outlines. Then the phone layout: the preview fills the screen.
+{
+  const ctx = await browser.newContext({ viewport: { width: 1366, height: 800 } })
+  const page = await ctx.newPage()
+  const errs = []
+  page.on('pageerror', (e) => errs.push(e.message))
+  const order = () => frame.locator('[data-studio-section]').evaluateAll((els) => els.map((e) => e.dataset.studioSection))
+  const frame = page.frameLocator('iframe.pv__screen')
+  try {
+    await page.goto(`${base}/#/studio/sageenvelope`, { waitUntil: 'networkidle' })
+    await frame.locator('[data-gate-primary]').click()
+    await page.waitForTimeout(3000)
+
+    // Typing fast in place: every character arrives, the caret never jumps, the draft is saved.
+    const typed = 'Om Shri Chintamani Parshvanathaya Namah!!'.slice(0, 40)
+    await frame.locator('[data-line="hn"]').click()
+    await frame.locator('[data-line="hn"] textarea').waitFor()
+    await page.keyboard.type(typed)
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(900)
+    const shown = (await frame.locator('[data-line="hn"]').textContent()).trim()
+    if (shown !== typed) fail('studio', `typed "${typed}" but the invitation shows "${shown}"`)
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('wi-studio-v1') || '{}').des?.sageenvelope?.['t-hn'])
+    if (saved !== typed) fail('studio', `the draft on this device holds "${saved}"`)
+
+    // The box on the page follows a change made elsewhere: the panel, Reset, Undo.
+    const DEFAULT_HN = '||Shri Chintamani Parshvanathaya Namah||'
+    const box = frame.locator('[data-line="hn"] textarea')
+    await frame.locator('[data-line="hn"]').click()
+    await box.waitFor()
+    await page.locator('#f-t-hn').fill('From the panel')
+    await page.waitForTimeout(700)
+    if ((await box.inputValue()) !== 'From the panel') fail('studio', `after a panel edit the box on the page reads "${await box.inputValue()}"`)
+    await page.getByRole('button', { name: 'Reset this line' }).click()
+    await page.waitForTimeout(700)
+    if ((await box.inputValue()) !== DEFAULT_HN) fail('studio', `after Reset the box on the page reads "${await box.inputValue()}"`)
+    if ((await page.locator('#f-t-hn').inputValue()) !== DEFAULT_HN) fail('studio', `after Reset the panel reads "${await page.locator('#f-t-hn').inputValue()}"`)
+    await page.getByRole('button', { name: 'Undo' }).click()
+    await page.waitForTimeout(700)
+    if ((await box.inputValue()) !== 'From the panel') fail('studio', `after Undo the box on the page reads "${await box.inputValue()}"`)
+    await page.locator('#f-t-hn').fill(typed)
+    await page.getByRole('button', { name: 'Done' }).click()
+
+    // Editing the directions button's words never follows its link.
+    let popups = 0
+    ctx.on('page', () => (popups += 1))
+    await frame.locator('[data-line="vb"]').click()
+    await frame.locator('[data-line="vb"] textarea').click()
+    await frame.locator('[data-line="vb"] .se-handle--width').click()
+    await page.waitForTimeout(500)
+    if (popups) fail('studio', `editing the directions button opened ${popups} tab(s)`)
+    await page.getByRole('button', { name: 'Done' }).click()
+
+    // The longest text, at the biggest size in the narrowest box, stays on the screen.
+    await frame.locator('[data-line="hg"]').click()
+    await frame.locator('[data-line="hg"] textarea').waitFor()
+    await page.keyboard.type('W'.repeat(160))
+    await page.locator('#i-hg-size').fill('300')
+    await page.locator('#i-hg-width').fill('20')
+    await page.waitForTimeout(700)
+    const sideways = await frame.locator('html').evaluate((el) => el.scrollWidth - window.innerWidth)
+    if (sideways > 0) fail('studio', `the page scrolls sideways by ${sideways}px with a 300% line in a 20% box`)
+    await page.getByRole('button', { name: 'Done' }).click()
+
+    // Reorder and hide sections; undo and redo them.
+    await page.getByRole('button', { name: 'Move Venue up' }).click()
+    await page.getByRole('button', { name: /^Hide Event 5/ }).click()
+    await page.waitForTimeout(700)
+    let o = await order()
+    if (o.includes('e4') || o.indexOf('venue') > o.indexOf('families')) fail('studio', `section order after moving and hiding: ${o}`)
+    await page.getByRole('button', { name: 'Undo' }).click()
+    await page.waitForTimeout(700)
+    if (!(await order()).includes('e4')) fail('studio', 'Undo did not bring Event 5 back')
+    await page.getByRole('button', { name: 'Redo' }).click()
+    await page.waitForTimeout(700)
+    o = await order()
+    if (o.includes('e4')) fail('studio', 'Redo did not hide Event 5 again')
+
+    // The share link, opened by a guest, shows the same invitation and nothing of the editor.
+    await page.getByRole('button', { name: 'Share' }).click()
+    const linkBox = page.locator('.share__link input')
+    await page.waitForFunction(() => document.querySelector('.share__link input')?.value.includes('?d='))
+    const link = await linkBox.inputValue()
+    const guest = await browser.newPage({ viewport: { width: 390, height: 844 } })
+    await guest.goto(link, { waitUntil: 'networkidle' }) // the share link points at this same server
+    await guest.locator('[data-gate-primary]').click()
+    await guest.waitForTimeout(3200)
+    const g = await guest.evaluate(() => ({
+      outlines: document.querySelectorAll('[data-line]').length,
+      namah: document.querySelector('.se-hero__namah')?.textContent.trim(),
+      order: [...document.querySelectorAll('[data-studio-section]')].map((e) => e.dataset.studioSection),
+      size: parseFloat(getComputedStyle(document.querySelector('.se-hero__blessings .se-line__t')).fontSize),
+    }))
+    if (g.outlines) fail('guest', `${g.outlines} editing outlines on the guest's invitation`)
+    if (g.namah !== typed) fail('guest', `guest sees "${g.namah}"`)
+    if (g.order.join() !== o.join()) fail('guest', `guest order ${g.order} differs from the Studio's ${o}`)
+    if (Math.round(g.size) !== 39) fail('guest', `blessings at ${g.size}px, expected 39px (300% of 13px)`)
+    await guest.close()
+    const narrow = await browser.newPage({ viewport: { width: 320, height: 568 } })
+    await narrow.goto(link + (link.includes('?') ? '&' : '?') + 'open=1', { waitUntil: 'networkidle' })
+    // Let every section finish rising in (cards slide 100px while entering), then measure the boxes.
+    await narrow.evaluate(() => document.querySelectorAll('[data-sec]').forEach((e) => e.setAttribute('data-in', '') || e.setAttribute('data-seen', '')))
+    await narrow.waitForTimeout(1500)
+    const out = await narrow.evaluate(() => [...document.querySelectorAll('.se-line')].filter((e) => { const r = e.getBoundingClientRect(); return r.width && (r.right > innerWidth + 1 || r.left < -1) }).map((e) => e.className))
+    if (out.length) fail('guest-320', `lines past the screen edge: ${out.join(' | ')}`)
+    await narrow.close()
+    if (errs.length) fail('studio', `page errors: ${errs.join(' | ')}`)
+  } catch (e) {
+    fail('studio', e.message.split('\n')[0])
+  } finally {
+    await ctx.close()
+  }
+}
+{
+  const ctx = await phone(390)
+  const page = await ctx.newPage()
+  try {
+    await page.goto(`${base}/#/studio/sageenvelope`, { waitUntil: 'networkidle' })
+    const box = await page.locator('iframe.pv__screen').boundingBox()
+    if (!box || box.height < 600) fail('studio-phone', `the preview is only ${Math.round(box?.height ?? 0)}px tall`)
+    const frame = page.frameLocator('iframe.pv__screen')
+    await frame.locator('[data-gate-primary]').tap()
+    await page.waitForTimeout(3000)
+    // A line low in the preview, tapped: once the sheet is up, the line is still in view above it.
+    await frame.locator('html').evaluate(() => { const el = document.querySelector('[data-line="wt"]'); window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - innerHeight * 0.75) })
+    await page.waitForTimeout(400)
+    await frame.locator('[data-line="wt"]').tap()
+    await page.waitForTimeout(1200)
+    const line = await frame.locator('[data-line="wt"]').boundingBox()
+    const sheet = await page.locator('.istudio__panel').boundingBox()
+    if (!line || !sheet || line.y + line.height > sheet.y) fail('studio-phone', `the tapped line (bottom ${Math.round((line?.y ?? 0) + (line?.height ?? 0))}) is under the sheet (top ${Math.round(sheet?.y ?? 0)})`)
+    await page.getByRole('button', { name: 'Done' }).tap()
+    await page.getByRole('button', { name: 'Page' }).tap()
+    await page.getByRole('button', { name: 'Show the envelope' }).tap()
+    await page.waitForTimeout(800)
+    if (!(await frame.locator('[data-gate-primary]').isVisible())) fail('studio-phone', 'the envelope cannot be shown again from a phone')
+  } catch (e) {
+    fail('studio-phone', e.message.split('\n')[0])
   } finally {
     await ctx.close()
   }

@@ -37,6 +37,10 @@
 .tpl-sageenvelope .se-enter { transition: opacity 1s ease var(--d, 0s), translate 1s ease var(--d, 0s); }
 .tpl-sageenvelope [data-sec]:not([data-seen]) .se-enter { opacity: 0; translate: var(--from, 0 0); }
 .tpl-sageenvelope .se-drop { animation: se-drop 2s ease-out both; }
+/* In the Studio's edit preview everything shows at once (nothing waits to rise in), and the map ignores taps. */
+.tpl-sageenvelope.is-editing :is(.se-t, .se-word, .se-once, .se-enter, .se-family, .se-hero__ganesha) { opacity: 1 !important; translate: none !important; scale: none !important; }
+.tpl-sageenvelope.is-editing .se-venue__map iframe { pointer-events: none; }
+.tpl-sageenvelope.is-editing .se-petals { display: none; } /* blossoms drifting over the words would get in the way */
 @keyframes se-drop { from { opacity: 0; transform: translateY(-80px); } }
 @keyframes se-sway { 0%, 100% { transform: translateX(calc(var(--sway) * -1)); } 50% { transform: translateX(var(--sway)); } }
 @keyframes se-bob { 50% { transform: translateY(var(--bob)); } }
@@ -55,7 +59,7 @@
 .tpl-sageenvelope .se-hero__hosts { margin-bottom: 8px; font: 600 13px/19.5px var(--serif); }
 .tpl-sageenvelope .se-hero__line { margin-bottom: 12px; font: 400 13px/15.5px var(--serif); letter-spacing: 0.025em; white-space: pre-line; }
 .tpl-sageenvelope .se-hero h1 { display: grid; font-weight: 400; }
-.tpl-sageenvelope .se-hero h1 span {
+.tpl-sageenvelope .se-hero h1 > span {
   font: 400 24px/32px var(--script);
   color: #b3385a;
   filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
@@ -120,6 +124,7 @@
   cursor: pointer;
   touch-action: none; /* on the coating only: dragging here scratches; anywhere else the page scrolls */
 }
+.tpl-sageenvelope .se-scratch__coat--edit { display: grid; place-items: center; background: linear-gradient(to bottom right, #fbbf24, #d97706); color: #fff; font: 400 20px/1 var(--serif); cursor: default; }
 .tpl-sageenvelope .se-scratch__key { /* keyboard and screen readers; taps and drags fall through to the coating */
   position: absolute;
   inset: 0;
@@ -187,8 +192,10 @@
 .tpl-sageenvelope .se-event--sangeet .se-event__dress { font-size: 14px; line-height: 20px; }
 
 /* ---- closing note and the families ---- */
-.tpl-sageenvelope .se-closing { padding: 80px 24px; background: linear-gradient(to bottom right, #fdf2f8, #fffbeb); }
-.tpl-sageenvelope .se-closing__card { margin-bottom: 64px; padding: 16px 24px; border-radius: 16px; background: #d8c2c5; }
+/* Two sections (each can be moved or hidden in the Studio); 40 + 24px between them, as the original's 64px. */
+.tpl-sageenvelope .se-closing { padding: 80px 24px 40px; background: linear-gradient(to bottom right, #fdf2f8, #fffbeb); }
+.tpl-sageenvelope .se-families { padding: 24px 24px 80px; background: linear-gradient(to bottom right, #fdf2f8, #fffbeb); }
+.tpl-sageenvelope .se-closing__card { padding: 16px 24px; border-radius: 16px; background: #d8c2c5; }
 .tpl-sageenvelope .se-closing__card h2 { margin-bottom: 24px; font: 400 30px/36px var(--script); color: #b8962e; }
 .tpl-sageenvelope .se-closing__card p { font: 400 16px/26px var(--serif); color: #4b4b3f; }
 .tpl-sageenvelope .se-families__head { margin-bottom: 64px; }
@@ -206,8 +213,9 @@
 .tpl-sageenvelope .se-family--l:not([data-in]) { opacity: 0; translate: -100px 0; }
 .tpl-sageenvelope .se-family--r:not([data-in]) { opacity: 0; translate: 100px 0; }
 .tpl-sageenvelope .se-family h3 { margin-bottom: 24px; font: 600 30px/36px var(--display); color: #ec4899; }
-.tpl-sageenvelope .se-family__names { display: grid; gap: 8px; padding-top: 16px; border-top: 1px solid #fbcfe8; }
-.tpl-sageenvelope .se-family__names p { font: 400 18px/28px var(--serif); color: #374151; }
+.tpl-sageenvelope .se-family__names { padding-top: 16px; border-top: 1px solid #fbcfe8; }
+.tpl-sageenvelope .se-family__names .se-line__t { display: grid; gap: 8px; }
+.tpl-sageenvelope .se-family__name { display: block; font: 400 18px/28px var(--serif); color: #374151; }
 
 /* ---- venue, map and directions ---- */
 .tpl-sageenvelope .se-venue { position: relative; padding: 80px 24px; background: center / cover; }

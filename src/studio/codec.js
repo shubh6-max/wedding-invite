@@ -5,8 +5,8 @@
 // result is only ever a bag of strings that cleanOverrides() then whitelists.
 
 export const VERSION = 1
-export const MAX_PAYLOAD_CHARS = 12000 // longest hash value we will even look at
-export const MAX_DECODED_BYTES = 16384 // largest JSON we will accept after decompression
+export const MAX_PAYLOAD_CHARS = 24000 // longest hash value we will even look at (a full design edit fits)
+export const MAX_DECODED_BYTES = 32768 // largest JSON we will accept after decompression
 export const PLAIN_LIMIT = 1200 // plain links up to this many characters are not compressed
 
 export class CodecError extends Error {

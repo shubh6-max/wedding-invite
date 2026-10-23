@@ -1,48 +1,18 @@
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { templates } from '../data/templates.js'
 import { presetFor } from '../data/presets.js'
 import { decodePayload } from './codec.js'
 import { compose, presetValues } from './compose.js'
+import Confirm from './Confirm.jsx'
 import Editor from './Editor.jsx'
+import InlineStudio from './InlineStudio.jsx'
 import { DEVICES } from './devices.js'
 import Preview from './Preview.jsx'
 import { cleanOverrides } from './sanitise.js'
 import ShareSheet from './ShareSheet.jsx'
+import { SAVE_TEXT, useWide } from './shell.js'
 import { useDraft } from './useDraft.js'
 import './studio.css'
-
-const WIDE = '(min-width: 900px)'
-const onWide = (cb) => {
-  const m = window.matchMedia(WIDE)
-  m.addEventListener('change', cb)
-  return () => m.removeEventListener('change', cb)
-}
-const useWide = () => useSyncExternalStore(onWide, () => window.matchMedia(WIDE).matches, () => true)
-
-const SAVE_TEXT = {
-  saved: 'Saved on this device',
-  saving: 'Saving…',
-  unsaved: 'Not saved on this device. The share link still holds everything.',
-}
-
-function Confirm({ title, children, yes, onYes, onNo }) {
-  const ref = useRef(null)
-  useEffect(() => {
-    if (!ref.current.open) ref.current.showModal()
-  }, [])
-  return (
-    <dialog ref={ref} className="share share--small" aria-labelledby="confirm-h" onClose={onNo}>
-      <form method="dialog" className="share__body">
-        <h2 id="confirm-h">{title}</h2>
-        {children}
-        <div className="share__actions">
-          <button type="button" className="btn" onClick={() => { onYes(); ref.current.close() }}>{yes}</button>
-          <button className="btn btn--quiet" autoFocus>Keep my changes</button>
-        </div>
-      </form>
-    </dialog>
-  )
-}
 
 function NotYet({ tpl }) {
   const ready = templates.filter((t) => t.editable)
@@ -63,8 +33,8 @@ function NotYet({ tpl }) {
 function StudioScreen({ tpl, params }) {
   const preset = presetFor(tpl.tradition, tpl.sample)
   const values = useMemo(() => presetValues(preset), [preset])
-  const draft = useDraft(tpl.tradition)
-  const invite = useMemo(() => compose(preset, draft.overrides), [preset, draft.overrides])
+  const draft = useDraft(tpl.tradition, tpl.id)
+  const invite = useMemo(() => compose(preset, draft.overrides, tpl.id), [preset, draft.overrides, tpl.id])
   const [openFirst] = useState(() => !draft.edited) // decided once: typing must never close the group it is in
   const wide = useWide()
   const [tab, setTab] = useState('edit')
@@ -87,12 +57,12 @@ function StudioScreen({ tpl, params }) {
     if (!d) return undefined
     let live = true
     decodePayload(d)
-      .then((raw) => live && setLink({ d, flat: cleanOverrides(raw, tpl.tradition).overrides }))
+      .then((raw) => live && setLink({ d, flat: cleanOverrides(raw, tpl.tradition, tpl.id).overrides }))
       .catch(() => live && setLink({ d, flat: null }))
     return () => {
       live = false
     }
-  }, [d, tpl.tradition])
+  }, [d, tpl.tradition, tpl.id])
   const offer = d && link.d === d ? link : null
   const closeOffer = () => {
     window.location.hash = `#/studio/${tpl.id}${qa ? '?qa=1' : ''}`
@@ -195,7 +165,7 @@ function StudioScreen({ tpl, params }) {
         </nav>
       )}
 
-      {sharing && <ShareSheet id={tpl.id} tradition={tpl.tradition} names={names} overrides={draft.overrides} onClose={() => setSharing(false)} onEdit={openGroup} />}
+      {sharing && <ShareSheet id={tpl.id} tradition={tpl.tradition} design={tpl.id} names={names} overrides={draft.overrides} onClose={() => setSharing(false)} onEdit={openGroup} />}
       {asking && (
         <Confirm title="Start over with the sample?" yes="Start over" onYes={draft.startOver} onNo={() => setAsking(false)}>
           <p>Your names, dates and wording on this device go back to the sample. You can undo this for a few seconds.</p>
@@ -207,5 +177,6 @@ function StudioScreen({ tpl, params }) {
 
 export default function Studio({ tpl, params }) {
   if (!tpl.editable && params.get('qa') !== '1') return <NotYet tpl={tpl} />
+  if (tpl.editor === 'inline') return <InlineStudio key={tpl.id} tpl={tpl} /> // edited on the invitation itself
   return <StudioScreen tpl={tpl} params={params} />
 }

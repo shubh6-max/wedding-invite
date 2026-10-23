@@ -85,7 +85,7 @@ const contemporary = [
     Component: lazy(() => import('../templates/velvetseal/VelvetSeal.jsx')),
   },
   {
-    id: 'sageenvelope', name: 'Sage Envelope', group: 'Romantic',
+    id: 'sageenvelope', name: 'Sage Envelope', group: 'Romantic', editable: true, editor: 'inline', // edited line by line on the page
     blurb: 'A painted sage envelope, then a watercolour wedding day, one scene per event.',
     signature: 'Tap the seal; scratch the orange card for the date, then scroll through five themed events.',
     palette: ['#fdfcf9', '#3e3935', '#b79b40'], font: "'Great Vibes', cursive", shape: 'rect', // page ground, ink, gold

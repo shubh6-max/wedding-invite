@@ -1,14 +1,14 @@
-import { dateFromLabel } from '../../studio/format.js'
+import { dateFromLabel, parseDate } from '../../studio/format.js'
 
 // Labels Sage Envelope prints the way the original invitation does. Calendar maths runs in UTC on the date as
 // written, so a guest in another time zone sees the same day the couple typed.
 const MONTH = new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' })
 const WEEKDAY = new Intl.DateTimeFormat('en-US', { weekday: 'short', timeZone: 'UTC' })
 
-// An event's day label ('11 Feb 2027') in parts: { weekday: 'THU', month: 'February', day: 11, year: 2027 }, so the
+// An event's day ('11 Feb 2027', or '2027-02-11' as picked in the Studio) in parts: { weekday: 'THU', month: 'February', day: 11, year: 2027 }, so the
 // day number can be styled on its own ("February 11 2027"). null when the label cannot be read; show it as typed.
 export function eventWhen(dayLabel) {
-  const iso = dateFromLabel(dayLabel ?? '')
+  const iso = parseDate(dayLabel ?? '') ? dayLabel : dateFromLabel(dayLabel ?? '')
   if (!iso) return null
   const t = new Date(`${iso}T00:00:00Z`)
   return { weekday: WEEKDAY.format(t).toUpperCase(), month: MONTH.format(t), day: t.getUTCDate(), year: t.getUTCFullYear() }

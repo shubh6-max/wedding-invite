@@ -369,7 +369,7 @@ Every message is `{ ns: 'wi-studio', v: 1, type, ... }`.
 | parent to child | `draft` | `{ seq: int >= 0, overrides: { key: string } }` | The whole flat override map. The child ignores a `seq` lower than the last one. |
 | child to parent | `applied` | `{ seq }` | The draft with that `seq` was committed by React (used by tests; not shown to the person). |
 | parent to child | `replay` | none | Close the gate again (same code path as the Replay button; the frame is not reloaded). |
-| parent to child | `scroll` | `{ section: /^[a-z-]{1,20}$/ }` | Scroll `[data-studio-section="<section>"]` into view (smooth unless reduced motion). |
+| parent to child | `scroll` | `{ section: /^[a-z0-9-]{1,20}$/ }` | Scroll `[data-studio-section="<section>"]` into view (smooth unless reduced motion). |
 
 Handshake and updates:
 

@@ -4,7 +4,10 @@
 // An *override* is `{ [key]: string }`: only the fields a person changed, keyed by the short `key`
 // below. These keys are what travels in a share link, so never rename one: add a migration instead.
 // `scope: 'common'` fields are shared by every design; `scope: 'tradition'` fields (wording and
-// ceremonies) belong to one tradition, so a Hindu invocation never lands on a Jain invitation.
+// ceremonies) belong to one tradition, so a Hindu invocation never lands on a Jain invitation;
+// `scope: 'design'` fields belong to one design edited in place (Sage Envelope's lines, their styles,
+// event dates and section order), and apply only when that design is named (appliesTo).
+import { DATE_KEYS, DESIGN, LINES, TEXT_FIELDS, TIME_KEYS } from '../templates/sageenvelope/lines.js'
 
 export const TRADITIONS = ['contemporary', 'hindu', 'marwadi', 'jain']
 const SACRED = ['hindu', 'marwadi', 'jain']
@@ -18,6 +21,7 @@ export const GROUPS = [
   { id: 'story', label: 'Our story' },
   { id: 'replies', label: 'Replies' },
   { id: 'wording', label: 'Traditional wording', traditions: SACRED },
+  { id: 'design', label: 'On the page', traditions: [] }, // edited in place, never in the form
 ]
 
 // Share-time check: a bucket is "still the sample" when none of its fields was edited. `group` is the
@@ -30,6 +34,25 @@ export const BUCKETS = [
   { id: 'places', group: 'events', label: 'Ceremony places', keys: [0, 1, 2, 3].map((i) => `e${i}p`), traditions: null },
   { id: 'story', group: 'story', label: 'Our story', keys: [0, 1, 2].flatMap((i) => [`s${i}t`, `s${i}x`]), traditions: null },
 ]
+
+// A design edited in place has its own list: what it shows that is still the sample (Sage Envelope has no story
+// or form ceremonies, but has an address, family names, a date line and a hashtag of its own).
+const EV = [0, 1, 2, 3, 4]
+export const DESIGN_BUCKETS = {
+  sageenvelope: [
+    { id: 'names', group: 'names', label: 'Names', keys: ['ca', 'cb'] },
+    { id: 'day', group: 'day', label: 'Date and time', keys: ['date', 'time'] },
+    { id: 'venue', group: 'venue', label: 'Venue', keys: ['venue'] },
+    { id: 'address', group: 'venue', label: 'Address (the map and directions use it)', keys: ['t-va'] },
+    { id: 'blessed', group: 'hosts', label: 'Blessed by', keys: ['t-hg'] },
+    { id: 'hosts', group: 'hosts', label: 'Hosts', keys: ['hosts'] },
+    { id: 'brideline', group: 'hosts', label: 'Bride’s family line', keys: ['t-hd'] },
+    { id: 'dates', group: 'day', label: 'Dates under the names', keys: ['t-hr'] },
+    { id: 'events', group: 'events', label: 'Event dates and places', keys: EV.flatMap((i) => [`t-e${i}d`, `t-e${i}p`]) },
+    { id: 'families', group: 'hosts', label: 'Family names', keys: ['t-f0n', 't-f1n'] },
+    { id: 'hashtag', group: 'hosts', label: 'Hashtag', keys: ['t-oh'] },
+  ],
+}
 
 const f = (o) => ({ control: 'text', type: 'text', scope: 'common', required: false, traditions: null, ...o })
 
@@ -83,21 +106,41 @@ const wording = ['invocation', 'greeting'].flatMap((name, n) => {
   ]
 })
 
-export const FIELDS = [...single, ...events, ...story, ...wording]
-export const FIELD_BY_KEY = new Map(FIELDS.map((x) => [x.key, x]))
-export const appliesTo = (field, tradition) => !field.traditions || field.traditions.includes(tradition)
-export const fieldsFor = (tradition) => FIELDS.filter((x) => appliesTo(x, tradition))
-export const scopeOf = (key) => FIELD_BY_KEY.get(key)?.scope
+// Sage Envelope, edited line by line on the page (templates/sageenvelope/lines.js): each line's text and
+// style, each event's own date and time, and the order sections appear in (a section left out is hidden).
+const des = (o) => f({ group: 'design', scope: 'design', design: DESIGN, ...o })
+const design = [
+  ...TEXT_FIELDS.map((t) => des({ key: t.key, path: `design.${t.key}`, label: t.label, control: t.control, max: t.max })),
+  ...LINES.map((l) => des({ key: `y-${l.id}`, path: `design.y-${l.id}`, label: `${l.label}: look`, control: 'style', max: 40 })),
+  ...DATE_KEYS.map((key, i) => des({ key, path: `design.${key}`, label: `Event ${i + 1} date`, control: 'date', type: 'date' })),
+  ...TIME_KEYS.map((key, i) => des({ key, path: `design.${key}`, label: `Event ${i + 1} time`, control: 'time', type: 'time' })),
+  des({ key: 'o', path: 'design.o', label: 'Section order', control: 'order', max: 200 }),
+]
 
-// Split a flat override map into the part shared by every design and the part for one tradition.
+export const FIELDS = [...single, ...events, ...story, ...wording, ...design]
+export const FIELD_BY_KEY = new Map(FIELDS.map((x) => [x.key, x]))
+// A design field applies only to its own design; every other field by tradition, as before.
+export const appliesTo = (field, tradition, design = null) => (field.design ? field.design === design : !field.traditions || field.traditions.includes(tradition))
+export const fieldsFor = (tradition, design = null) => FIELDS.filter((x) => appliesTo(x, tradition, design))
+export const scopeOf = (key) => FIELD_BY_KEY.get(key)?.scope
+// Designs that have fields of their own (edited in place).
+export const DESIGNS = [...new Set(FIELDS.filter((x) => x.design).map((x) => x.design))]
+
+// Split a flat override map into the part shared by every design, the part for one tradition and the
+// part for one design.
 export function splitScopes(flat) {
   const common = {}
   const trad = {}
-  for (const [k, v] of Object.entries(flat)) (scopeOf(k) === 'tradition' ? trad : common)[k] = v
-  return { common, trad }
+  const des = {}
+  for (const [k, v] of Object.entries(flat)) {
+    const scope = scopeOf(k)
+    ;(scope === 'tradition' ? trad : scope === 'design' ? des : common)[k] = v
+  }
+  return { common, trad, des }
 }
 
 // Buckets (see BUCKETS) in which nothing has been edited, for the "still the sample" warning.
-export function staleBuckets(overrides, tradition) {
+export function staleBuckets(overrides, tradition, design = null) {
+  if (DESIGN_BUCKETS[design]) return DESIGN_BUCKETS[design].filter((b) => !b.keys.some((k) => Object.hasOwn(overrides, k)))
   return BUCKETS.filter((b) => (!b.traditions || b.traditions.includes(tradition)) && !b.keys.some((k) => Object.hasOwn(overrides, k)))
 }

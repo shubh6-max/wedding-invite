@@ -1,6 +1,7 @@
 // Turns untrusted text (a typed value, a share-link payload, a saved draft, a postMessage) into
 // values the invitation may safely render. Used by the editor, the viewer and the preview, so a
 // guest sees exactly what the editor accepted. Nothing here touches the DOM.
+import { formatStyle, normaliseOrder, parseStyle } from '../templates/sageenvelope/lines.js'
 import { FIELDS, FIELD_BY_KEY, appliesTo, fieldsFor } from './fields.js'
 import { TZ_VALUES, clip, glen, parseDate, parseTime } from './format.js'
 
@@ -53,9 +54,16 @@ const dateOk = (s) => {
 export function normaliseValue(field, raw) {
   if (typeof raw === 'number' && field.control === 'offset') raw = String(raw)
   if (typeof raw !== 'string') return null
+  // Multi-line text keeps its breaks: each line is tidied on its own, blank lines go, at most six stay.
+  if (field.control === 'lines') return clip(raw.split(/\r\n|\r|\n/).map(tidy).filter(Boolean).slice(0, 6).join('\n'), field.max)
   const s = tidy(raw)
   if (s === '') return ''
   switch (field.control) {
+    case 'style': {
+      const st = parseStyle(s)
+      return st ? formatStyle(st) : null
+    }
+    case 'order': return normaliseOrder(s)
     case 'date': return dateOk(s) ? s : null
     case 'time': return parseTime(s) ? s : null
     case 'select': return TZ_VALUES.has(s) ? s : null
@@ -91,17 +99,18 @@ export function checkField(field, raw) {
 
 // Fields the person edited whose value cannot be used as typed (invalid, empty but required, or too long
 // and so cut). The share sheet lists them: nothing is dropped silently.
-export const problemFields = (overrides, tradition) => fieldsFor(tradition).filter((f) => Object.hasOwn(overrides, f.key) && checkField(f, overrides[f.key]) !== '')
+export const problemFields = (overrides, tradition, design = null) => fieldsFor(tradition, design).filter((f) => Object.hasOwn(overrides, f.key) && checkField(f, overrides[f.key]) !== '')
 
 // Whitelist copy: reads only the keys in the field table (never iterates `raw`), so unknown keys,
 // "__proto__" and friends are ignored. Required fields that are empty are dropped so the preset shows.
-export function cleanOverrides(raw, tradition) {
+// `design` names the design being shown: its own fields (scope 'design') are kept only for it.
+export function cleanOverrides(raw, tradition, design = null) {
   const overrides = {}
   const dropped = []
   if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) return { overrides, dropped: ['*'] }
   for (const field of FIELDS) {
     if (!Object.hasOwn(raw, field.key)) continue
-    if (!appliesTo(field, tradition)) {
+    if (!appliesTo(field, tradition, design)) {
       dropped.push(field.key)
       continue
     }

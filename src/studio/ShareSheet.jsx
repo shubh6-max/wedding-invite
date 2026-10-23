@@ -10,7 +10,7 @@ const nameOf = (f) => (f.sub === 'events' ? `${f.label} (ceremony ${f.index + 1}
 // "Share" dialog: the link, how to send it, and a check for details that are still the sample.
 // The link carries every edit (nothing is stored on a server), so editing again makes a new link;
 // links already sent keep the details they had. Nothing here blocks sharing: warnings only.
-export default function ShareSheet({ id, tradition, names, overrides, onClose, onEdit }) {
+export default function ShareSheet({ id, tradition, design = null, names, overrides, onClose, onEdit }) {
   const dialog = useRef(null)
   const input = useRef(null)
   const olderInput = useRef(null)
@@ -18,9 +18,9 @@ export default function ShareSheet({ id, tradition, names, overrides, onClose, o
   const [to, setTo] = useState('')
   const [links, setLinks] = useState({ for: null, main: '', plain: '', failed: false })
   const [note, setNote] = useState('')
-  const clean = useMemo(() => cleanOverrides(overrides, tradition).overrides, [overrides, tradition])
-  const stale = staleBuckets(clean, tradition)
-  const problems = useMemo(() => problemFields(overrides, tradition), [overrides, tradition])
+  const clean = useMemo(() => cleanOverrides(overrides, tradition, design).overrides, [overrides, tradition, design])
+  const stale = staleBuckets(clean, tradition, design)
+  const problems = useMemo(() => problemFields(overrides, tradition, design), [overrides, tradition, design])
 
   useEffect(() => {
     const el = dialog.current
