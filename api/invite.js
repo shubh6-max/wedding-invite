@@ -15,7 +15,7 @@ const hash = (s) => createHash('sha256').update(s).digest('hex')
 const key = (slug) => `invite:${slug}`
 
 // One Redis command over Upstash's REST API: no client library needed.
-async function redis(...command) {
+async function upstash(...command) {
   const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL
   const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
   if (!url || !token) throw new Error('Redis is not configured (KV_REST_API_URL / KV_REST_API_TOKEN)')
@@ -25,8 +25,9 @@ async function redis(...command) {
   return body.result
 }
 
+// `redis` runs one command: Upstash in production; `npm run dev` / `preview` pass a local file store (vite.config.js).
 // ponytail: no rate limit or expiry; add Upstash's ratelimit and an EX on SET if names get squatted or storage grows.
-export default async function handler(req, res) {
+export async function handle(req, res, redis = upstash) {
   try {
     if (req.method === 'GET') {
       const slug = String(req.query?.slug || '')
@@ -53,3 +54,5 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'server' })
   }
 }
+
+export default (req, res) => handle(req, res)

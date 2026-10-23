@@ -8,7 +8,7 @@ import { cleanOverrides, problemFields } from './sanitise.js'
 const SHORT_PROBLEM = {
   bad: 'Use 3 to 40 letters or numbers, with dashes between words.',
   taken: 'Another invitation already uses this name. Add something to it, like the year.',
-  failed: 'The short link could not be saved. Check your connection and try again, or send the long link.',
+  failed: 'The short link could not be saved just now. Try again in a moment, or send the long link.',
 }
 
 // Where a field sits, for a message: "Place (ceremony 2)".
