@@ -25,6 +25,7 @@ const DESIGNS = {
   scrollcinema: { name: 'ScrollCinema', prefix: 'scc' },
   vellumpeel: { name: 'VellumPeel', prefix: 'vpl' },
   lanternsky: { name: 'LanternSky', prefix: 'lsk' },
+  roseleaf: { name: 'Roseleaf', prefix: 'rl' },
 }
 const BANNED_FONTS = /\b(Fraunces|Inter|Roboto|Geist|Plus Jakarta Sans|Space Grotesk)\b/i
 // Fonts the device already has; fine as fallbacks without being loaded.

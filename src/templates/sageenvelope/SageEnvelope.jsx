@@ -4,10 +4,12 @@ import { useCountdown } from '../../lib/hooks.js'
 import { clearedShare } from '../../lib/scratch.js'
 import { clock } from '../../studio/format.js'
 import { art } from './art.js'
+import Music from '../../components/Music.jsx'
 import RsvpForm from '../../components/RsvpForm.jsx'
 import { directionsUrl, eventWhen, mapEmbedUrl, revealDate } from './format.js'
 import Line from './Line.jsx'
 import { DEFAULT_ORDER, normaliseOrder } from './lines.js'
+import { track } from './song.js'
 import './sageenvelope.css'
 
 // Sage Envelope page: the original invitation's mobile layout (390px), rebuilt layer for layer from its own artwork
@@ -441,6 +443,7 @@ export default function SageEnvelope({ invite, viaGate }) {
   }
   return (
     <main ref={rootRef} className={`tpl tpl-sageenvelope${viaGate ? ' is-via-gate' : ''}${edit ? ' is-editing' : ''}`} onClick={edit ? deselect : undefined}>
+      <Music track={track} className="se-music" />
       {order.map((id) => sections[id])}
     </main>
   )

@@ -46,6 +46,27 @@
 @keyframes se-bob { 50% { transform: translateY(var(--bob)); } }
 @keyframes se-pulse { 50% { scale: var(--pulse); } }
 
+/* The song's pause control (components/Music.jsx): a gold disc pinned top-right of the 430px column. */
+.tpl-sageenvelope .se-music {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top));
+  right: max(calc(12px + env(safe-area-inset-right)), calc((100vw - 430px) / 2 + 12px));
+  z-index: 800;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1.5px solid rgb(255 255 255 / 0.7);
+  border-radius: 50%;
+  background: linear-gradient(to bottom right, #c8a882, #b8986a);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+  cursor: pointer;
+}
+.tpl-sageenvelope .se-music svg { width: 22px; height: 22px; fill: none; stroke: #2a2725; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tpl-sageenvelope .se-music[aria-pressed='false'] { opacity: 0.85; }
+.tpl-sageenvelope .se-music:focus-visible { outline: 2px solid #3e3935; outline-offset: 3px; }
+
 /* ---- hero: sky behind, the painted mandap scene, the formal invitation, seven dancers, falling blossoms ---- */
 .tpl-sageenvelope .se-hero { position: relative; min-height: 100dvh; overflow: hidden; background: top center / cover no-repeat; }
 .tpl-sageenvelope .se-hero__scene { position: relative; min-height: 100dvh; margin-top: 8px; background: center / cover no-repeat; }

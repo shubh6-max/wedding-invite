@@ -274,7 +274,9 @@ async function checkContrast(page, scopeSel, vp, tag, fail, notes) {
       notes.add(`${tag}: data-over-photo #${i} is outside the viewport; not measured`)
       continue
     }
-    const hide = await page.addStyleTag({ content: '[data-over-photo],[data-over-photo] *{color:transparent!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important}' })
+    // Decorative layers (data-decor: petals drifting over the page, corner sprigs) are hidden too: they pass in front
+    // of the text for a moment and are not the background it is read against.
+    const hide = await page.addStyleTag({ content: '[data-over-photo],[data-over-photo] *{color:transparent!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important}[data-decor]{visibility:hidden!important}' })
     const shot = await page.screenshot({ clip, type: 'png' })
     await hide.evaluate((n) => n.remove())
     const ratio = await page.evaluate(minContrast, { b64: shot.toString('base64'), rgb: col.rgb, alpha })

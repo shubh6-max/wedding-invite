@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import Photo from '../../components/Photo.jsx'
 import RsvpForm from '../../components/RsvpForm.jsx'
 import { guestName } from '../../lib/guest.js'
 import { useCountdown, useReveal } from '../../lib/hooks.js'
 import { downloadIcs } from '../../lib/ics.js'
-import { holdSong, releaseSong, song } from './song.js'
+import Music from '../../components/Music.jsx'
+import { track } from './song.js'
 import './lanternsky.css'
 
 // Lantern Sky: a hand-painted dusk sky full of rising paper lanterns over a golden chhatri pavilion, the
@@ -469,57 +470,6 @@ function Posy({ className }) {
   )
 }
 
-// The pause control for the song the gate's tap started: sound that plays on its own must be stoppable
-// (WCAG 1.4.2). Hidden when the file fails to load, so it is never a dead control. Hiding the tab pauses
-// the song and coming back resumes it only if it was playing; leaving the page stops and rewinds it.
-function Music() {
-  const [on, setOn] = useState(false)
-  const [ok, setOk] = useState(true)
-  useEffect(() => {
-    const a = song()
-    if (!a) return undefined
-    holdSong()
-    const sync = () => setOn(!a.paused)
-    const fail = () => setOk(false)
-    if (a.error) fail()
-    sync()
-    let resume = false
-    const vis = () => {
-      if (document.hidden) {
-        resume = !a.paused
-        a.pause()
-      } else if (resume) {
-        a.play()?.catch(() => {})
-      }
-    }
-    a.addEventListener('play', sync)
-    a.addEventListener('pause', sync)
-    a.addEventListener('error', fail)
-    document.addEventListener('visibilitychange', vis)
-    return () => {
-      a.removeEventListener('play', sync)
-      a.removeEventListener('pause', sync)
-      a.removeEventListener('error', fail)
-      document.removeEventListener('visibilitychange', vis)
-      releaseSong()
-    }
-  }, [])
-  if (!ok) return null
-  const toggle = () => {
-    const a = song()
-    if (a.paused) a.play()?.catch(() => {})
-    else a.pause()
-  }
-  return (
-    <button type="button" className="lsk-music" aria-pressed={on} aria-label={on ? 'Pause music' : 'Play music'} onClick={toggle}>
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M9 18V6l10-2v12M9 18a3 3 0 1 1-3-3 3 3 0 0 1 3 3Zm10-2a3 3 0 1 1-3-3 3 3 0 0 1 3 3Z" />
-        {!on && <path d="M4 4l16 16" />}
-      </svg>
-    </button>
-  )
-}
-
 // Its own component so the 1 s countdown tick re-renders four numbers, not the whole page.
 function Count({ date }) {
   const t = useCountdown(date)
@@ -549,7 +499,7 @@ export default function LanternSky({ invite, viaGate }) {
   return (
     <div className={`tpl tpl-lanternsky${viaGate ? ' via-gate' : ''}`} ref={rootRef}>
       <Defs />
-      <Music />
+      <Music track={track} className="lsk-music" />
 
       <section className="lsk-hero" aria-label="The invitation">
         <SkySwirls />

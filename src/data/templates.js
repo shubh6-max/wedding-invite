@@ -1,5 +1,6 @@
 import { lazy } from 'react'
 import { sageEnvelopeSample } from './samples/sageenvelope.js'
+import { roseleafSample } from './samples/roseleaf.js'
 
 // Registry of the contemporary designs, then the tradition-specific ones. Each template lives in src/templates/<id>/ and default-exports
 // a component taking `{ invite }` (see data/sample.js). To add one: create the folder, add a row here.
@@ -207,6 +208,14 @@ const contemporary = [
     signature: 'Lanterns drift up the painted sky; the couple glows inside the pavilion arch.',
     palette: ['#2a5fa3', '#fdf3dd', '#eab052'], font: "'Cormorant Garamond', serif", shape: 'arch',
     Component: lazy(() => import('../templates/lanternsky/LanternSky.jsx')),
+  },
+  {
+    id: 'roseleaf', name: 'Roseleaf', group: 'Romantic', photos: true,
+    blurb: 'An embroidered ivory envelope, then a blush arch of lotus and roses.',
+    signature: 'Tap the envelope open, scratch the gold card for the date, flip the event cards for details.',
+    palette: ['#f9f4ec', '#3b2c20', '#c03a57'], font: "'Alex Brush', cursive", shape: 'arch', // ivory ground, ink, blush
+    sample: roseleafSample, // Komal & Prem over Sage Envelope's placeholders (data/samples/roseleaf.js)
+    Component: lazy(() => import('../templates/roseleaf/Roseleaf.jsx')),
   },
 ]
 

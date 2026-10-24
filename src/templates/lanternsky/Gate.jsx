@@ -3,7 +3,7 @@ import Photo from '../../components/Photo.jsx'
 import { useGate } from '../../lib/gate.js'
 import { firstGrapheme } from '../../lib/fit.js'
 import { guestName } from '../../lib/guest.js'
-import { playSong, song } from './song.js'
+import { track } from './song.js'
 import './gate.css'
 
 // Lantern Sky gate: night sky (the background photo dimmed to a texture), the names above one paper
@@ -18,13 +18,13 @@ export default function Gate({ invite, onOpen, onDone }) {
   useEffect(() => {
     const t = setTimeout(() => {
       setWarm(true)
-      song()
+      track.song()
     }, 1200)
     return () => clearTimeout(t)
   }, [])
-  // The song must start inside this tap (see song.js); it rises with the lanterns as the page opens.
+  // The song must start inside this tap (see lib/song.js); it rises with the lanterns as the page opens.
   const light = () => {
-    playSong()
+    track.play()
     trigger()
   }
 
