@@ -175,8 +175,8 @@ test('a smaller text size never goes below the 12px readable floor', () => {
 test("the share check warns about this design's own sample details, not the form's", () => {
   const edited = { ca: 'A', cb: 'B', date: '2027-03-01', time: '18:00', venue: 'V' }
   const ids = staleBuckets(edited, 'contemporary', 'sageenvelope').map((b) => b.id)
-  for (const id of ['address', 'blessed', 'hosts', 'brideline', 'dates', 'events', 'families']) assert.ok(ids.includes(id), id)
-  for (const id of ['names', 'day', 'venue', 'story', 'places']) assert.ok(!ids.includes(id), id)
+  for (const id of ['address', 'dates', 'events', 'families']) assert.ok(ids.includes(id), id)
+  for (const id of ['names', 'day', 'venue', 'story', 'places', 'blessed', 'hosts', 'brideline']) assert.ok(!ids.includes(id), id)
   assert.ok(!staleBuckets({ ...edited, 't-va': 'X' }, 'contemporary', 'sageenvelope').some((b) => b.id === 'address'))
   assert.ok(staleBuckets({}, 'contemporary').some((b) => b.id === 'story')) // other designs keep the form's list
 })

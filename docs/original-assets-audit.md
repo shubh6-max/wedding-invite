@@ -35,7 +35,7 @@ Source URL for each: `https://kabir-weds-diksha.site/assets/<original file>`.
 | `dancer7.webp` | `dancer7-CxqnVLnh.png` | 330x529 | 240x385 | Hero: dancer |
 | `dancer8.webp` | `dancer8-DLrAVB_Q.png` | 257x605 | 240x565 | Hero: dancer |
 | `couple.webp` | `couple-BgrKK4o8.png` | 464x538 | 464x538 | Welcome: the couple |
-| `mehendi-bg.webp` | `bg-m-mehndi-iO-YGkmA.PNG` | 1786x3221 | 1000x1803 | Mehendi: backdrop |
+| `mehendi-bg.webp` | `bg-m-mehndi-iO-YGkmA.PNG` | 1786x3221 | 1000x1803 | Mehendi: backdrop (its sign repainted to read "Haldi", in Great Vibes) |
 | `umbrella1.webp` | `umbrella1-BdeDwzVj.png` | 579x311 | 320x172 | Mehendi: umbrella (x2) |
 | `umbrella2.webp` | `umbrella2-CnwT3ZHh.png` | 609x341 | 320x179 | Mehendi: umbrella (x2) |
 | `mehendi-cart.webp` | `gadi-CtWIaOjT.png` | 1139x1437 | 640x807 | Mehendi: flower cart |
@@ -45,7 +45,7 @@ Source URL for each: `https://kabir-weds-diksha.site/assets/<original file>`.
 | `disco.webp` | `disco1-BETnkKjM.png` | 400x399 | 240x239 | Sangeet (x4), Reception (x2): disco ball |
 | `lamp.webp` | `lamp-B6S3oSZG.png` | 286x1046 | 140x512 | Sangeet: lamp (x2) |
 | `side-disco.webp` | `side_disco-DgWJgi4b.png` | 980x881 | 380x342 | Sangeet: disco stand |
-| `wedding-bg.webp` | `bg-m-wedding2-DwIcryQB.jpeg` | 992x1600 | 992x1600 | Wedding: backdrop |
+| `wedding-bg.webp` | `bg-m-wedding2-DwIcryQB.jpeg` | 992x1600 | 992x1600 | Wedding: backdrop (sky regraded from dusk pink to an early-morning blue with a gold sunrise) |
 | `wedding-garland.webp` | `sidemala2-DDLEBbLq.png` | 1054x860 | 400x326 | Wedding: hanging bells (x2) |
 | `wedding-sidevase.webp` | `sidevase-DkdV7-Qs.png` | 1406x786 | 1000x559 | Wedding: plant and side table |
 | `wedding-vase-tall.webp` | `flowervase2-tGMi9Ik3.png` | 334x1479 | 280x1240 | Wedding: tall urn |
@@ -61,7 +61,7 @@ Source URL for each: `https://kabir-weds-diksha.site/assets/<original file>`.
 | `cocktail-bg.webp` | `bg-m-cocktail2-BJsTzgZz.jpeg` | 936x1600 | 936x1600 | Cocktail: backdrop |
 | `cocktail-trail-left.webp` | `silvertrail1-B1bK_LgN.png` | 1524x1007 | 400x264 | Cocktail: crystal strands, left |
 | `cocktail-trail-right.webp` | `silvertrail2-C_iqAopH.png` | 1801x709 | 400x157 | Cocktail: crystal strands, right |
-| `cocktail-drapes.webp` | `purpledesign-CN28xBz5.png` | 1987x665 | 1000x335 | Cocktail: drapes |
+| `cocktail-drapes.webp` | `purpledesign-CN28xBz5.png` | 1987x665 | 1000x335 | Cocktail: drapes (recoloured from purple to the carpet's maroon) |
 | `cocktail-balls.webp` | `cocktail_balls-Cx1Ccqje.png` | 1946x520 | 1000x267 | Cocktail: mirror balls |
 | `cocktail-arch-small.webp` | `cocktail_bitmap2-BQgAJTrz.png` | 256x608 | 140x333 | Cocktail: light arch, small |
 | `cocktail-arch.webp` | `cocktail_bitmap-BIJU7WZh.png` | 256x1037 | 140x567 | Cocktail: light arch |

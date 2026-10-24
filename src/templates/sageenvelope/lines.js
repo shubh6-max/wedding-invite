@@ -41,6 +41,7 @@ export const LINES = [
   bound('hh', 'hero', 'Hosts', ['hosts']),
   text('hi', 'hero', 'Invitation line', 120, 'lines'),
   bound('hgr', 'hero', 'Groom’s name', ['cb']),
+  text('hs', 'hero', 'Groom’s family line', 160, 'lines'),
   text('hw', 'hero', 'Word between the names', 20),
   bound('hbr', 'hero', 'Bride’s name', ['ca']),
   text('hd', 'hero', 'Bride’s family line', 160, 'lines'),

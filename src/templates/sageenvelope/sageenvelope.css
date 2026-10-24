@@ -80,7 +80,7 @@
 .tpl-sageenvelope .se-hero__hosts { margin-bottom: 8px; font: 600 13px/19.5px var(--serif); }
 .tpl-sageenvelope .se-hero__line { margin-bottom: 12px; font: 400 13px/15.5px var(--serif); letter-spacing: 0.025em; white-space: pre-line; }
 .tpl-sageenvelope .se-hero h1 { display: grid; font-weight: 400; }
-.tpl-sageenvelope .se-hero h1 > span {
+.tpl-sageenvelope .se-hero h1 > span:not(.se-hero__strong) { /* the names; the groom's family line keeps __strong */
   font: 400 24px/32px var(--script);
   color: #b3385a;
   filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
