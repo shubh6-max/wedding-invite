@@ -4,8 +4,8 @@
    1.2; the gradient and corner flowers hold until App removes the gate at 1200ms (useGate ms). */
 .gate-sageenvelope.gate {
   padding: 0; /* the envelope fills the screen; the seal and words sit clear of the nav pill on their own */
-  background: linear-gradient(to bottom right, #a8bfa2, #c8d5b9, #a8bfa2);
-  color: #3e3935;
+  background: linear-gradient(to bottom right, #4a1118, #6d1a24, #4a1118);
+  color: #f3e6d3;
   perspective: 1000px;
 }
 .gate-sageenvelope p,
@@ -55,6 +55,8 @@
   transition: transform 0.8s ease, opacity 0.8s ease;
 }
 .gate-sageenvelope .gate-sageenvelope__seal img { display: block; width: 100%; height: 100%; object-fit: contain; }
+/* The monogram sits on the seal's inner disc: seal.webp's disc is centred at 50.5% of its height, ~37% across. */
+.gate-sageenvelope .gate-sageenvelope__seal .gate-sageenvelope__logo { position: absolute; top: 50.5%; left: 50%; width: 35%; height: 35%; translate: -50% -50%; }
 .gate-sageenvelope .gate-sageenvelope__seal:focus-visible { outline: 2px solid #fff; outline-offset: -24px; }
 .gate-sageenvelope .gate-sageenvelope__seal:active { transform: scale(0.95); }
 
@@ -71,7 +73,7 @@
 }
 @keyframes se-gate-words { from { opacity: 0; transform: translateY(20px); } }
 .gate-sageenvelope .gate-sageenvelope__words h2 { font: 400 30px/36px 'Great Vibes', cursive; filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06)); }
-.gate-sageenvelope .gate-sageenvelope__words p { margin-top: 16px; font: 400 18px/28px 'Cormorant', Georgia, serif; letter-spacing: 0.025em; color: rgb(62 57 53 / 0.8); }
+.gate-sageenvelope .gate-sageenvelope__words p { margin-top: 16px; font: 400 18px/28px 'Cormorant', Georgia, serif; letter-spacing: 0.025em; color: rgb(243 230 211 / 0.8); }
 .gate-sageenvelope .gate-sageenvelope__words .gate-sageenvelope__guest { margin: 0 0 6px; font-style: italic; font-weight: 600; }
 
 .gate-sageenvelope .gate-sageenvelope__rule {
