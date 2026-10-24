@@ -13,9 +13,13 @@ export async function saveToSheet(url, { name, attending, guests, note }, fetchI
       body: JSON.stringify({ name, attending, guests, note }),
       signal: AbortSignal.timeout?.(15000), // a stuck request must not leave the guest on "Sending…"
     })
-    return (await r.json()).ok === true
-  } catch {
-    return false // offline, timed out, blocked, or not the script's JSON
+    const body = await r.json()
+    if (body.ok !== true) console.warn('RSVP: the sheet did not save the reply', body)
+    return body.ok === true
+  } catch (e) {
+    // Offline, timed out, blocked, or a Google page instead of the script's JSON. Logged for the couple's setup check.
+    console.warn('RSVP: could not save to the sheet', e)
+    return false
   }
 }
 
