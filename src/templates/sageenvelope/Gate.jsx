@@ -21,7 +21,7 @@ export default function Gate({ invite, onOpen, onDone }) {
       <span className="gate-sageenvelope__corner gate-sageenvelope__corner--br" aria-hidden="true">🌿</span>
       <div className="gate-sageenvelope__stage">
         <img className="gate-sageenvelope__envelope" src={art('envelope')} alt="" />
-        <button type="button" className="gate-sageenvelope__seal" data-gate-primary onClick={trigger} disabled={opening} autoFocus aria-label="Tap to open your invitation">
+        <button type="button" className="gate-sageenvelope__seal" data-gate-primary onClick={trigger} disabled={opening} aria-label="Tap to open your invitation">
           <img src={art('seal')} alt="" />
           <img className="gate-sageenvelope__logo" src={art('logo')} alt="" />
         </button>

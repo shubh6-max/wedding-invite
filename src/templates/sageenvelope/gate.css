@@ -57,7 +57,9 @@
 .gate-sageenvelope .gate-sageenvelope__seal img { display: block; width: 100%; height: 100%; object-fit: contain; }
 /* The monogram sits on the seal's inner disc: seal.webp's disc is centred at 50.5% of its height, ~37% across. */
 .gate-sageenvelope .gate-sageenvelope__seal .gate-sageenvelope__logo { position: absolute; top: 50.5%; left: 50%; width: 35%; height: 35%; translate: -50% -50%; }
-.gate-sageenvelope .gate-sageenvelope__seal:focus-visible { outline: 2px solid #fff; outline-offset: -24px; }
+/* Not focused on load (an autofocused seal drew this ring for touch users too); for keyboard users the ring
+   hugs the wax: seal.webp's disc starts ~21.5% in from the button's edge. */
+.gate-sageenvelope .gate-sageenvelope__seal:focus-visible { outline: 2px solid #fff; outline-offset: calc(min(296px, 35dvh) * -0.2); }
 .gate-sageenvelope .gate-sageenvelope__seal:active { transform: scale(0.95); }
 
 /* Shrink-to-fit from the centre line, as the original does: "Tap to open your invitation" wraps onto two lines. */
