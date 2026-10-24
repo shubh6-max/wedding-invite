@@ -194,11 +194,11 @@ for (const w of [360, 375, 390, 430]) {
     await page.getByRole('button', { name: 'Done' }).click()
 
     // The longest text, at the biggest size in the narrowest box, stays on the screen.
-    await frame.locator('[data-line="hg"]').click()
-    await frame.locator('[data-line="hg"] textarea').waitFor()
+    await frame.locator('[data-line="hd"]').click()
+    await frame.locator('[data-line="hd"] textarea').waitFor()
     await page.keyboard.type('W'.repeat(160))
-    await page.locator('#i-hg-size').fill('300')
-    await page.locator('#i-hg-width').fill('20')
+    await page.locator('#i-hd-size').fill('300')
+    await page.locator('#i-hd-width').fill('20')
     await page.waitForTimeout(700)
     const sideways = await frame.locator('html').evaluate((el) => el.scrollWidth - window.innerWidth)
     if (sideways > 0) fail('studio', `the page scrolls sideways by ${sideways}px with a 300% line in a 20% box`)
@@ -231,12 +231,12 @@ for (const w of [360, 375, 390, 430]) {
       outlines: document.querySelectorAll('[data-line]').length,
       namah: document.querySelector('.se-hero__namah')?.textContent.trim(),
       order: [...document.querySelectorAll('[data-studio-section]')].map((e) => e.dataset.studioSection),
-      size: parseFloat(getComputedStyle(document.querySelector('.se-hero__blessings .se-line__t')).fontSize),
+      size: parseFloat(getComputedStyle(document.querySelector('.se-hero__copy > .se-hero__strong .se-line__t')).fontSize),
     }))
     if (g.outlines) fail('guest', `${g.outlines} editing outlines on the guest's invitation`)
     if (g.namah !== typed) fail('guest', `guest sees "${g.namah}"`)
     if (g.order.join() !== o.join()) fail('guest', `guest order ${g.order} differs from the Studio's ${o}`)
-    if (Math.round(g.size) !== 39) fail('guest', `blessings at ${g.size}px, expected 39px (300% of 13px)`)
+    if (Math.round(g.size) !== 39) fail('guest', `bride's family line at ${g.size}px, expected 39px (300% of 13px)`)
     await guest.close()
     const narrow = await browser.newPage({ viewport: { width: 320, height: 568 } })
     await narrow.goto(link + (link.includes('?') ? '&' : '?') + 'open=1', { waitUntil: 'networkidle' })

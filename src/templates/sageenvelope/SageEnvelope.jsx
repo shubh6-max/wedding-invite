@@ -340,20 +340,17 @@ export default function SageEnvelope({ invite, viaGate }) {
           <div className="se-hero__copy">
             <img className="se-hero__ganesha" src={art('ganesha')} alt="" />
             <Line id="hn" fallback={invite.invocation?.text ? `||${invite.invocation.text}||` : ''} className="se-hero__namah se-t" style={rise(0)} />
-            <Line id="hb" fallback={invite.blessings ? 'With the blessings Of' : ''} className="se-hero__small se-t" style={rise(1)} />
-            <Line id="hg" fallback={invite.blessings ?? ''} className="se-hero__blessings se-t" style={rise(2)} />
-            <Line id="hh" fallback={invite.hosts ?? ''} className="se-hero__hosts se-t" style={rise(3)} />
-            <Line id="hi" fallback={invite.inviteLine ?? ''} className="se-hero__line se-t" style={rise(4)} />
+            <Line id="hi" fallback={invite.inviteLine ?? ''} className="se-hero__line se-t" style={rise(1)} />
             <h1>
-              <Line id="hgr" as="span" fallback={b} className="se-t" style={rise(5)} />
-              <Line id="hs" as="span" fallback={invite.groomLine ?? ''} className="se-hero__strong se-t" style={rise(6)} />
-              <Line id="hw" as="small" fallback="WITH" className="se-t" style={rise(7)} />
-              <Line id="hbr" as="span" fallback={a} className="se-t" style={rise(8)} />
+              <Line id="hgr" as="span" fallback={b} className="se-t" style={rise(2)} />
+              <Line id="hs" as="span" fallback={invite.groomLine ?? ''} className="se-hero__strong se-t" style={rise(3)} />
+              <Line id="hw" as="small" fallback="WITH" className="se-t" style={rise(4)} />
+              <Line id="hbr" as="span" fallback={a} className="se-t" style={rise(5)} />
             </h1>
-            <Line id="hd" fallback={invite.brideLine ?? ''} className="se-hero__strong se-t" style={rise(9)} />
-            <Line id="hr" fallback={invite.dateRange || invite.dateLabel} className="se-hero__strong se-t" style={rise(10)} />
-            <Line id="ha" fallback="at" className="se-hero__strong se-hero__at se-t" style={rise(11)} />
-            <Line id="hv" fallback={invite.venue} className="se-hero__strong se-hero__venue se-t" style={rise(12)} />
+            <Line id="hd" fallback={invite.brideLine ?? ''} className="se-hero__strong se-t" style={rise(6)} />
+            <Line id="hr" fallback={invite.dateRange || invite.dateLabel} className="se-hero__strong se-t" style={rise(7)} />
+            <Line id="ha" fallback="at" className="se-hero__strong se-hero__at se-t" style={rise(8)} />
+            <Line id="hv" fallback={invite.venue} className="se-hero__strong se-hero__venue se-t" style={rise(9)} />
           </div>
           <div className="se-dancers">
             {DANCERS.map((p) => <Img key={p.img} p={p} />)}

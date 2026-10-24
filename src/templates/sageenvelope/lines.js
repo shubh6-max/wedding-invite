@@ -23,7 +23,7 @@ export const SECTIONS = [
 export const DEFAULT_ORDER = SECTIONS.map((s) => s.id).join(',')
 
 // Fields shared with every design (studio/fields.js); a line bound to one edits it for all designs.
-export const SHARED_KEYS = ['ca', 'cb', 'hosts', 'venue', 'date', 'time', 'tz', 'mapUrl']
+export const SHARED_KEYS = ['ca', 'cb', 'venue', 'date', 'time', 'tz', 'mapUrl']
 // Each event's own date and time (absolute, not offsets: these slots are this design's alone).
 export const DATE_KEYS = [0, 1, 2, 3, 4].map((i) => `t-e${i}d`)
 export const TIME_KEYS = [0, 1, 2, 3, 4].map((i) => `t-e${i}t`)
@@ -36,9 +36,6 @@ export const LINES = [
   text('gt', 'gate', 'Tap to open', 60),
 
   text('hn', 'hero', 'Invocation', 80),
-  text('hb', 'hero', 'Blessings heading', 60),
-  text('hg', 'hero', 'Blessed by', 160, 'lines'),
-  bound('hh', 'hero', 'Hosts', ['hosts']),
   text('hi', 'hero', 'Invitation line', 120, 'lines'),
   bound('hgr', 'hero', 'Groom’s name', ['cb']),
   text('hs', 'hero', 'Groom’s family line', 160, 'lines'),

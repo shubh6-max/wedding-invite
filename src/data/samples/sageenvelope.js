@@ -18,8 +18,6 @@ export const sageEnvelopeSample = {
 
   // The hero's formal invitation, top to bottom. All family names are placeholders.
   invocation: { text: 'Shri Chintamani Parshvanathaya Namah', script: null, meaning: '' },
-  // No "With the blessings Of" block or hosts line: no `blessings`, and `hosts` is '' so the base sample's doesn't show.
-  hosts: '',
   inviteLine: 'Cordially invite you to attend the\nWedding of their son', // \n: the line breaks there, as in the original
   // Real, not placeholders: each family line sits under that name.
   groomLine: 'Grand Son of Late Smt. Pravinaben Shamlalji Siyakiya\n&\nSon of Smt. Nirmala Pramodji Siyakiya (Oswal)',

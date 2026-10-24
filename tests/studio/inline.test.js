@@ -82,7 +82,8 @@ test('multi-line text keeps its line breaks, tidied, at most six lines', () => {
 })
 
 test('styles, order, event dates and times are validated', () => {
-  assert.deepEqual(sage({ 'y-hn': 'w10', 'y-hb': 's120' }), { 'y-hb': 's120' })
+  assert.deepEqual(sage({ 'y-hn': 'w10', 'y-hi': 's120' }), { 'y-hi': 's120' })
+  assert.deepEqual(sage({ 't-hg': 'x', 'y-hb': 's120' }), {}) // lines taken off the design are dropped from old links
   assert.deepEqual(sage({ o: 'hero,hero' }), {})
   assert.deepEqual(sage({ o: 'venue,hero' }), { o: 'venue,hero' })
   assert.deepEqual(sage({ 't-e0d': '2027-02-30', 't-e1d': '2027-02-11' }), { 't-e1d': '2027-02-11' })

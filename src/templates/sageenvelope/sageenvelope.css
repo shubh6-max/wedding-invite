@@ -75,9 +75,6 @@
 .tpl-sageenvelope .se-hero__ganesha { display: block; width: 16px; margin: 0 auto; padding-top: 8px; transition: opacity 0.8s ease, scale 0.8s ease; }
 .tpl-sageenvelope .se-hero:not([data-in]) .se-hero__ganesha { opacity: 0; scale: 0.8; }
 .tpl-sageenvelope .se-hero__namah { margin-bottom: 8px; font: 500 12px/15px var(--serif); letter-spacing: 0.025em; } /* the original sets 10px; 12px is this site's readable floor */
-.tpl-sageenvelope .se-hero__small { font: 400 12px/18px var(--serif); color: rgb(0 0 0 / 0.9); }
-.tpl-sageenvelope .se-hero__blessings { margin-bottom: 4px; font: 400 13px/19.5px var(--display); }
-.tpl-sageenvelope .se-hero__hosts { margin-bottom: 8px; font: 600 13px/19.5px var(--serif); }
 .tpl-sageenvelope .se-hero__line { margin-bottom: 12px; font: 400 13px/15.5px var(--serif); letter-spacing: 0.025em; white-space: pre-line; }
 .tpl-sageenvelope .se-hero h1 { display: grid; font-weight: 400; }
 .tpl-sageenvelope .se-hero h1 > span:not(.se-hero__strong) { /* the names; the groom's family line keeps __strong */
