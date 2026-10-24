@@ -1,5 +1,23 @@
-// The reply a guest sends to the couple. There is no server: the form only prepares this message, and the
-// guest sends it themselves (WhatsApp, email, or copy and paste), so the wording and links are built here once.
+// The reply a guest sends to the couple. When the couple connected a Google Sheet (Studio: "Google Sheet link
+// for replies"), the form saves the reply there; otherwise, or when saving fails, it prepares this message and
+// the guest sends it themselves (WhatsApp, email, or copy and paste), so the wording and links are built here once.
+
+// Adds the reply as a row in the couple's sheet, through the Apps Script web app at `url` (its doPost answers
+// { ok: true } once the row is written). Sent as text/plain so the browser makes a simple request: Apps Script
+// cannot answer a CORS preflight. Resolves true only on that answer; false on any failure, never throws.
+export async function saveToSheet(url, { name, attending, guests, note }, fetchImpl = fetch) {
+  try {
+    const r = await fetchImpl(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ name, attending, guests, note }),
+      signal: AbortSignal.timeout?.(15000), // a stuck request must not leave the guest on "Sending…"
+    })
+    return (await r.json()).ok === true
+  } catch {
+    return false // offline, timed out, blocked, or not the script's JSON
+  }
+}
 
 // The message, plain text. `who` is "Meera & Arjun"; `guests` is the number as a string or a number.
 export function replyText({ who, name, attending, guests, note }) {

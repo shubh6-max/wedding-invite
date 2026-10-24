@@ -3,10 +3,11 @@ import Field from './Field.jsx'
 import { FIELD_BY_KEY } from './fields.js'
 
 const LABEL = new Map(SECTIONS.map((s) => [s.id, s.label]))
-const ESSENTIALS = ['ca', 'cb', 'date', 'time', 'tz', 'venue', 'mapUrl', 't-va']
+const ESSENTIALS = ['ca', 'cb', 'date', 'time', 'tz', 'venue', 'mapUrl', 't-va', 'gs', 'cw']
 
 // The whole page: which sections show and in what order (the envelope always comes first), then the details
-// several lines share (names, the wedding date and time, the venue, the map link and the address).
+// several lines share (names, the wedding date and time, the venue, the map link and the address) and where
+// the RSVP form sends replies (the Google Sheet, and the WhatsApp number used when the sheet cannot be reached).
 export default function PagePanel({ invite, overrides, defaultFor, onSet, onShowSection, onEnvelope, onStartOver, edited }) {
   const order = (normaliseOrder(overrides.o ?? '') ?? DEFAULT_ORDER).split(',')
   const hidden = SECTIONS.map((s) => s.id).filter((id) => !order.includes(id))

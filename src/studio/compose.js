@@ -26,7 +26,7 @@ export function presetValues(preset) {
     hosts: preset.hosts, tagline: preset.tagline,
     date: d.date, time: d.time, tz: d.tz,
     venue: preset.venue, city: preset.city, mapUrl: preset.mapUrl,
-    rsvpBy: dateFromLabel(preset.rsvpBy) ?? '', cw: '', ce: '',
+    rsvpBy: dateFromLabel(preset.rsvpBy) ?? '', cw: '', ce: '', gs: '',
   }
   preset.events.forEach((e, i) => {
     Object.assign(v, { [`e${i}n`]: e.name, [`e${i}o`]: String(d.events[i].offset), [`e${i}t`]: d.events[i].time, [`e${i}p`]: e.place, [`e${i}d`]: e.dress, [`e${i}x`]: e.note ?? '' })
@@ -69,7 +69,8 @@ export function compose(preset, rawOverrides = {}, design = null) {
 
   const wa = waNumber(get('cw', ''))
   const email = get('ce', '')
-  if (wa || email) invite.contact = { ...(wa && { whatsapp: wa }), ...(email && { email }) }
+  const sheet = get('gs', '')
+  if (wa || email || sheet) invite.contact = { ...(wa && { whatsapp: wa }), ...(email && { email }), ...(sheet && { sheet }) }
 
   invite.story = preset.story.map((s, i) => ({
     year: get(`s${i}y`, s.year),

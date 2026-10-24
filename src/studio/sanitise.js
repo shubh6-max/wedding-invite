@@ -42,6 +42,9 @@ export function waNumber(s) {
   const digits = String(s).replace(/\D/g, '').replace(/^00/, '')
   return digits.length === 10 && /^[6-9]/.test(digits) ? `91${digits}` : digits
 }
+// A Google Apps Script web app (the couple's RSVP sheet): personal accounts get /macros/s/<id>/exec,
+// Workspace accounts /a/macros/<domain>/s/<id>/exec. Nothing else may receive guests' replies.
+const SHEET_URL = /^https:\/\/script\.google\.com\/(?:a\/macros\/[a-z0-9.-]+|macros)\/s\/[A-Za-z0-9_-]+\/exec$/
 const phoneOk = (s) => /^[+\d][\d\s()+-]*$/.test(s) && waNumber(s).length >= 8 && waNumber(s).length <= 15
 const emailOk = (s) => /^[^\s@<>"',;:?&=]+@[^\s@<>"',;:?&=]+\.[^\s@<>"',;:?&=]+$/.test(s)
 
@@ -73,6 +76,7 @@ export function normaliseValue(field, raw) {
     }
     case 'tel': return phoneOk(s) ? clip(s, field.max) : null
     case 'email': return emailOk(s) && s.length <= field.max ? s : null
+    case 'sheet': return SHEET_URL.test(s) && s.length <= field.max ? s : null
     case 'year': return /^\d{4}$/.test(s) && s >= '1900' && s <= '2100' ? s : null
     case 'offset': return /^-?\d{1,2}$/.test(s) && Number(s) >= -60 && Number(s) <= 30 ? String(Number(s)) : null
     default: return clip(s, field.max)
@@ -83,7 +87,7 @@ export function normaliseValue(field, raw) {
 export function checkField(field, raw) {
   const s = tidy(raw ?? '')
   if (s === '') return field.required ? `${field.label} is needed.` : ''
-  if (field.max && glen(s) > field.max && !['url', 'tel', 'email'].includes(field.control)) return `Shorten this to ${field.max} characters or fewer. Anything longer is cut off.`
+  if (field.max && glen(s) > field.max && !['url', 'tel', 'email', 'sheet'].includes(field.control)) return `Shorten this to ${field.max} characters or fewer. Anything longer is cut off.`
   if (normaliseValue(field, s) !== null) return ''
   switch (field.control) {
     case 'date': return 'Enter a real date between 2000 and 2100.'
@@ -91,6 +95,7 @@ export function checkField(field, raw) {
     case 'url': return 'Use a Google Maps or Apple Maps link that starts with https://.'
     case 'tel': return 'Enter 8 to 15 digits, starting with the country code.'
     case 'email': return 'Enter an email like name@example.com.'
+    case 'sheet': return 'Paste the Web app link from Apps Script. It starts with https://script.google.com/ and ends with /exec.'
     case 'year': return 'Enter a four-digit year, for example 2019.'
     case 'offset': return 'Pick a date within 60 days before or 30 days after the wedding.'
     default: return 'This value cannot be used.'

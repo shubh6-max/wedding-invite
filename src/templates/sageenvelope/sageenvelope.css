@@ -259,4 +259,43 @@
 .tpl-sageenvelope .se-footer__flower i { width: 64px; height: 1px; background: linear-gradient(to right, transparent, #c8a882); }
 .tpl-sageenvelope .se-footer__flower i:last-child { background: linear-gradient(to left, transparent, #c8a882); }
 .tpl-sageenvelope .se-footer__date { margin-bottom: 8px; font: 400 18px/28px var(--serif); opacity: 0.8; }
-.tpl-sageenvelope .se-footer__tag { font: 400 14px/20px var(--serif); opacity: 0.6; }
+
+/* RSVP form (components/RsvpForm.jsx) on the dark footer: cream text, gold hairlines, the venue's gold button.
+   Inputs stay at 18px so phones do not zoom in on focus; color-scheme makes the native pickers dark too. */
+.tpl-sageenvelope .se-rsvp { max-width: 340px; margin: 32px auto 0; color-scheme: dark; }
+.tpl-sageenvelope .se-rsvp .rsvp { display: grid; gap: 16px; text-align: left; }
+.tpl-sageenvelope .se-rsvp .rsvp label { display: grid; gap: 6px; }
+.tpl-sageenvelope .se-rsvp .rsvp label span { font: italic 400 16px/22px var(--serif); color: rgb(255 255 255 / 0.75); }
+.tpl-sageenvelope .se-rsvp :is(input, select, textarea) {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid rgb(200 168 130 / 0.5);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.06);
+  color: #fff;
+  font: 400 18px/26px var(--serif);
+}
+.tpl-sageenvelope .se-rsvp textarea { resize: vertical; }
+/* The open dropdown list is drawn by the system (white on Windows); options must not inherit the white text. */
+.tpl-sageenvelope .se-rsvp option { background: #fff; color: #2a2725; }
+.tpl-sageenvelope .se-rsvp :is(input, select, textarea, button, a):focus-visible { outline: 2px solid #c8a882; outline-offset: 2px; }
+.tpl-sageenvelope .se-rsvp .rsvp button,
+.tpl-sageenvelope .se-rsvp .rsvp__reply :is(a, button) {
+  justify-self: center;
+  padding: 12px 28px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(to right, #c8a882, #b8986a);
+  color: #2a2725; /* dark on gold: white would be ~2:1 */
+  font: 600 18px/26px var(--serif);
+  text-decoration: none;
+  cursor: pointer;
+}
+.tpl-sageenvelope .se-rsvp .rsvp button:disabled { opacity: 0.6; cursor: progress; }
+.tpl-sageenvelope .se-rsvp .rsvp__error { font: 600 16px/22px var(--serif); color: #f5b5b5; }
+.tpl-sageenvelope .se-rsvp .rsvp__done { display: grid; gap: 12px; font: 400 18px/26px var(--serif); }
+.tpl-sageenvelope .se-rsvp .rsvp__next { color: rgb(255 255 255 / 0.75); }
+.tpl-sageenvelope .se-rsvp .rsvp__msg { padding: 12px 14px; border: 1px dashed rgb(200 168 130 / 0.5); border-radius: 12px; font-size: 16px; text-align: left; white-space: pre-line; }
+.tpl-sageenvelope .se-rsvp .rsvp__reply { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.tpl-sageenvelope .se-rsvp .rsvp__reply :is(a, button) { padding: 10px 20px; font-size: 16px; }
+.tpl-sageenvelope .se-rsvp .rsvp__hint { min-height: 22px; font-size: 15px; opacity: 0.75; }

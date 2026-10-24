@@ -4,7 +4,8 @@ import { useCountdown } from '../../lib/hooks.js'
 import { clearedShare } from '../../lib/scratch.js'
 import { clock } from '../../studio/format.js'
 import { art } from './art.js'
-import { directionsUrl, eventWhen, footerDate, mapEmbedUrl, revealDate } from './format.js'
+import RsvpForm from '../../components/RsvpForm.jsx'
+import { directionsUrl, eventWhen, mapEmbedUrl, revealDate } from './format.js'
 import Line from './Line.jsx'
 import { DEFAULT_ORDER, normaliseOrder } from './lines.js'
 import './sageenvelope.css'
@@ -12,7 +13,7 @@ import './sageenvelope.css'
 // Sage Envelope page: the original invitation's mobile layout (390px), rebuilt layer for layer from its own artwork
 // (public/sageenvelope/, docs/original-assets-audit.md) with Komal & Prem's words (data/samples/sageenvelope.js).
 // One continuous scroll: hero, welcome with the scratch-off date and countdown, five events, closing note,
-// families, venue, footer. Motion follows the original: each section's copy rises in while the section is on
+// families, venue, RSVP form. Motion follows the original: each section's copy rises in while the section is on
 // screen and leaves again when it goes; props slide in the first time and then breathe, sway or bob.
 
 // Idle loops, as CSS animations with their amount in a custom property (see sageenvelope.css).
@@ -422,10 +423,13 @@ export default function SageEnvelope({ invite, viaGate }) {
     footer: (
       <footer key="footer" className="se-footer" data-sec data-studio-section="footer">
         <div className="se-once" style={{ '--ty': '20px' }}>
-          <Line id="on" fallback="{groom} & {bride}" className="se-footer__names" />
+          <Line id="rh" as="h2" fallback="Kindly RSVP" className="se-footer__names" />
           <div className="se-footer__flower" aria-hidden="true"><i /><span>💐</span><i /></div>
-          <Line id="od" fallback={footerDate(invite.date)} className="se-footer__date" />
-          <Line id="oh" fallback={invite.hashtag ?? ''} className="se-footer__tag" />
+          <Line id="rs" fallback="We would love to know if you can join us" className="se-footer__date" />
+          {/* While editing, the form is shown but cannot be filled in: taps go to the lines around it. */}
+          <div className="se-rsvp" inert={!!edit}>
+            <RsvpForm />
+          </div>
         </div>
       </footer>
     ),

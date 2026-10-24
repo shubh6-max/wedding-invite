@@ -18,7 +18,7 @@ export const SECTIONS = [
   { id: 'closing', label: 'Closing note' },
   { id: 'families', label: 'Families' },
   { id: 'venue', label: 'Venue' },
-  { id: 'footer', label: 'Footer' },
+  { id: 'footer', label: 'RSVP' }, // id kept: saved section orders name it
 ]
 export const DEFAULT_ORDER = SECTIONS.map((s) => s.id).join(',')
 
@@ -87,9 +87,8 @@ export const LINES = [
   text('va', 'venue', 'Address (also places the map)', 200, 'lines'),
   text('vb', 'venue', 'Directions button', 30, 'text', ['mapUrl']),
 
-  text('on', 'footer', 'Names', 60),
-  bound('od', 'footer', 'Date', ['date', 'time', 'tz']),
-  text('oh', 'footer', 'Hashtag', 40),
+  text('rh', 'footer', 'RSVP heading', 40),
+  text('rs', 'footer', 'Line above the form', 120, 'lines'),
 ]
 export const LINE_BY_ID = new Map(LINES.map((l) => [l.id, l]))
 

@@ -20,11 +20,5 @@ export function revealDate(iso) {
   return m ? `${m[3]} ${MONTH.format(new Date(Date.UTC(+m[1], +m[2] - 1, 1)))} ${m[1]}` : ''
 }
 
-// The footer's date line: '2026-06-05T13:00:00+05:30' -> 'June 05, 2026'.
-export function footerDate(iso) {
-  const m = /^(\d{4})-(\d{2})-(\d{2})T/.exec(iso || '')
-  return m ? `${MONTH.format(new Date(Date.UTC(+m[1], +m[2] - 1, 1)))} ${m[3]}, ${m[1]}` : ''
-}
-
 export const mapEmbedUrl = (address) => `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`
 export const directionsUrl = (address) => `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`

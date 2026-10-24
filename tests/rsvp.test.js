@@ -1,6 +1,18 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { replyText, replyLinks } from '../src/lib/rsvp.js'
+import { replyText, replyLinks, saveToSheet } from '../src/lib/rsvp.js'
+
+test('saveToSheet: true only when the script answers ok, as a simple text/plain POST', async () => {
+  let sent
+  const answer = (body) => async (url, init) => ((sent = init), { json: async () => body })
+  assert.equal(await saveToSheet('https://s/exec', { name: 'Asha', attending: 'yes', guests: '2', note: '' }, answer({ ok: true })), true)
+  assert.equal(sent.method, 'POST')
+  assert.match(sent.headers['Content-Type'], /^text\/plain/) // no CORS preflight, which Apps Script cannot answer
+  assert.deepEqual(JSON.parse(sent.body), { name: 'Asha', attending: 'yes', guests: '2', note: '' })
+  assert.equal(await saveToSheet('https://s/exec', {}, answer({ ok: false })), false)
+  assert.equal(await saveToSheet('https://s/exec', {}, async () => { throw new TypeError('offline') }), false)
+  assert.equal(await saveToSheet('https://s/exec', {}, async () => ({ json: async () => { throw new SyntaxError('html') } })), false)
+})
 
 const base = { who: 'Meera & Arjun', name: 'Asha Rao', attending: 'yes', guests: '2', note: '' }
 

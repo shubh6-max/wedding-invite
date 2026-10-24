@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import { presetFor } from '../src/data/presets.js'
 import { sageEnvelopeSample } from '../src/data/samples/sageenvelope.js'
 import { compose } from '../src/studio/compose.js'
-import { directionsUrl, eventWhen, footerDate, mapEmbedUrl, revealDate } from '../src/templates/sageenvelope/format.js'
+import { directionsUrl, eventWhen, mapEmbedUrl, revealDate } from '../src/templates/sageenvelope/format.js'
 
 const root = new URL('../', import.meta.url)
 
@@ -20,8 +20,6 @@ test('the scratch card date is the calendar day as written, in any viewer time z
   assert.equal(revealDate('2027-02-12T00:30:00+05:30'), '12 February 2027') // still the 12th, though UTC is the 11th
   assert.equal(revealDate(''), '')
   assert.equal(revealDate('not a date'), '')
-  assert.equal(footerDate('2026-06-05T13:00:00+05:30'), 'June 05, 2026')
-  assert.equal(footerDate(''), '')
 })
 
 test('map links encode the whole address', () => {

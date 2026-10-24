@@ -36,7 +36,7 @@ export const BUCKETS = [
 ]
 
 // A design edited in place has its own list: what it shows that is still the sample (Sage Envelope has no story
-// or form ceremonies, but has an address, family names, a date line and a hashtag of its own).
+// or form ceremonies, but has an address, family names and a date line of its own).
 const EV = [0, 1, 2, 3, 4]
 export const DESIGN_BUCKETS = {
   sageenvelope: [
@@ -50,7 +50,6 @@ export const DESIGN_BUCKETS = {
     { id: 'dates', group: 'day', label: 'Dates under the names', keys: ['t-hr'] },
     { id: 'events', group: 'events', label: 'Event dates and places', keys: EV.flatMap((i) => [`t-e${i}d`, `t-e${i}p`]) },
     { id: 'families', group: 'hosts', label: 'Family names', keys: ['t-f0n', 't-f1n'] },
-    { id: 'hashtag', group: 'hosts', label: 'Hashtag', keys: ['t-oh'] },
   ],
 }
 
@@ -72,6 +71,7 @@ const single = [
   f({ key: 'rsvpBy', path: 'rsvpBy', group: 'replies', label: 'Please reply by', help: 'Optional. Guests see this above the reply form.', control: 'date', type: 'date' }),
   f({ key: 'cw', path: 'contact.whatsapp', group: 'replies', label: 'WhatsApp number for replies', help: 'Include the country code, for example +91 98765 43210. Guests send their reply to this number.', control: 'tel', type: 'tel', inputMode: 'tel', autoComplete: 'tel', max: 24 }),
   f({ key: 'ce', path: 'contact.email', group: 'replies', label: 'Email for replies', help: 'Optional. Guests can also reply by email.', control: 'email', type: 'email', inputMode: 'email', autoComplete: 'email', max: 100 }),
+  f({ key: 'gs', path: 'contact.sheet', group: 'replies', label: 'Google Sheet link for replies', help: 'Optional. The Web app link from your sheet’s Apps Script (it ends in /exec). Replies are saved straight into the sheet; if saving fails, guests send them on WhatsApp.', control: 'sheet', type: 'url', inputMode: 'url', max: 200 }),
 ]
 
 const events = [0, 1, 2, 3].flatMap((i) => {

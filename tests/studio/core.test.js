@@ -139,6 +139,15 @@ test('phone numbers and emails', () => {
   assert.deepEqual(clean({ ce: 'a@b.com?bcc=x@y.com' }).overrides, {})
   assert.deepEqual(clean({ ce: 'meera@example.com' }).overrides, { ce: 'meera@example.com' })
 })
+test('the RSVP sheet link must be an Apps Script web app', () => {
+  for (const ok of ['https://script.google.com/macros/s/AKfy_c-1/exec', 'https://script.google.com/a/macros/example.com/s/AKfy_c-1/exec']) {
+    assert.deepEqual(clean({ gs: ok }).overrides, { gs: ok }, ok)
+  }
+  for (const bad of ['http://script.google.com/macros/s/x/exec', 'https://script.google.com.evil.example/macros/s/x/exec', 'https://script.google.com/macros/s/x/dev', 'https://evil.example/exec', 'javascript:alert(1)']) {
+    assert.deepEqual(clean({ gs: bad }).overrides, {}, bad)
+  }
+  assert.equal(compose(hindu, { gs: 'https://script.google.com/macros/s/x/exec' }).contact.sheet, 'https://script.google.com/macros/s/x/exec')
+})
 test('fields for another tradition are dropped', () => {
   assert.deepEqual(clean({ ivs: 'x', e0x: 'y' }, 'contemporary').overrides, {})
   assert.equal(clean({ ivs: 'श्री' }, 'hindu').overrides.ivs, 'श्री')
