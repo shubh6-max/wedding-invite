@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import { presetFor } from '../src/data/presets.js'
 import { sageEnvelopeSample } from '../src/data/samples/sageenvelope.js'
 import { compose } from '../src/studio/compose.js'
-import { directionsUrl, eventWhen, mapEmbedUrl, revealDate } from '../src/templates/sageenvelope/format.js'
+import { directionsUrl, eventWhen, formatTime12, mapEmbedUrl, revealDate } from '../src/templates/sageenvelope/format.js'
 
 const root = new URL('../', import.meta.url)
 
@@ -51,4 +51,22 @@ test("the design's own content composes: Komal & Prem, five events in the reel's
 test('an event date picked in the Studio (YYYY-MM-DD) reads the same as the sample label', () => {
   assert.deepEqual(eventWhen('2027-02-11'), eventWhen('11 Feb 2027'))
   assert.equal(eventWhen('2027-02-30'), null)
+})
+
+test('event times format in 12-hour AM/PM format from 24-hour, 12-hour, or raw values', () => {
+  assert.equal(formatTime12('15:30'), '3:30 PM')
+  assert.equal(formatTime12('19:00'), '7:00 PM')
+  assert.equal(formatTime12('00:00'), '12:00 AM')
+  assert.equal(formatTime12('00:30'), '12:30 AM')
+  assert.equal(formatTime12('12:00'), '12:00 PM')
+  assert.equal(formatTime12('12:45'), '12:45 PM')
+  assert.equal(formatTime12('09:15'), '9:15 AM')
+  assert.equal(formatTime12('9:15'), '9:15 AM')
+  assert.equal(formatTime12('14:00:00'), '2:00 PM')
+  assert.equal(formatTime12('3:30 PM'), '3:30 PM')
+  assert.equal(formatTime12('03:30 pm'), '3:30 PM')
+  assert.equal(formatTime12('11:00 AM'), '11:00 AM')
+  assert.equal(formatTime12(''), '')
+  assert.equal(formatTime12(undefined), '')
+  assert.equal(formatTime12('Sunset'), 'Sunset')
 })

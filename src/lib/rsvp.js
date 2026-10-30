@@ -5,12 +5,12 @@
 // Adds the reply as a row in the couple's sheet, through the Apps Script web app at `url` (its doPost answers
 // { ok: true } once the row is written). Sent as text/plain so the browser makes a simple request: Apps Script
 // cannot answer a CORS preflight. Resolves true only on that answer; false on any failure, never throws.
-export async function saveToSheet(url, { name, attending, guests, note }, fetchImpl = fetch) {
+export async function saveToSheet(url, { name, attending, guests, note, ...extra }, fetchImpl = fetch) {
   try {
     const r = await fetchImpl(url, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ name, attending, guests, note }),
+      body: JSON.stringify({ name, attending, guests, note, ...extra }),
       signal: AbortSignal.timeout?.(15000), // a stuck request must not leave the guest on "Sending…"
     })
     const body = await r.json()
@@ -24,10 +24,11 @@ export async function saveToSheet(url, { name, attending, guests, note }, fetchI
 }
 
 // The message, plain text. `who` is "Meera & Arjun"; `guests` is the number as a string or a number.
-export function replyText({ who, name, attending, guests, note }) {
+export function replyText({ who, name, attending, guests, note, aadhaarName }) {
   const n = String(guests)
   const answer = attending === 'yes' ? `joyfully accepts (${n} guest${n === '1' ? '' : 's'})` : 'regretfully declines'
-  return [`RSVP for ${who}'s wedding`, `${String(name).trim()}: ${answer}`, String(note || '').trim()].filter(Boolean).join('\n')
+  const idLine = aadhaarName ? `Aadhaar: ${aadhaarName}` : ''
+  return [`RSVP for ${who}'s wedding`, `${String(name).trim()}: ${answer}`, idLine, String(note || '').trim()].filter(Boolean).join('\n')
 }
 
 // An address we are willing to put in a mailto: link: one plain address, none of the characters that let a

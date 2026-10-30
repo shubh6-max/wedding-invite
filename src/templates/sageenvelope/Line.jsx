@@ -19,7 +19,7 @@ export default function Line({ id, htmlId, as: Tag = 'p', fallback = '', classNa
   const edit = useEditing()
   const own = invite.design || {}
   const line = LINE_BY_ID.get(id)
-  const raw = own[`t-${id}`] ?? fallback
+  const raw = (line?.kind === 'bound' ? fallback : own[`t-${id}`]) ?? fallback
   const text = fill(raw, { bride: invite.couple.a, groom: invite.couple.b, venue: invite.venue })
   const st = parseStyle(own[`y-${id}`] ?? '') || {}
   const css = styleCss(st)

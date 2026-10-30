@@ -10,6 +10,7 @@ export default function RsvpForm({ onSubmit, labels = {} }) {
   const invite = useInvite()
   const sheet = invite?.contact?.sheet
   const [state, setState] = useState(() => ({ name: guestName(), attending: 'yes', guests: '1', note: '' }))
+  const [aadhaarFile, setAadhaarFile] = useState(null)
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
   const [sending, setSending] = useState(false)
@@ -17,19 +18,56 @@ export default function RsvpForm({ onSubmit, labels = {} }) {
   const [copy, setCopy] = useState('') // '' | 'copied' | 'failed'
   const set = (k) => (e) => setState((s) => ({ ...s, [k]: e.target.value }))
 
+  const handleAadhaar = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 10 * 1024 * 1024) {
+      setError('File size must be less than 10 MB.')
+      return
+    }
+    setError('')
+    const reader = new FileReader()
+    reader.onload = () => {
+      setAadhaarFile({
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        data: reader.result,
+      })
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const removeAadhaar = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setAadhaarFile(null)
+    const el = document.getElementById('rsvp-aadhaar-input')
+    if (el) el.value = ''
+  }
+
   const submit = async (e) => {
     e.preventDefault()
     if (sending) return
     if (!state.name.trim()) return setError('Please enter your name.')
     setError('')
+    const payload = {
+      ...state,
+      folderId: '1_1prC0CH5nrkCSbcmGC1Fn0enxgphuCP',
+      ...(aadhaarFile && {
+        aadhaarName: aadhaarFile.name,
+        aadhaarType: aadhaarFile.type,
+        aadhaarData: aadhaarFile.data,
+      }),
+    }
     try {
-      onSubmit?.(state)
+      onSubmit?.(payload)
     } catch {
       return setError('Something went wrong. Please try again.')
     }
     if (sheet) {
       setSending(true)
-      setSaved(await saveToSheet(sheet, state))
+      setSaved(await saveToSheet(sheet, payload))
       setSending(false)
     }
     setDone(true)
@@ -55,7 +93,7 @@ export default function RsvpForm({ onSubmit, labels = {} }) {
     // says so plainly and offers three ways to do it (WhatsApp, email if the couple gave one, copy).
     const who = invite ? `${invite.couple.a} & ${invite.couple.b}` : 'the couple'
     const name = state.name.trim()
-    const text = replyText({ who, ...state })
+    const text = replyText({ who, ...state, aadhaarName: aadhaarFile?.name })
     const { wa, mail } = replyLinks({ number: invite?.contact?.whatsapp, email: invite?.contact?.email, who, text })
     const copyReply = async () => {
       try {
@@ -79,6 +117,11 @@ export default function RsvpForm({ onSubmit, labels = {} }) {
           {mail && <a href={mail}>Send by email</a>}
           <button type="button" onClick={copyReply}>Copy reply</button>
         </p>
+        {aadhaarFile && (
+          <p className="rsvp__hint" style={{ marginTop: '8px' }}>
+            📎 Please attach your Aadhaar ({aadhaarFile.name}) when WhatsApp opens.
+          </p>
+        )}
         <p className="rsvp__hint">
           {copy === 'copied' && 'Copied. Paste it into a message to the couple.'}
           {copy === 'failed' && 'Could not copy. Press and hold the message above to copy it.'}
@@ -101,14 +144,45 @@ export default function RsvpForm({ onSubmit, labels = {} }) {
         </select>
       </label>
       {state.attending === 'yes' && (
-        <label>
-          <span>{labels.guests || 'Guests'}</span>
-          <select value={state.guests} onChange={set('guests')}>
-            {[1, 2, 3, 4, 5].map((n) => (
-              <option key={n} value={n}>{n}</option>
-            ))}
-          </select>
-        </label>
+        <>
+          <label>
+            <span>{labels.guests || 'Guests'}</span>
+            <select value={state.guests} onChange={set('guests')}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+          <label className="rsvp__file-label">
+            <span>{labels.aadhaar || 'Upload Aadhaar (Photo or PDF)'}</span>
+            <div className="rsvp__file-box">
+              <input
+                type="file"
+                id="rsvp-aadhaar-input"
+                className="rsvp__file-input"
+                accept="image/*,application/pdf"
+                onChange={handleAadhaar}
+              />
+              {!aadhaarFile ? (
+                <label htmlFor="rsvp-aadhaar-input" className="rsvp__file-cta">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                  <span>Choose Aadhaar File</span>
+                </label>
+              ) : (
+                <div className="rsvp__file-preview">
+                  <span className="rsvp__file-icon" aria-hidden="true">{aadhaarFile.type?.includes('pdf') ? '📄' : '🖼️'}</span>
+                  <span className="rsvp__file-name" title={aadhaarFile.name}>{aadhaarFile.name}</span>
+                  <span className="rsvp__file-size">({(aadhaarFile.size / (1024 * 1024)).toFixed(1)} MB)</span>
+                  <button type="button" className="rsvp__file-remove" onClick={removeAadhaar} aria-label="Remove uploaded file">✕</button>
+                </div>
+              )}
+            </div>
+          </label>
+        </>
       )}
       <label>
         <span>{labels.note || 'A note for the couple'}</span>

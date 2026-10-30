@@ -35,7 +35,8 @@ export const LINES = [
   text('gi', 'gate', 'You’re invited', 40),
   text('gt', 'gate', 'Tap to open', 60),
 
-  text('hn', 'hero', 'Invocation', 80),
+  text('hn', 'hero', 'Left invocation', 80),
+  text('hn2', 'hero', 'Right invocation', 80),
   text('hi', 'hero', 'Invitation line', 120, 'lines'),
   bound('hgr', 'hero', 'Groom’s name', ['cb']),
   text('hs', 'hero', 'Groom’s family line', 160, 'lines'),

@@ -68,4 +68,5 @@ temp/
 public/bride/
 public/groom/
 public/background/
-public/couple/
+public/couple/*
+!public/couple/couple_pic.png

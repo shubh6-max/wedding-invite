@@ -17,7 +17,7 @@ export const sageEnvelopeSample = {
   mapUrl: 'https://www.google.com/maps/search/?api=1&query=Saffron%20Court%20Gardens%2C%20Udaipur',
 
   // The hero's formal invitation, top to bottom. All family names are placeholders.
-  invocation: { text: 'Shri Chintamani Parshvanathaya Namah', script: null, meaning: '' },
+  invocation: { text: '॥ श्री आदिनाथाय नमः ॥', script: null, meaning: '' },
   inviteLine: 'Cordially invite you to attend the\nWedding of their son', // \n: the line breaks there, as in the original
   // Real, not placeholders: each family line sits under that name.
   groomLine: 'Grand Son of Late Smt. Pravinaben Shamlalji Siyakiya\n&\nSon of Smt. Nirmala Pramodji Siyakiya (Oswal)',

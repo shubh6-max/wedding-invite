@@ -2,11 +2,10 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { useEditing } from '../../lib/editing.js'
 import { useCountdown } from '../../lib/hooks.js'
 import { clearedShare } from '../../lib/scratch.js'
-import { clock } from '../../studio/format.js'
 import { art } from './art.js'
 import Music from '../../components/Music.jsx'
 import RsvpForm from '../../components/RsvpForm.jsx'
-import { directionsUrl, eventWhen, mapEmbedUrl, revealDate } from './format.js'
+import { directionsUrl, eventWhen, formatTime12, mapEmbedUrl, revealDate } from './format.js'
 import Line from './Line.jsx'
 import { DEFAULT_ORDER, normaliseOrder } from './lines.js'
 import { track } from './song.js'
@@ -33,6 +32,7 @@ const enter = (p, from, d = 0) => ({ ...p, enter: true, style: { ...p.style, '--
 // A section's painted backdrop, set inline so the URL follows the site's base path.
 const bg = (name) => ({ backgroundImage: `url(${art(name)})` })
 const BACKDROP = { mehendi: 'mehendi-bg', sangeet: 'sangeet-bg', wedding: 'wedding-bg', reception: 'reception-bg', cocktail: 'cocktail-bg' }
+const couplePic = `${import.meta.env.BASE_URL}couple/couple_pic.png`
 
 const DANCERS = [
   prop('dancer7', { bottom: 152, left: 32, width: 80 }, pulse(4, 1.05)),
@@ -290,8 +290,9 @@ function Event({ invite, i }) {
   const day = invite.design?.[`t-${s}d`] ?? ev.day
   const when = eventWhen(day)
   const picked = invite.design?.[`t-${s}t`]
-  const time = picked ? clock(picked) : ev.time ?? ''
+  const time = formatTime12(picked || ev.time)
   const after = own(invite, `${s}o`, 'onwards')
+  const timeStr = [time, after].filter(Boolean).join(' ')
   return (
     <section className={`se-event se-event--${theme}`} style={bg(BACKDROP[theme])} data-sec data-studio-section={s} aria-labelledby={`se-h-${s}`}>
       {PROPS[theme].map((p, k) => <Img key={k} p={p} />)}
@@ -303,7 +304,9 @@ function Event({ invite, i }) {
           <Line id={`${s}d`} fallback={when ? `${when.month} ${when.day} ${when.year}` : day ?? ''}>
             {when && <>{when.month} <span className="se-event__daynum">{when.day}</span> {when.year}</>}
           </Line>
-          <Line id={`${s}t`} fallback={[time, after].filter(Boolean).join(' ')} />
+          <Line id={`${s}t`} fallback={timeStr}>
+            {timeStr || null}
+          </Line>
           <Line id={`${s}p`} fallback={ev.place ?? ''} className="se-event__place" />
         </div>
         <Line id={`${s}l`} fallback={ev.dress ? 'Dress code' : ''} className="se-event__dresslabel" />
@@ -338,8 +341,10 @@ export default function SageEnvelope({ invite, viaGate }) {
         </div>
         <div className="se-hero__scene" style={bg('hero-scene')}>
           <div className="se-hero__copy">
-            <img className="se-hero__ganesha" src={art('ganesha')} alt="" />
-            <Line id="hn" fallback={invite.invocation?.text ? `||${invite.invocation.text}||` : ''} className="se-hero__namah se-t" style={rise(0)} />
+            <div className="se-hero__corners">
+              <Line id="hn" fallback={invite.invocation?.text || '॥ श्री आदिनाथाय नमः ॥'} className="se-hero__namah se-hero__namah--left se-t" style={rise(0)} />
+              <Line id="hn2" fallback="॥ श्री चिन्तामणि पार्श्वनाथाय नमः ॥" className="se-hero__namah se-hero__namah--right se-t" style={rise(0)} />
+            </div>
             <Line id="hi" fallback={invite.inviteLine ?? ''} className="se-hero__line se-t" style={rise(1)} />
             <h1>
               <Line id="hgr" as="span" fallback={b} className="se-t" style={rise(2)} />
@@ -365,7 +370,7 @@ export default function SageEnvelope({ invite, viaGate }) {
           <Line id="wn" htmlId="se-h-welcome" as="h2" fallback="{bride} & {groom}" className="se-welcome__names se-t" />
           <ScratchDate label={revealDate(invite.date)} coatText={own(invite, 'ws', 'Scratch to reveal')} editing={!!edit} />
         </div>
-        <img className="se-welcome__couple" src={art('couple')} alt="" />
+        <img className="se-welcome__couple" src={couplePic} alt="" />
         <Countdown iso={invite.date} />
         <div className="se-welcome__save">
           <Line id="wv" fallback="Save the date" className="se-t" style={{ '--d': '0.1s' }} />

@@ -14,6 +14,27 @@ export function eventWhen(dayLabel) {
   return { weekday: WEEKDAY.format(t).toUpperCase(), month: MONTH.format(t), day: t.getUTCDate(), year: t.getUTCFullYear() }
 }
 
+// Format a time string into 12-hour AM/PM format ('3:30 PM'). Accepts 24-hour ('15:30', '15:30:00'),
+// 12-hour ('3:30 PM', '03:30 pm'), or returns the string as typed if unrecognised.
+export function formatTime12(s) {
+  if (!s) return ''
+  const str = String(s).trim()
+  const m24 = /^([01]?\d|2[0-3]):([0-5]\d)(?::[0-5]\d)?$/.exec(str)
+  if (m24) {
+    const h = Number(m24[1])
+    const m = m24[2]
+    return `${h % 12 || 12}:${m} ${h < 12 ? 'AM' : 'PM'}`
+  }
+  const m12 = /^(\d{1,2}):([0-5]\d)(?::[0-5]\d)?\s*([AaPp][Mm])$/.exec(str)
+  if (m12) {
+    const h = Number(m12[1]) % 12 || 12
+    const m = m12[2]
+    const ampm = m12[3].toUpperCase()
+    return `${h}:${m} ${ampm}`
+  }
+  return str
+}
+
 // The wedding date under the scratch coating: '2026-06-05T13:00:00+05:30' -> '05 June 2026'.
 export function revealDate(iso) {
   const m = /^(\d{4})-(\d{2})-(\d{2})T/.exec(iso || '')

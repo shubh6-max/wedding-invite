@@ -38,7 +38,7 @@
 .tpl-sageenvelope [data-sec]:not([data-seen]) .se-enter { opacity: 0; translate: var(--from, 0 0); }
 .tpl-sageenvelope .se-drop { animation: se-drop 2s ease-out both; }
 /* In the Studio's edit preview everything shows at once (nothing waits to rise in), and the map ignores taps. */
-.tpl-sageenvelope.is-editing :is(.se-t, .se-word, .se-once, .se-enter, .se-family, .se-hero__ganesha) { opacity: 1 !important; translate: none !important; scale: none !important; }
+.tpl-sageenvelope.is-editing :is(.se-t, .se-word, .se-once, .se-enter, .se-family) { opacity: 1 !important; translate: none !important; scale: none !important; }
 .tpl-sageenvelope.is-editing .se-venue__map iframe { pointer-events: none; }
 .tpl-sageenvelope.is-editing .se-petals { display: none; } /* blossoms drifting over the words would get in the way */
 @keyframes se-drop { from { opacity: 0; transform: translateY(-80px); } }
@@ -46,46 +46,62 @@
 @keyframes se-bob { 50% { transform: translateY(var(--bob)); } }
 @keyframes se-pulse { 50% { scale: var(--pulse); } }
 
-/* The song's pause control (components/Music.jsx): a gold disc pinned top-right of the 430px column. */
+/* The song's pause control (components/Music.jsx): a gold disc pinned bottom-right of the 430px column. */
 .tpl-sageenvelope .se-music {
   position: fixed;
-  top: calc(12px + env(safe-area-inset-top));
-  right: max(calc(12px + env(safe-area-inset-right)), calc((100vw - 430px) / 2 + 12px));
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  right: max(calc(14px + env(safe-area-inset-right)), calc((100vw - 430px) / 2 + 14px));
   z-index: 800;
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 28px;
+  height: 28px;
   padding: 0;
-  border: 1.5px solid rgb(255 255 255 / 0.7);
+  border: 1px solid rgb(255 255 255 / 0.7);
   border-radius: 50%;
   background: linear-gradient(to bottom right, #c8a882, #b8986a);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.25);
   cursor: pointer;
 }
-.tpl-sageenvelope .se-music svg { width: 22px; height: 22px; fill: none; stroke: #2a2725; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tpl-sageenvelope .se-music svg { width: 14px; height: 14px; fill: none; stroke: #2a2725; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .tpl-sageenvelope .se-music[aria-pressed='false'] { opacity: 0.85; }
 .tpl-sageenvelope .se-music:focus-visible { outline: 2px solid #3e3935; outline-offset: 3px; }
 
 /* ---- hero: sky behind, the painted mandap scene, the formal invitation, seven dancers, falling blossoms ---- */
 .tpl-sageenvelope .se-hero { position: relative; min-height: 100dvh; overflow: hidden; background: top center / cover no-repeat; }
 .tpl-sageenvelope .se-hero__scene { position: relative; min-height: 100dvh; margin-top: 8px; background: center / cover no-repeat; }
-.tpl-sageenvelope .se-hero__copy { position: relative; width: 100%; padding: 0 24px; }
+.tpl-sageenvelope .se-hero__copy { position: relative; width: 100%; padding: 12px 18px 0; }
 .tpl-sageenvelope .se-hero .se-t { transition-duration: 0.6s; }
-.tpl-sageenvelope .se-hero__ganesha { display: block; width: 16px; margin: 0 auto; padding-top: 8px; transition: opacity 0.8s ease, scale 0.8s ease; }
-.tpl-sageenvelope .se-hero:not([data-in]) .se-hero__ganesha { opacity: 0; scale: 0.8; }
-.tpl-sageenvelope .se-hero__namah { margin-bottom: 8px; font: 500 12px/15px var(--serif); letter-spacing: 0.025em; } /* the original sets 10px; 12px is this site's readable floor */
-.tpl-sageenvelope .se-hero__line { margin-bottom: 12px; font: 400 13px/15.5px var(--serif); letter-spacing: 0.025em; white-space: pre-line; }
-.tpl-sageenvelope .se-hero h1 { display: grid; font-weight: 400; }
+.tpl-sageenvelope .se-hero__corners {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 14px;
+}
+.tpl-sageenvelope .se-hero__namah {
+  font: 500 11.5px/15px var(--serif);
+  letter-spacing: 0.025em;
+  color: #3e3935;
+  white-space: nowrap;
+}
+.tpl-sageenvelope .se-hero__namah--left {
+  text-align: left;
+}
+.tpl-sageenvelope .se-hero__namah--right {
+  text-align: right;
+}
+.tpl-sageenvelope .se-hero__line { margin-bottom: 14px; font: 400 13px/16px var(--serif); letter-spacing: 0.025em; white-space: pre-line; }
+.tpl-sageenvelope .se-hero h1 { display: grid; font-weight: 400; gap: 2px; }
 .tpl-sageenvelope .se-hero h1 > span:not(.se-hero__strong) { /* the names; the groom's family line keeps __strong */
-  font: 400 24px/32px var(--script);
+  font: 400 25px/33px var(--script);
   color: #b3385a;
   filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
 }
-.tpl-sageenvelope .se-hero h1 small { font: 400 15px/22.5px var(--serif); }
-.tpl-sageenvelope .se-hero__strong { font: 600 13px/19.5px var(--serif); letter-spacing: 0.025em; }
-.tpl-sageenvelope .se-hero__at { margin-top: -4px; }
-.tpl-sageenvelope .se-hero__venue { font-weight: 700; }
+.tpl-sageenvelope .se-hero h1 small { font: 400 14px/20px var(--serif); margin: 2px 0; }
+.tpl-sageenvelope .se-hero__strong { font: 600 13px/19px var(--serif); letter-spacing: 0.025em; }
+.tpl-sageenvelope .se-hero__at { margin-top: 4px; }
+.tpl-sageenvelope .se-hero__venue { font-weight: 700; margin-top: 2px; }
 .tpl-sageenvelope .se-dancers { position: absolute; bottom: 0; left: 0; z-index: 20; width: 100%; }
 
 .tpl-sageenvelope .se-petals { position: absolute; inset: 0; z-index: 50; overflow: hidden; pointer-events: none; }
@@ -153,7 +169,13 @@
 }
 .tpl-sageenvelope .se-scratch__key:focus-visible { outline: 2px solid #b79b40; outline-offset: 4px; }
 
-.tpl-sageenvelope .se-welcome__couple { width: 256px; object-fit: contain; animation: se-pulse 4s ease-in-out infinite; --pulse: 1.08; }
+.tpl-sageenvelope .se-welcome__couple {
+  width: 256px;
+  max-width: 80%;
+  object-fit: contain;
+  animation: se-pulse 4s ease-in-out infinite;
+  --pulse: 1.08;
+}
 
 .tpl-sageenvelope .se-count { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
 .tpl-sageenvelope .se-count > div {
@@ -317,3 +339,84 @@
 .tpl-sageenvelope .se-rsvp .rsvp__reply { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
 .tpl-sageenvelope .se-rsvp .rsvp__reply :is(a, button) { padding: 10px 20px; font-size: 16px; }
 .tpl-sageenvelope .se-rsvp .rsvp__hint { min-height: 22px; font-size: 15px; opacity: 0.75; }
+
+/* Aadhaar file upload box */
+.tpl-sageenvelope .se-rsvp .rsvp__file-box {
+  position: relative;
+  border: 1px dashed rgb(200 168 130 / 0.6);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.04);
+  padding: 10px 14px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.tpl-sageenvelope .se-rsvp .rsvp__file-box:hover {
+  border-color: #c8a882;
+  background: rgb(255 255 255 / 0.08);
+}
+.tpl-sageenvelope .se-rsvp .rsvp__file-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+  padding: 0;
+}
+.tpl-sageenvelope .se-rsvp .rsvp__file-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 8px;
+  cursor: pointer;
+  color: #c8a882;
+  font: 500 15px/22px var(--serif);
+}
+.tpl-sageenvelope .se-rsvp .rsvp__file-cta svg {
+  stroke: #c8a882;
+  flex-shrink: 0;
+}
+.tpl-sageenvelope .se-rsvp .rsvp__file-preview {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+  font: 400 14px/20px var(--serif);
+  color: #fff;
+}
+.tpl-sageenvelope .se-rsvp .rsvp__file-name {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tpl-sageenvelope .se-rsvp .rsvp__file-size {
+  opacity: 0.7;
+  font-size: 13px;
+}
+.tpl-sageenvelope .se-rsvp .rsvp__file-remove {
+  margin-left: auto;
+  appearance: none;
+  border: 0;
+  background: rgb(255 255 255 / 0.15);
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+}
+.tpl-sageenvelope .se-rsvp .rsvp__file-remove:hover {
+  background: rgba(220, 50, 50, 0.7);
+}
