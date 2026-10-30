@@ -153,8 +153,8 @@ export default function RsvpForm({ onSubmit, labels = {} }) {
               ))}
             </select>
           </label>
-          <label className="rsvp__file-label">
-            <span>{labels.aadhaar || 'Upload Aadhaar (Photo or PDF)'}</span>
+          <div className="rsvp__file-field">
+            <span className="rsvp__file-label">{labels.aadhaar || 'Upload Aadhaar Card (Photo or PDF)'}</span>
             <div className="rsvp__file-box">
               <input
                 type="file"
@@ -162,26 +162,31 @@ export default function RsvpForm({ onSubmit, labels = {} }) {
                 className="rsvp__file-input"
                 accept="image/*,application/pdf"
                 onChange={handleAadhaar}
+                aria-label="Upload Aadhaar Card"
               />
               {!aadhaarFile ? (
-                <label htmlFor="rsvp-aadhaar-input" className="rsvp__file-cta">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="17 8 12 3 7 8" />
-                    <line x1="12" y1="3" x2="12" y2="15" />
+                <div className="rsvp__file-cta" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="16" rx="2" />
+                    <circle cx="9" cy="10" r="2" />
+                    <line x1="15" y1="8" x2="17" y2="8" />
+                    <line x1="15" y1="12" x2="17" y2="12" />
+                    <line x1="7" y1="16" x2="17" y2="16" />
                   </svg>
-                  <span>Choose Aadhaar File</span>
-                </label>
+                  <span>Choose Aadhaar Card</span>
+                </div>
               ) : (
                 <div className="rsvp__file-preview">
-                  <span className="rsvp__file-icon" aria-hidden="true">{aadhaarFile.type?.includes('pdf') ? '📄' : '🖼️'}</span>
-                  <span className="rsvp__file-name" title={aadhaarFile.name}>{aadhaarFile.name}</span>
-                  <span className="rsvp__file-size">({(aadhaarFile.size / (1024 * 1024)).toFixed(1)} MB)</span>
+                  <div className="rsvp__file-info">
+                    <span className="rsvp__file-icon" aria-hidden="true">{aadhaarFile.type?.includes('pdf') ? '📄' : '🪪'}</span>
+                    <span className="rsvp__file-name" title={aadhaarFile.name}>{aadhaarFile.name}</span>
+                    <span className="rsvp__file-size">({(aadhaarFile.size / (1024 * 1024)).toFixed(1)} MB)</span>
+                  </div>
                   <button type="button" className="rsvp__file-remove" onClick={removeAadhaar} aria-label="Remove uploaded file">✕</button>
                 </div>
               )}
             </div>
-          </label>
+          </div>
         </>
       )}
       <label>

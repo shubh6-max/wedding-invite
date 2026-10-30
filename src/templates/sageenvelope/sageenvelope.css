@@ -306,7 +306,7 @@
 .tpl-sageenvelope .se-rsvp .rsvp { display: grid; gap: 16px; text-align: left; }
 .tpl-sageenvelope .se-rsvp .rsvp label { display: grid; gap: 6px; }
 .tpl-sageenvelope .se-rsvp .rsvp label span { font: italic 400 16px/22px var(--serif); color: rgb(255 255 255 / 0.75); }
-.tpl-sageenvelope .se-rsvp :is(input, select, textarea) {
+.tpl-sageenvelope .se-rsvp :is(input:not([type="file"]), select, textarea) {
   width: 100%;
   padding: 10px 14px;
   border: 1px solid rgb(200 168 130 / 0.5);
@@ -340,23 +340,41 @@
 .tpl-sageenvelope .se-rsvp .rsvp__reply :is(a, button) { padding: 10px 20px; font-size: 16px; }
 .tpl-sageenvelope .se-rsvp .rsvp__hint { min-height: 22px; font-size: 15px; opacity: 0.75; }
 
-/* Aadhaar file upload box */
+/* Aadhaar file upload field */
+.tpl-sageenvelope .se-rsvp .rsvp__file-field {
+  display: grid;
+  gap: 6px;
+  text-align: left;
+}
+.tpl-sageenvelope .se-rsvp .rsvp__file-label {
+  font: italic 400 16px/22px var(--serif);
+  color: rgb(255 255 255 / 0.75);
+}
 .tpl-sageenvelope .se-rsvp .rsvp__file-box {
   position: relative;
-  border: 1px dashed rgb(200 168 130 / 0.6);
-  border-radius: 12px;
-  background: rgb(255 255 255 / 0.04);
-  padding: 10px 14px;
-  min-height: 48px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px dashed rgb(200 168 130 / 0.7);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.05);
+  cursor: pointer;
+  box-sizing: border-box;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 .tpl-sageenvelope .se-rsvp .rsvp__file-box:hover {
   border-color: #c8a882;
-  background: rgb(255 255 255 / 0.08);
+  background: rgb(255 255 255 / 0.09);
+}
+.tpl-sageenvelope .se-rsvp .rsvp__file-box:focus-within {
+  outline: 2px solid #c8a882;
+  outline-offset: 2px;
 }
 .tpl-sageenvelope .se-rsvp .rsvp__file-input {
+  all: unset;
   position: absolute;
   inset: 0;
   width: 100%;
@@ -364,59 +382,81 @@
   opacity: 0;
   cursor: pointer;
   z-index: 2;
-  padding: 0;
+  box-sizing: border-box;
 }
 .tpl-sageenvelope .se-rsvp .rsvp__file-cta {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  gap: 8px;
-  cursor: pointer;
+  gap: 10px;
   color: #c8a882;
-  font: 500 15px/22px var(--serif);
+  font: 500 16px/24px var(--serif);
+  pointer-events: none;
 }
 .tpl-sageenvelope .se-rsvp .rsvp__file-cta svg {
+  width: 20px;
+  height: 20px;
   stroke: #c8a882;
   flex-shrink: 0;
+  display: block;
 }
 .tpl-sageenvelope .se-rsvp .rsvp__file-preview {
   position: relative;
   z-index: 3;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
   gap: 8px;
-  font: 400 14px/20px var(--serif);
+  font: 400 15px/22px var(--serif);
   color: #fff;
 }
+.tpl-sageenvelope .se-rsvp .rsvp__file-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+.tpl-sageenvelope .se-rsvp .rsvp__file-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  line-height: 1;
+}
 .tpl-sageenvelope .se-rsvp .rsvp__file-name {
-  max-width: 150px;
+  max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: 500;
+  color: #fff;
 }
 .tpl-sageenvelope .se-rsvp .rsvp__file-size {
   opacity: 0.7;
   font-size: 13px;
+  flex-shrink: 0;
+  color: rgb(255 255 255 / 0.75);
 }
 .tpl-sageenvelope .se-rsvp .rsvp__file-remove {
-  margin-left: auto;
   appearance: none;
   border: 0;
   background: rgb(255 255 255 / 0.15);
   color: #fff;
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
   border-radius: 50%;
   cursor: pointer;
   display: grid;
   place-items: center;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1;
   padding: 0;
+  transition: background 0.2s, transform 0.1s;
+  flex-shrink: 0;
 }
 .tpl-sageenvelope .se-rsvp .rsvp__file-remove:hover {
-  background: rgba(220, 50, 50, 0.7);
+  background: rgba(220, 50, 50, 0.8);
+  transform: scale(1.08);
 }
