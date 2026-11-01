@@ -2,6 +2,7 @@
 // values the invitation may safely render. Used by the editor, the viewer and the preview, so a
 // guest sees exactly what the editor accepted. Nothing here touches the DOM.
 import { formatStyle, normaliseOrder, parseStyle } from '../templates/sageenvelope/lines.js'
+import { parseTimeline, serializeTimeline } from '../templates/sageenvelope/timelineData.js'
 import { FIELDS, FIELD_BY_KEY, appliesTo, fieldsFor } from './fields.js'
 import { TZ_VALUES, clip, glen, parseDate, parseTime } from './format.js'
 
@@ -65,6 +66,10 @@ export function normaliseValue(field, raw) {
     case 'style': {
       const st = parseStyle(s)
       return st ? formatStyle(st) : null
+    }
+    case 'timeline': {
+      const parsed = parseTimeline(raw)
+      return parsed ? serializeTimeline(parsed) : null
     }
     case 'order': return normaliseOrder(s)
     case 'date': return dateOk(s) ? s : null

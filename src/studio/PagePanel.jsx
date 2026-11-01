@@ -50,6 +50,9 @@ export default function PagePanel({ invite, overrides, defaultFor, onSet, onShow
         {order.map((id, i) => (
           <li key={id} className="ppanel__row">
             <button type="button" className="ppanel__name" onClick={() => onShowSection(id)}>{label(id)}</button>
+            {id === 'timeline' && (
+              <button type="button" className="ppanel__btn ppanel__btn--text" onClick={() => onShowSection('timeline')} aria-label="Customize Wedding Timeline">Customize</button>
+            )}
             <button type="button" className="ppanel__btn" aria-label={`Move ${label(id)} up`} disabled={i === 0} onClick={() => move(id, -1)}>↑</button>
             <button type="button" className="ppanel__btn" aria-label={`Move ${label(id)} down`} disabled={i === order.length - 1} onClick={() => move(id, 1)}>↓</button>
             <button type="button" className="ppanel__btn ppanel__btn--text" aria-label={`Hide ${label(id)}`} disabled={order.length === 1} onClick={() => write(order.filter((x) => x !== id))}>Hide</button>

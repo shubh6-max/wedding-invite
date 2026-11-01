@@ -9,6 +9,7 @@ import Inspector from './Inspector.jsx'
 import PagePanel from './PagePanel.jsx'
 import Preview from './Preview.jsx'
 import ShareSheet from './ShareSheet.jsx'
+import TimelineManager from './TimelineManager.jsx'
 import { SAVE_TEXT, useWide } from './shell.js'
 import { useDraft } from './useDraft.js'
 import './inline.css'
@@ -100,11 +101,21 @@ export default function InlineStudio({ tpl }) {
   }
   const showSection = (id) => {
     setPageOpen(false)
+    if (id === 'timeline') {
+      setSelected({ line: 'timeline', text: '', type: 'timeline' })
+    }
     preview.current?.scrollTo(id)
   }
 
   const names = `${invite.couple.a} & ${invite.couple.b}`
-  const panel = line ? (
+  const isTimeline = selected.line === 'timeline'
+  const panel = isTimeline ? (
+    <TimelineManager
+      overrides={draft.overrides}
+      onSet={change}
+      onClose={close}
+    />
+  ) : line ? (
     <Inspector
       key={line.id}
       line={line}
@@ -171,7 +182,7 @@ export default function InlineStudio({ tpl }) {
           editable
           edit={mode === 'edit'}
           onSelect={(l, text) => {
-            setSelected({ line: l, text: text ?? '' })
+            setSelected({ line: l, text: text ?? '', type: l === 'timeline' ? 'timeline' : undefined })
             if (l) setPageOpen(false)
             if (l && !wide) preview.current?.select(l) // the sheet rises over the lower half: bring the line up
           }}
@@ -179,9 +190,9 @@ export default function InlineStudio({ tpl }) {
         />
       </section>
 
-      {(wide || line || pageOpen) && (
-        <aside className="istudio__panel" aria-label={line ? `Change: ${line.label}` : 'Page'}>
-          {!wide && !line && (
+      {(wide || line || isTimeline || pageOpen) && (
+        <aside className="istudio__panel" aria-label={isTimeline ? 'Wedding Timeline' : line ? `Change: ${line.label}` : 'Page'}>
+          {!wide && !line && !isTimeline && (
             <button type="button" className="btn btn--quiet istudio__close" onClick={() => setPageOpen(false)}>Close</button>
           )}
           {panel}

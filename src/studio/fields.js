@@ -113,6 +113,7 @@ const design = [
   ...DATE_KEYS.map((key, i) => des({ key, path: `design.${key}`, label: `Event ${i + 1} date`, control: 'date', type: 'date' })),
   ...TIME_KEYS.map((key, i) => des({ key, path: `design.${key}`, label: `Event ${i + 1} time`, control: 'time', type: 'time' })),
   des({ key: 'o', path: 'design.o', label: 'Section order', control: 'order', max: 200 }),
+  des({ key: 't-tl', path: 'design.t-tl', label: 'Wedding Timeline', control: 'timeline', max: 8000 }),
 ]
 
 export const FIELDS = [...single, ...events, ...story, ...wording, ...design]

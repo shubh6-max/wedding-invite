@@ -71,7 +71,31 @@ export default function Inspector({ line, where, overrides, defaultFor, weddingD
         <div className="insp__font">
           <label htmlFor={id('font')}>Font</label>
           <select id={id('font')} value={st.font ?? 0} onChange={(e) => setStyle({ font: Number(e.target.value) || undefined })}>
-            {FONTS.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}
+            {(() => {
+              const groups = {}
+              for (const f of FONTS) {
+                const g = f.group || 'Other'
+                if (!groups[g]) groups[g] = []
+                groups[g].push(f)
+              }
+              return Object.entries(groups).map(([grp, list]) =>
+                grp === 'Default' ? (
+                  list.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.label}
+                    </option>
+                  ))
+                ) : (
+                  <optgroup key={grp} label={grp}>
+                    {list.map((f) => (
+                      <option key={f.id} value={f.id} style={{ fontFamily: f.css || 'inherit' }}>
+                        {f.label}
+                      </option>
+                    ))}
+                  </optgroup>
+                )
+              )
+            })()}
           </select>
         </div>
       </fieldset>

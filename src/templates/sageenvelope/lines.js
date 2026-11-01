@@ -17,6 +17,7 @@ export const SECTIONS = [
   ...[0, 1, 2, 3, 4].map((i) => ({ id: `e${i}`, label: `Event ${i + 1}` })),
   { id: 'closing', label: 'Closing note' },
   { id: 'families', label: 'Families' },
+  { id: 'timeline', label: 'Wedding Timeline' },
   { id: 'venue', label: 'Venue' },
   { id: 'footer', label: 'RSVP' }, // id kept: saved section orders name it
 ]
@@ -97,10 +98,75 @@ export const TEXT_FIELDS = [
   ...[0, 1, 2, 3, 4].map((i) => ({ key: `t-e${i}o`, max: 20, control: 'text', label: 'Word after the time' })),
 ]
 
+// The fonts a line can switch to; 0 keeps the line's own.
+export const FONTS = [
+  { id: 0, label: 'As designed', css: null, group: 'Default' },
+  { id: 1, label: 'Great Vibes (Script)', css: "'Great Vibes', cursive", group: 'Script & Calligraphy' },
+  { id: 2, label: 'Cormorant (Serif)', css: "'Cormorant', Georgia, serif", group: 'Classic & Book Serif' },
+  { id: 3, label: 'Playfair Display', css: "'Playfair Display', Georgia, serif", group: 'Classic & Book Serif' },
+
+  // Script & Calligraphy (Top Wedding Classics)
+  { id: 4, label: 'Allura (Romantic calligraphy)', css: "'Allura', cursive", group: 'Script & Calligraphy' },
+  { id: 5, label: 'Pinyon Script (Regal French script)', css: "'Pinyon Script', cursive", group: 'Script & Calligraphy' },
+  { id: 6, label: 'Alex Brush (Graceful brush script)', css: "'Alex Brush', cursive", group: 'Script & Calligraphy' },
+  { id: 7, label: 'Tangerine (Delicate tall script)', css: "'Tangerine', cursive", group: 'Script & Calligraphy' },
+  { id: 8, label: 'Parisienne (French romantic cursive)', css: "'Parisienne', cursive", group: 'Script & Calligraphy' },
+  { id: 9, label: 'Dancing Script (Playful wedding script)', css: "'Dancing Script', cursive", group: 'Script & Calligraphy' },
+  { id: 10, label: 'Kalam (Handwritten cursive)', css: "'Kalam', 'Noto Serif Devanagari', cursive", group: 'Script & Calligraphy' },
+  { id: 11, label: 'Amita (Calligraphic)', css: "'Amita', 'Noto Serif Gujarati', serif", group: 'Script & Calligraphy' },
+
+  // Classic & Book Serif (Luxury Wedding Staples)
+  { id: 12, label: 'Cormorant Garamond (Classic book)', css: "'Cormorant Garamond', Georgia, serif", group: 'Classic & Book Serif' },
+  { id: 13, label: 'Prata (Teardrop Didone serif)', css: "'Prata', Georgia, serif", group: 'Classic & Book Serif' },
+  { id: 14, label: 'EB Garamond (Traditional heritage)', css: "'EB Garamond', Georgia, serif", group: 'Classic & Book Serif' },
+  { id: 15, label: 'Cinzel (Roman inscriptional)', css: "'Cinzel', serif", group: 'Classic & Book Serif' },
+  { id: 16, label: 'Instrument Serif (Modern editorial)', css: "'Instrument Serif', Georgia, serif", group: 'Classic & Book Serif' },
+  { id: 17, label: 'Italiana (Haute couture)', css: "'Italiana', Georgia, serif", group: 'Classic & Book Serif' },
+  { id: 18, label: 'Marcellus (Roman capitals)', css: "'Marcellus', Georgia, serif", group: 'Classic & Book Serif' },
+  { id: 19, label: 'Spectral (Literary serif)', css: "'Spectral', Georgia, serif", group: 'Classic & Book Serif' },
+  { id: 20, label: 'IM Fell English (Historic serif)', css: "'IM Fell English', Georgia, serif", group: 'Classic & Book Serif' },
+  { id: 21, label: 'Lora (Contemporary serif)', css: "'Lora', Georgia, serif", group: 'Classic & Book Serif' },
+
+  // Display & High-Contrast Serif
+  { id: 22, label: 'Bodoni Moda (Didone fashion)', css: "'Bodoni Moda', serif", group: 'Display & High-Contrast Serif' },
+  { id: 23, label: 'DM Serif Display (Warm editorial)', css: "'DM Serif Display', Georgia, serif", group: 'Display & High-Contrast Serif' },
+  { id: 24, label: 'Fraunces (Soft editorial)', css: "'Fraunces', Georgia, serif", group: 'Display & High-Contrast Serif' },
+  { id: 25, label: 'Gloock (Bold headline)', css: "'Gloock', Georgia, serif", group: 'Display & High-Contrast Serif' },
+  { id: 26, label: 'Limelight (Art deco)', css: "'Limelight', Georgia, serif", group: 'Display & High-Contrast Serif' },
+  { id: 27, label: 'Rozha One (Bold Indic Bodoni)', css: "'Rozha One', 'Noto Serif Devanagari', serif", group: 'Display & High-Contrast Serif' },
+  { id: 28, label: 'Eczar (Robust display)', css: "'Eczar', 'Noto Serif Devanagari', serif", group: 'Display & High-Contrast Serif' },
+
+  // Modern Clean Sans-Serif
+  { id: 29, label: 'Montserrat (Modern wedding sans)', css: "'Montserrat', system-ui, sans-serif", group: 'Modern Sans-Serif' },
+  { id: 30, label: 'Josefin Sans (Vintage geometric)', css: "'Josefin Sans', sans-serif", group: 'Modern Sans-Serif' },
+  { id: 31, label: 'Karla (Grotesque sans)', css: "'Karla', system-ui, sans-serif", group: 'Modern Sans-Serif' },
+  { id: 32, label: 'Outfit (Fashion sans)', css: "'Outfit', system-ui, sans-serif", group: 'Modern Sans-Serif' },
+  { id: 33, label: 'Manrope (Modern geometric)', css: "'Manrope', system-ui, sans-serif", group: 'Modern Sans-Serif' },
+  { id: 34, label: 'DM Sans (Geometric sans)', css: "'DM Sans', system-ui, sans-serif", group: 'Modern Sans-Serif' },
+  { id: 35, label: 'Hanken Grotesk (Neo-grotesk)', css: "'Hanken Grotesk', system-ui, sans-serif", group: 'Modern Sans-Serif' },
+  { id: 36, label: 'Archivo (Clean grotesk)', css: "'Archivo', system-ui, sans-serif", group: 'Modern Sans-Serif' },
+  { id: 37, label: 'Barlow Condensed (Tall condensed)', css: "'Barlow Condensed', sans-serif", group: 'Modern Sans-Serif' },
+  { id: 38, label: 'Hind (Humanist sans)', css: "'Hind', 'Mukta', system-ui, sans-serif", group: 'Modern Sans-Serif' },
+  { id: 39, label: 'Mukta (Contemporary sans)', css: "'Mukta', system-ui, sans-serif", group: 'Modern Sans-Serif' },
+  { id: 40, label: 'Nunito (Rounded friendly)', css: "'Nunito', sans-serif", group: 'Modern Sans-Serif' },
+
+  // Traditional & Indic Scripts
+  { id: 41, label: 'Noto Serif Devanagari (Devanagari)', css: "'Noto Serif Devanagari', serif", group: 'Traditional & Indic' },
+  { id: 42, label: 'Noto Serif Gujarati (Gujarati)', css: "'Noto Serif Gujarati', serif", group: 'Traditional & Indic' },
+  { id: 43, label: 'Tiro Devanagari Hindi (Formal Indic)', css: "'Tiro Devanagari Hindi', 'Noto Serif Devanagari', serif", group: 'Traditional & Indic' },
+  { id: 44, label: 'Sahitya (Literary Devanagari)', css: "'Sahitya', 'Noto Serif Devanagari', serif", group: 'Traditional & Indic' },
+  { id: 45, label: 'Shrikhand (Retro hand-painted)', css: "'Shrikhand', cursive", group: 'Traditional & Indic' },
+  { id: 46, label: 'Yatra One (Devanagari display)', css: "'Yatra One', display", group: 'Traditional & Indic' },
+
+  // Novelty & Monospace
+  { id: 47, label: 'Bagel Fat One (Chunky playful)', css: "'Bagel Fat One', sans-serif", group: 'Chunky & Monospace' },
+  { id: 48, label: 'IBM Plex Mono (Monospace)', css: "'IBM Plex Mono', monospace", group: 'Chunky & Monospace' },
+]
+
 // ---- style: s<size %>w<box width %>a<l|c|r>c<hex colour>f<font>m<space above px>, every part optional ---
-const STYLE = /^(?:s(\d{2,3}))?(?:w(\d{2,3}))?(?:a([lcr]))?(?:c([0-9a-f]{6}))?(?:f([0-3]))?(?:m(-?\d{1,3}))?$/
+const STYLE = /^(?:s(\d{2,3}))?(?:w(\d{2,3}))?(?:a([lcr]))?(?:c([0-9a-f]{6}))?(?:f(\d{1,2}))?(?:m(-?\d{1,3}))?$/
 const inRange = (n, lo, hi) => n >= lo && n <= hi
-export const STYLE_LIMITS = { size: [50, 300], width: [20, 100], space: [-60, 120] }
+export const STYLE_LIMITS = { size: [50, 300], width: [20, 100], space: [-60, 120], font: [0, FONTS.length - 1] }
 
 // The style object for a compact string, {} for '', or null when it is malformed or out of range.
 export function parseStyle(s) {
@@ -128,14 +194,6 @@ export function formatStyle(o) {
     o.space !== undefined && `m${o.space}`,
   ].filter(Boolean).join('')
 }
-
-// The fonts a line can switch to; 0 keeps the line's own.
-export const FONTS = [
-  { id: 0, label: 'As designed', css: null },
-  { id: 1, label: 'Great Vibes (script)', css: "'Great Vibes', cursive" },
-  { id: 2, label: 'Cormorant (serif)', css: "'Cormorant', Georgia, serif" },
-  { id: 3, label: 'Playfair Display', css: "'Playfair Display', Georgia, serif" },
-]
 const ALIGN = { l: 'left', c: 'center', r: 'right' }
 
 // CSS for a line: `outer` on the line's own element (box, alignment, colour, font, space above) and

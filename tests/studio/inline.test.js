@@ -2,7 +2,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
-  DATE_KEYS, DEFAULT_ORDER, LINES, SECTIONS, SHARED_KEYS, TEXT_FIELDS, TIME_KEYS, fill, formatStyle, normaliseOrder, parseStyle, styleCss,
+  DATE_KEYS, DEFAULT_ORDER, FONTS, LINES, SECTIONS, SHARED_KEYS, TEXT_FIELDS, TIME_KEYS, fill, formatStyle, normaliseOrder, parseStyle, styleCss,
 } from '../../src/templates/sageenvelope/lines.js'
 
 // ---- Task 1: catalogue, style, order, tokens ----------------------------------------------------
@@ -21,7 +21,7 @@ test('every line has a unique id, a known section and fields it can edit', () =>
 
 test('the default order lists every orderable section once', () => {
   assert.equal(DEFAULT_ORDER, SECTIONS.map((s) => s.id).join(','))
-  assert.equal(SECTIONS.length, 11)
+  assert.equal(SECTIONS.length, 12)
 })
 
 test('styles round-trip through their compact form', () => {
@@ -34,8 +34,21 @@ test('styles round-trip through their compact form', () => {
 })
 
 test('styles out of range or malformed are refused', () => {
-  for (const bad of ['s301', 's49', 'w10', 'w101', 'cZZZZZZ', 'c12345', 'f4', 'm200', 'm-61', 'x1', 'w80s120', 'aq']) assert.equal(parseStyle(bad), null, bad)
+  for (const bad of ['s301', 's49', 'w10', 'w101', 'cZZZZZZ', 'c12345', 'f99', `f${FONTS.length}`, 'm200', 'm-61', 'x1', 'w80s120', 'aq']) assert.equal(parseStyle(bad), null, bad)
   assert.equal(parseStyle(undefined), null)
+})
+
+test('every font option has an id, label, css stack (except as designed) and parses correctly', () => {
+  assert.ok(FONTS.length >= 40, `expected at least 40 fonts, got ${FONTS.length}`)
+  for (const f of FONTS) {
+    assert.equal(typeof f.id, 'number')
+    assert.ok(f.label)
+    if (f.id === 0) assert.equal(f.css, null)
+    else assert.ok(f.css)
+    const st = parseStyle(`f${f.id}`)
+    assert.deepEqual(st, { font: f.id })
+    assert.equal(formatStyle(st), `f${f.id}`)
+  }
 })
 
 test('section order keeps known ids once; anything else is refused', () => {

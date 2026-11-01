@@ -9,6 +9,7 @@ import { directionsUrl, eventWhen, formatTime12, mapEmbedUrl, revealDate } from 
 import Line from './Line.jsx'
 import { DEFAULT_ORDER, normaliseOrder } from './lines.js'
 import { track } from './song.js'
+import TimelineSection from './TimelineSection.jsx'
 import './sageenvelope.css'
 
 // Sage Envelope page: the original invitation's mobile layout (390px), rebuilt layer for layer from its own artwork
@@ -54,11 +55,12 @@ const PROPS = {
     prop('umbrella1', { bottom: 216, right: -40, width: 112, rotate: '-25deg' }, sway(4, 5)),
   ],
   sangeet: [
-    { ...prop('sangeet-lights', { top: 0, left: 0, width: '100%' }), drop: true },
-    prop('disco', { top: 128, left: 0, width: 64 }, bob(3, -10)),
-    prop('disco', { top: 40, left: 112, marginLeft: -32, width: 64 }, bob(3.5, -12)),
-    prop('disco', { top: 96, right: 24, width: 80 }, bob(4, -10)),
-    prop('disco', { top: 16, right: 128, width: 56 }, bob(4, -10)),
+    enter(prop('cocktail-drapes', { top: 0, left: 0, width: '100%', zIndex: 10 }), '0 -120px'),
+    { ...prop('sangeet-lights', { top: 0, left: 0, width: '100%', zIndex: 15 }), drop: true },
+    prop('disco', { top: 128, left: 0, width: 64, zIndex: 20 }, bob(3, -10)),
+    prop('disco', { top: 40, left: 112, marginLeft: -32, width: 64, zIndex: 20 }, bob(3.5, -12)),
+    prop('disco', { top: 96, right: 24, width: 80, zIndex: 20 }, bob(4, -10)),
+    prop('disco', { top: 16, right: 128, width: 56, zIndex: 20 }, bob(4, -10)),
     prop('lamp', { top: 480, right: 8, width: 48 }, pulse(2.5, 1.08)),
     prop('lamp', { bottom: 160, right: 80, width: 40 }, pulse(2.5, 1.08)),
     prop('side-disco', { bottom: 160, left: -32, width: 144 }, pulse(2.5, 1.08)),
@@ -337,7 +339,7 @@ export default function SageEnvelope({ invite, viaGate }) {
           <div className="se-hero__copy">
             <div className="se-hero__corners">
               <Line id="hn" fallback={invite.invocation?.text || '॥ श्री आदिनाथाय नमः ॥'} className="se-hero__namah se-hero__namah--left se-t" style={rise(0)} />
-              <Line id="hn2" fallback="॥ श्री चिन्तामणि पार्श्वनाथाय नमः ॥" className="se-hero__namah se-hero__namah--right se-t" style={rise(0)} />
+              <Line id="hn2" fallback="॥ श्री चिंतामणि पार्श्वनाथाय नमः ॥" className="se-hero__namah se-hero__namah--right se-t" style={rise(0)} />
             </div>
             <Line id="hi" fallback={invite.inviteLine ?? ''} className="se-hero__line se-t" style={rise(1)} />
             <h1>
@@ -396,6 +398,9 @@ export default function SageEnvelope({ invite, viaGate }) {
           </div>
         ))}
       </section>
+    ),
+    timeline: (
+      <TimelineSection key="timeline" invite={invite} />
     ),
     venue: (
       <section key="venue" className="se-venue" style={bg('venue-bg')} data-sec data-studio-section="venue" aria-labelledby="se-h-venue">
