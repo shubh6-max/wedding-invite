@@ -86,7 +86,8 @@ const contemporary = [
     Component: lazy(() => import('../templates/velvetseal/VelvetSeal.jsx')),
   },
   {
-    id: 'sageenvelope', name: 'KomalWedsPrem', group: 'Romantic', editable: true, editor: 'inline', // edited line by line on the page
+    id: 'KomalWedsPrem', name: 'KomalWedsPrem', group: 'Romantic', editable: true, editor: 'inline', // edited line by line on the page
+    design: 'sageenvelope',
     blurb: 'A painted sage envelope, then a watercolour wedding day, one scene per event.',
     signature: 'Tap the seal; scratch the orange card for the date, then scroll through five themed events.',
     palette: ['#fdfcf9', '#3e3935', '#b79b40'], font: "'Great Vibes', cursive", shape: 'rect', // page ground, ink, gold
@@ -335,7 +336,10 @@ const traditional = [
 // without a Gate simply opens directly. `preload` warms the page chunk while the gate is on screen.
 const gateLoaders = import.meta.glob(['../templates/*/Gate.jsx', '!../templates/_reference/*'])
 const pageLoaders = import.meta.glob(['../templates/*/*.jsx', '!../templates/*/Gate.jsx', '!../templates/_reference/*'])
-const byId = (map, id) => map[Object.keys(map).find((k) => k.includes(`/templates/${id}/`))]
+const byId = (map, id) => {
+  const target = id === 'KomalWedsPrem' ? 'sageenvelope' : id
+  return map[Object.keys(map).find((k) => k.includes(`/templates/${target}/`))]
+}
 
 export const templates = [...contemporary.map((t) => ({ tradition: 'contemporary', ...t })), ...traditional].map((t) => {
   const gate = byId(gateLoaders, t.id)

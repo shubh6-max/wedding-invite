@@ -40,6 +40,19 @@ test('replyText: names with spaces, emoji and Devanagari are kept as typed (trim
   assert.match(t, /\nआशा 🌸: /)
 })
 
+test('replyText: single aadhaar file is included', () => {
+  const t1 = replyText({ ...base, aadhaarName: 'card.jpg' })
+  assert.match(t1, /\nAadhaar: card\.jpg/)
+
+  const t2 = replyText({ ...base, aadhaarNames: ['card.jpg'] })
+  assert.match(t2, /\nAadhaar: card\.jpg/)
+})
+
+test('replyText: multiple aadhaar files format with count and list', () => {
+  const t = replyText({ ...base, aadhaarNames: ['card1.jpg', 'card2.pdf'] })
+  assert.match(t, /\nAadhaar \(2\): card1\.jpg, card2\.pdf/)
+})
+
 test('replyLinks: a WhatsApp number is reduced to digits', () => {
   const { wa } = replyLinks({ number: '+91 98765-43210', email: '', text: 'hi' })
   assert.equal(wa, 'https://wa.me/919876543210?text=hi')

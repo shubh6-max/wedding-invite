@@ -21,7 +21,7 @@ const HISTORY = 50 // undo steps kept
 // line's words, size, width, alignment, colour and font, or, with nothing selected, the page order and the
 // details shared by several lines. The draft, the device copy and the share link are the form Studio's own.
 export default function InlineStudio({ tpl }) {
-  const design = tpl.id
+  const design = tpl.design || (tpl.id === 'KomalWedsPrem' ? 'sageenvelope' : tpl.id)
   const preset = presetFor(tpl.tradition, tpl.sample)
   const values = useMemo(() => presetValues(preset), [preset])
   const draft = useDraft(tpl.tradition, design)

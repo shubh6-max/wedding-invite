@@ -57,9 +57,19 @@ qa-out/
 # Local AI / design tool state
 .impeccable/
 .superpowers/
+docs/superpowers/
 
-# Scratch / throwaway scripts
+# Scratch / throwaway scripts & prototypes
 scratch-*
+scratch.*
+*-preview.html
+preview-*.html
+preview.html
+
+# Backup files
+*.orig
+*.orig.*
+*.bak
 
 # Local reference kits (source video, reference frames, planning notes)
 temp/
@@ -70,3 +80,10 @@ public/groom/
 public/background/
 public/couple/*
 !public/couple/couple_pic.png
+
+# Intermediate design exploration assets
+public/sageenvelope/hero-mandap-*
+public/sageenvelope/mandap-*
+public/sageenvelope/haldi-bowl.*
+public/sageenvelope/shubh-kalash.*
+public/sageenvelope/wedding-diya.*

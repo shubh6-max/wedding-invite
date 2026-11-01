@@ -534,6 +534,8 @@
   font-size: 0.95rem;
 }
 .rsvp__file-cta svg { flex-shrink: 0; }
+.rsvp__files-list { display: grid; gap: 6px; margin-top: 6px; }
+.rsvp__file-item,
 .rsvp__file-preview {
   position: relative;
   z-index: 3;
@@ -542,7 +544,11 @@
   justify-content: space-between;
   width: 100%;
   gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
   font-size: 0.9rem;
+  box-sizing: border-box;
 }
 .rsvp__file-info {
   display: flex;

@@ -49,6 +49,7 @@ export const DESIGN_BUCKETS = {
     { id: 'families', group: 'hosts', label: 'Family names', keys: ['t-f0n', 't-f1n'] },
   ],
 }
+DESIGN_BUCKETS.KomalWedsPrem = DESIGN_BUCKETS.sageenvelope
 
 const f = (o) => ({ control: 'text', type: 'text', scope: 'common', required: false, traditions: null, ...o })
 
@@ -117,7 +118,10 @@ const design = [
 export const FIELDS = [...single, ...events, ...story, ...wording, ...design]
 export const FIELD_BY_KEY = new Map(FIELDS.map((x) => [x.key, x]))
 // A design field applies only to its own design; every other field by tradition, as before.
-export const appliesTo = (field, tradition, design = null) => (field.design ? field.design === design : !field.traditions || field.traditions.includes(tradition))
+export const appliesTo = (field, tradition, design = null) => {
+  const d = design === 'KomalWedsPrem' ? 'sageenvelope' : design
+  return field.design ? field.design === d : !field.traditions || field.traditions.includes(tradition)
+}
 export const fieldsFor = (tradition, design = null) => FIELDS.filter((x) => appliesTo(x, tradition, design))
 export const scopeOf = (key) => FIELD_BY_KEY.get(key)?.scope
 // Designs that have fields of their own (edited in place).

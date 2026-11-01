@@ -36,13 +36,16 @@ function LinkProblem({ code }) {
 // removed). Designs without a Gate, the original invite and `?open=1` go straight to 'open'.
 // Content comes from useInviteSource: the sample, a personalised link (?d=), or the Studio's preview
 // (?embed=1). A new draft only swaps the invite prop; it never changes `phase`, so the gate is not replayed.
+const resolveTemplateId = (id) => (id === 'sageenvelope' || (id && id.toLowerCase() === 'komalwedsprem') ? 'KomalWedsPrem' : id)
+
 function Design({ id, params }) {
+  const resolvedId = resolveTemplateId(id)
   const embed = params.get('embed') === '1'
-  const tpl = templates.find((t) => t.id === id)
-  const isOriginal = id === 'original'
+  const tpl = templates.find((t) => t.id === resolvedId)
+  const isOriginal = resolvedId === 'original'
   const hasGate = !!tpl?.Gate && params.get('open') !== '1'
   const [seq, setSeq] = useState({ id: null, phase: 'closed' })
-  const phase = !hasGate ? 'open' : seq.id === id ? seq.phase : 'closed'
+  const phase = !hasGate ? 'open' : seq.id === resolvedId ? seq.phase : 'closed'
 
   const onReplay = useCallback(() => {
     window.scrollTo(0, 0)
@@ -93,9 +96,9 @@ function Design({ id, params }) {
     }
   }, [tpl])
 
-  const onOpen = useCallback(() => setSeq({ id, phase: 'opening' }), [id])
+  const onOpen = useCallback(() => setSeq({ id: resolvedId, phase: 'opening' }), [resolvedId])
   const onDone = useCallback(() => {
-    setSeq({ id, phase: 'open' })
+    setSeq({ id: resolvedId, phase: 'open' })
     // Hand keyboard / screen-reader focus to the invitation's heading once the gate is gone. The page
     // may still be suspended on a slow network, so retry for ~1s until its heading exists.
     let tries = 0
@@ -109,7 +112,7 @@ function Design({ id, params }) {
       }
     }
     requestAnimationFrame(focusHeading)
-  }, [id])
+  }, [resolvedId])
 
   if (source.status === 'error') return <LinkProblem code={source.code} />
   const invite = tpl ? source.invite : sample
@@ -143,28 +146,39 @@ function Design({ id, params }) {
           {/* Same context as the page, so a gate can show the couple's photos (components/Photo.jsx). */}
           <InviteContext.Provider value={invite}>
             <EditContext.Provider value={source.edit}>
-              <Gate key={id} invite={invite} onOpen={onOpen} onDone={onDone} />
+              <Gate key={resolvedId} invite={invite} onOpen={onOpen} onDone={onDone} />
             </EditContext.Provider>
           </InviteContext.Provider>
         </Suspense>
       )}
-      {!embed && <Pill id={id} params={params} onReplay={hasGate ? onReplay : undefined} />}
+      {!embed && <Pill id={resolvedId} params={params} onReplay={hasGate ? onReplay : undefined} />}
     </>
   )
 }
 
 export default function App() {
   const { view, id, params } = useRoute()
-  const tpl = templates.find((t) => t.id === id)
+  const resolvedId = resolveTemplateId(id)
+  const tpl = templates.find((t) => t.id === resolvedId)
+
+  useEffect(() => {
+    if (id === 'sageenvelope' || (id && id !== 'KomalWedsPrem' && id.toLowerCase() === 'komalwedsprem')) {
+      const current = window.location.hash
+      const updated = current.replace(/#\/(t|studio)\/[^?#]+/i, '#/$1/KomalWedsPrem')
+      if (updated !== current) {
+        window.location.replace(updated)
+      }
+    }
+  }, [id])
 
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, [view, id])
+  }, [view, resolvedId])
   // Not in the studio: its editor panels scroll on their own, and its preview is an iframe that runs its own.
-  useSmoothScroll(view !== 'studio', `${view}/${id}`)
+  useSmoothScroll(view !== 'studio', `${view}/${resolvedId}`)
   useEffect(() => {
-    if (view === 'gallery' || !(tpl || id === 'original')) document.title = 'Wedding invitation designs'
-  }, [view, tpl, id])
+    if (view === 'gallery' || !(tpl || resolvedId === 'original')) document.title = 'Wedding invitation designs'
+  }, [view, tpl, resolvedId])
 
   if (view === 'studio' && tpl) {
     return (
@@ -173,6 +187,6 @@ export default function App() {
       </Suspense>
     )
   }
-  if (view === 'design' && (tpl || id === 'original')) return <Design id={id} params={params} />
+  if (view === 'design' && (tpl || resolvedId === 'original')) return <Design id={resolvedId} params={params} />
   return <Gallery />
 }

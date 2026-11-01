@@ -30,7 +30,7 @@ const prop = (img, box, ...loops) => ({
 const enter = (p, from, d = 0) => ({ ...p, enter: true, style: { ...p.style, '--from': from, '--d': `${d}s` } })
 
 // A section's painted backdrop, set inline so the URL follows the site's base path.
-const bg = (name) => ({ backgroundImage: `url(${art(name)})` })
+const bg = (name) => ({ backgroundImage: `url(${art(name)}?v=5)` })
 const BACKDROP = { mehendi: 'mehendi-bg', sangeet: 'sangeet-bg', wedding: 'wedding-bg', reception: 'reception-bg', cocktail: 'cocktail-bg' }
 const couplePic = `${import.meta.env.BASE_URL}couple/couple_pic.png`
 
@@ -64,13 +64,7 @@ const PROPS = {
     prop('side-disco', { bottom: 160, left: -32, width: 144 }, pulse(2.5, 1.08)),
   ],
   wedding: [
-    enter(prop('wedding-garland', { top: -40, right: 16, width: 160 }, bob(4, -6), pulse(4, 1.02)), '120px 0'),
-    enter(prop('wedding-garland', { top: -40, left: -96, width: 160 }, bob(4, -6), pulse(4, 1.02)), '120px 0'),
-    enter(prop('wedding-sidevase', { bottom: 40, right: -295, width: 400 }, bob(5, -8)), '0 0', 0.2),
-    enter(prop('wedding-vase-tall', { bottom: -80, left: -24, width: 112 }, bob(4, -5)), '-120px 0', 0.3),
-    enter(prop('wedding-vase', { bottom: 0, left: 56, width: 96 }, bob(4.5, -6)), '-120px 0', 0.4),
-    enter(prop('wedding-fire', { bottom: 40, right: 80, width: 128 }, pulse(3, 1.06)), '0 120px', 0.5),
-    enter(prop('wedding-pond', { bottom: -24, left: 240, marginLeft: -72, width: 144 }, bob(5, -4)), '0 0', 0.6),
+    enter(prop('wedding-mandap', { bottom: 0, left: '50%', marginLeft: -193, width: 386, zIndex: 10, filter: 'drop-shadow(0 14px 24px rgba(0,0,0,0.35))' }, bob(5, -6)), '0 120px', 0.25),
   ],
   reception: [
     enter(prop('reception-table', { bottom: -16, left: -40, width: 232 }, bob(4, -6)), '-120px 0'),
@@ -110,7 +104,7 @@ const PETALS = (() => {
 })()
 
 const Img = ({ p, className = '' }) => (
-  <img className={`se-prop${p.enter ? ' se-enter' : ''}${p.drop ? ' se-drop' : ''} ${className}`} src={art(p.img)} style={p.style} alt="" aria-hidden="true" />
+  <img className={`se-prop${p.enter ? ' se-enter' : ''}${p.drop ? ' se-drop' : ''} ${className}`} src={`${art(p.img)}?v=6`} style={p.style} alt="" aria-hidden="true" />
 )
 
 // Text split into words that rise in one after another (the original reveals these line by line as you scroll).
@@ -433,7 +427,7 @@ export default function SageEnvelope({ invite, viaGate }) {
           <Line id="rs" fallback="We would love to know if you can join us" className="se-footer__date" />
           {/* While editing, the form is shown but cannot be filled in: taps go to the lines around it. */}
           <div className="se-rsvp" inert={!!edit}>
-            <RsvpForm />
+            <RsvpForm sheetUrl={invite?.contact?.sheet || 'https://script.google.com/macros/s/AKfycbz4zMrT7zwX9W2LCML97CCG3QfJj8yravbhXChOMWIs129hx26j0_hTaULTaRvfnm1R/exec'} />
           </div>
         </div>
       </footer>

@@ -17,8 +17,9 @@ const EDIT_ICON = 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z'
 //   guest (a personalised link, ?d=): only replay and share. A guest is not browsing a gallery.
 // It never renders inside the Studio's preview (?embed=1); the caller skips it.
 export default function Pill({ id, params, onReplay }) {
+  const resolvedId = (id === 'sageenvelope' || (id && id.toLowerCase() === 'komalwedsprem')) ? 'KomalWedsPrem' : id
   const guest = !!params.get('d')
-  const i = templates.findIndex((t) => t.id === id)
+  const i = templates.findIndex((t) => t.id === resolvedId)
   const prev = templates[(i + templates.length - 1) % templates.length]
   const next = templates[(i + 1) % templates.length]
   const label = i === -1 ? 'Original invite' : templates[i].name
@@ -26,7 +27,7 @@ export default function Pill({ id, params, onReplay }) {
   // Share the gate version of the link (never ?open=1) and keep the personalised data and guest name.
   const q = new URLSearchParams(params)
   for (const k of ['open', 'embed', 'qa']) q.delete(k)
-  const url = `${pageBase()}#/t/${id}${q.size ? `?${q}` : ''}`
+  const url = `${pageBase()}#/t/${resolvedId}${q.size ? `?${q}` : ''}`
   const canShare = typeof navigator !== 'undefined' && !!navigator.share
 
   useEffect(() => {
@@ -71,7 +72,7 @@ export default function Pill({ id, params, onReplay }) {
         </a>
       ))}
       {!guest && i !== -1 && templates[i].editable && (
-        <a className="pill__edit" href={`#/studio/${id}`} aria-label="Customize this design">
+        <a className="pill__edit" href={`#/studio/${resolvedId}`} aria-label="Customize this design">
           <Icon d={EDIT_ICON} />
           <span className="pill__edit-text">Customize</span>
         </a>

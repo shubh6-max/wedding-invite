@@ -11,7 +11,7 @@ export async function saveToSheet(url, { name, attending, guests, note, ...extra
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ name, attending, guests, note, ...extra }),
-      signal: AbortSignal.timeout?.(15000), // a stuck request must not leave the guest on "Sending…"
+      signal: AbortSignal.timeout?.(35000), // 35s allows photo/pdf upload to finish reliably
     })
     const body = await r.json()
     if (body.ok !== true) console.warn('RSVP: the sheet did not save the reply', body)
@@ -24,10 +24,19 @@ export async function saveToSheet(url, { name, attending, guests, note, ...extra
 }
 
 // The message, plain text. `who` is "Meera & Arjun"; `guests` is the number as a string or a number.
-export function replyText({ who, name, attending, guests, note, aadhaarName }) {
+export function replyText({ who, name, attending, guests, note, aadhaarName, aadhaarNames }) {
   const n = String(guests)
   const answer = attending === 'yes' ? `joyfully accepts (${n} guest${n === '1' ? '' : 's'})` : 'regretfully declines'
-  const idLine = aadhaarName ? `Aadhaar: ${aadhaarName}` : ''
+  const names = Array.isArray(aadhaarNames) && aadhaarNames.length > 0
+    ? aadhaarNames
+    : aadhaarName
+    ? [aadhaarName]
+    : []
+  const idLine = names.length > 1
+    ? `Aadhaar (${names.length}): ${names.join(', ')}`
+    : names.length === 1
+    ? `Aadhaar: ${names[0]}`
+    : ''
   return [`RSVP for ${who}'s wedding`, `${String(name).trim()}: ${answer}`, idLine, String(note || '').trim()].filter(Boolean).join('\n')
 }
 

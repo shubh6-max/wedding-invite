@@ -6,11 +6,11 @@ import { replyLinks, replyText, saveToSheet } from '../lib/rsvp.js'
 // `.rsvp`, `.rsvp input/select/textarea/button`, `.rsvp__error`, `.rsvp__done` under its own scope.
 // When the couple connected a Google Sheet (invite.contact.sheet) the reply is saved there; otherwise, or when
 // saving fails, the form prepares the reply and the guest sends it (WhatsApp, email or copy); see lib/rsvp.js.
-export default function RsvpForm({ onSubmit, labels = {} }) {
+export default function RsvpForm({ onSubmit, labels = {}, sheetUrl }) {
   const invite = useInvite()
-  const sheet = invite?.contact?.sheet
+  const sheet = sheetUrl || invite?.contact?.sheet || import.meta.env.VITE_RSVP_SHEET_URL
   const [state, setState] = useState(() => ({ name: guestName(), attending: 'yes', guests: '1', note: '' }))
-  const [aadhaarFile, setAadhaarFile] = useState(null)
+  const [aadhaarFiles, setAadhaarFiles] = useState([])
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
   const [sending, setSending] = useState(false)
@@ -18,32 +18,96 @@ export default function RsvpForm({ onSubmit, labels = {} }) {
   const [copy, setCopy] = useState('') // '' | 'copied' | 'failed'
   const set = (k) => (e) => setState((s) => ({ ...s, [k]: e.target.value }))
 
-  const handleAadhaar = (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    if (file.size > 10 * 1024 * 1024) {
-      setError('File size must be less than 10 MB.')
+  const processFile = (file) =>
+    new Promise((resolve, reject) => {
+      if (file.size > 10 * 1024 * 1024) {
+        return reject(new Error(`"${file.name}" exceeds the 10 MB size limit.`))
+      }
+      if (file.type.startsWith('image/')) {
+        const img = new Image()
+        const objectUrl = URL.createObjectURL(file)
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl)
+          let { width, height } = img
+          const maxDim = 1600
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width)
+              width = maxDim
+            } else {
+              width = Math.round((width * maxDim) / height)
+              height = maxDim
+            }
+          }
+          const canvas = document.createElement('canvas')
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')
+          ctx.drawImage(img, 0, 0, width, height)
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.85)
+          resolve({
+            id: `${file.name}-${file.lastModified}-${Math.random().toString(36).slice(2, 7)}`,
+            name: file.name.replace(/\.[^.]+$/, '') + '.jpg',
+            type: 'image/jpeg',
+            size: Math.round((dataUrl.length * 3) / 4),
+            data: dataUrl,
+          })
+        }
+        img.onerror = () => {
+          URL.revokeObjectURL(objectUrl)
+          const reader = new FileReader()
+          reader.onload = () => {
+            resolve({
+              id: `${file.name}-${file.lastModified}-${Math.random().toString(36).slice(2, 7)}`,
+              name: file.name,
+              type: file.type || 'image/jpeg',
+              size: file.size,
+              data: reader.result,
+            })
+          }
+          reader.onerror = () => reject(new Error(`Failed to read "${file.name}".`))
+          reader.readAsDataURL(file)
+        }
+        img.src = objectUrl
+      } else {
+        const reader = new FileReader()
+        reader.onload = () => {
+          resolve({
+            id: `${file.name}-${file.lastModified}-${Math.random().toString(36).slice(2, 7)}`,
+            name: file.name,
+            type: file.type || 'application/pdf',
+            size: file.size,
+            data: reader.result,
+          })
+        }
+        reader.onerror = () => reject(new Error(`Failed to read "${file.name}".`))
+        reader.readAsDataURL(file)
+      }
+    })
+
+  const handleAadhaar = async (e) => {
+    const inputFiles = Array.from(e.target.files || [])
+    if (!inputFiles.length) return
+    if (aadhaarFiles.length + inputFiles.length > 10) {
+      setError('You can upload up to 10 Aadhaar cards.')
+      e.target.value = ''
       return
     }
     setError('')
-    const reader = new FileReader()
-    reader.onload = () => {
-      setAadhaarFile({
-        name: file.name,
-        type: file.type,
-        size: file.size,
-        data: reader.result,
-      })
+    try {
+      const processed = await Promise.all(inputFiles.map(processFile))
+      setAadhaarFiles((prev) => [...prev, ...processed])
+    } catch (err) {
+      setError(err.message || 'Error processing files. Please try again.')
+    } finally {
+      e.target.value = ''
     }
-    reader.readAsDataURL(file)
   }
 
-  const removeAadhaar = (e) => {
+  const removeAadhaar = (idxToRemove) => (e) => {
     e.preventDefault()
     e.stopPropagation()
-    setAadhaarFile(null)
-    const el = document.getElementById('rsvp-aadhaar-input')
-    if (el) el.value = ''
+    setAadhaarFiles((prev) => prev.filter((_, idx) => idx !== idxToRemove))
   }
 
   const submit = async (e) => {
@@ -51,13 +115,21 @@ export default function RsvpForm({ onSubmit, labels = {} }) {
     if (sending) return
     if (!state.name.trim()) return setError('Please enter your name.')
     setError('')
+    const aadhaarNames = aadhaarFiles.map((f) => f.name)
     const payload = {
       ...state,
       folderId: '1_1prC0CH5nrkCSbcmGC1Fn0enxgphuCP',
-      ...(aadhaarFile && {
-        aadhaarName: aadhaarFile.name,
-        aadhaarType: aadhaarFile.type,
-        aadhaarData: aadhaarFile.data,
+      ...(aadhaarFiles.length > 0 && {
+        aadhaarName: aadhaarNames.join(', '),
+        aadhaarNames,
+        aadhaarType: aadhaarFiles[0].type,
+        aadhaarData: aadhaarFiles[0].data,
+        aadhaarFiles: aadhaarFiles.map((f) => ({
+          name: f.name,
+          type: f.type,
+          size: f.size,
+          data: f.data,
+        })),
       }),
     }
     try {
@@ -67,10 +139,17 @@ export default function RsvpForm({ onSubmit, labels = {} }) {
     }
     if (sheet) {
       setSending(true)
-      setSaved(await saveToSheet(sheet, payload))
+      const ok = await saveToSheet(sheet, payload)
       setSending(false)
+      if (ok) {
+        setSaved(true)
+        setDone(true)
+      } else {
+        setError('Could not connect to Google Sheet. Please check the Web App link and Drive permissions.')
+      }
+    } else {
+      setDone(true)
     }
-    setDone(true)
   }
 
   if (done && saved) {
@@ -93,7 +172,8 @@ export default function RsvpForm({ onSubmit, labels = {} }) {
     // says so plainly and offers three ways to do it (WhatsApp, email if the couple gave one, copy).
     const who = invite ? `${invite.couple.a} & ${invite.couple.b}` : 'the couple'
     const name = state.name.trim()
-    const text = replyText({ who, ...state, aadhaarName: aadhaarFile?.name })
+    const aadhaarNames = aadhaarFiles.map((f) => f.name)
+    const text = replyText({ who, ...state, aadhaarNames })
     const { wa, mail } = replyLinks({ number: invite?.contact?.whatsapp, email: invite?.contact?.email, who, text })
     const copyReply = async () => {
       try {
@@ -117,9 +197,9 @@ export default function RsvpForm({ onSubmit, labels = {} }) {
           {mail && <a href={mail}>Send by email</a>}
           <button type="button" onClick={copyReply}>Copy reply</button>
         </p>
-        {aadhaarFile && (
+        {aadhaarFiles.length > 0 && (
           <p className="rsvp__hint" style={{ marginTop: '8px' }}>
-            📎 Please attach your Aadhaar ({aadhaarFile.name}) when WhatsApp opens.
+            📎 Please attach your Aadhaar {aadhaarFiles.length > 1 ? `cards (${aadhaarNames.join(', ')})` : `(${aadhaarNames[0]})`} when WhatsApp opens.
           </p>
         )}
         <p className="rsvp__hint">
@@ -148,23 +228,24 @@ export default function RsvpForm({ onSubmit, labels = {} }) {
           <label>
             <span>{labels.guests || 'Guests'}</span>
             <select value={state.guests} onChange={set('guests')}>
-              {[1, 2, 3, 4, 5].map((n) => (
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
                 <option key={n} value={n}>{n}</option>
               ))}
             </select>
           </label>
           <div className="rsvp__file-field">
-            <span className="rsvp__file-label">{labels.aadhaar || 'Upload Aadhaar Card (Photo or PDF)'}</span>
-            <div className="rsvp__file-box">
-              <input
-                type="file"
-                id="rsvp-aadhaar-input"
-                className="rsvp__file-input"
-                accept="image/*,application/pdf"
-                onChange={handleAadhaar}
-                aria-label="Upload Aadhaar Card"
-              />
-              {!aadhaarFile ? (
+            <span className="rsvp__file-label">{labels.aadhaar || 'Upload Aadhaar Card(s) (Photo or PDF)'}</span>
+            {aadhaarFiles.length < 10 && (
+              <div className="rsvp__file-box">
+                <input
+                  type="file"
+                  id="rsvp-aadhaar-input"
+                  className="rsvp__file-input"
+                  accept="image/*,application/pdf"
+                  multiple
+                  onChange={handleAadhaar}
+                  aria-label="Upload Aadhaar Card"
+                />
                 <div className="rsvp__file-cta" aria-hidden="true">
                   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="4" width="18" height="16" rx="2" />
@@ -173,19 +254,24 @@ export default function RsvpForm({ onSubmit, labels = {} }) {
                     <line x1="15" y1="12" x2="17" y2="12" />
                     <line x1="7" y1="16" x2="17" y2="16" />
                   </svg>
-                  <span>Choose Aadhaar Card</span>
+                  <span>{aadhaarFiles.length > 0 ? `+ Add another Aadhaar (${aadhaarFiles.length}/10)` : 'Choose Aadhaar Card(s)'}</span>
                 </div>
-              ) : (
-                <div className="rsvp__file-preview">
-                  <div className="rsvp__file-info">
-                    <span className="rsvp__file-icon" aria-hidden="true">{aadhaarFile.type?.includes('pdf') ? '📄' : '🪪'}</span>
-                    <span className="rsvp__file-name" title={aadhaarFile.name}>{aadhaarFile.name}</span>
-                    <span className="rsvp__file-size">({(aadhaarFile.size / (1024 * 1024)).toFixed(1)} MB)</span>
+              </div>
+            )}
+            {aadhaarFiles.length > 0 && (
+              <div className="rsvp__files-list">
+                {aadhaarFiles.map((file, idx) => (
+                  <div key={file.id || idx} className="rsvp__file-item">
+                    <div className="rsvp__file-info">
+                      <span className="rsvp__file-icon" aria-hidden="true">{file.type?.includes('pdf') ? '📄' : '🪪'}</span>
+                      <span className="rsvp__file-name" title={file.name}>{file.name}</span>
+                      <span className="rsvp__file-size">({(file.size / (1024 * 1024)).toFixed(1)} MB)</span>
+                    </div>
+                    <button type="button" className="rsvp__file-remove" onClick={removeAadhaar(idx)} aria-label={`Remove ${file.name}`}>✕</button>
                   </div>
-                  <button type="button" className="rsvp__file-remove" onClick={removeAadhaar} aria-label="Remove uploaded file">✕</button>
-                </div>
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </>
       )}
